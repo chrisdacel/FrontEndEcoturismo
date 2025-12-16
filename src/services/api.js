@@ -379,6 +379,13 @@ export async function createPlace(placeData, coverImage, climateImage, featuresI
     
     return data;
   } catch (error) {
+    const errors = error.response?.data?.errors;
+    if (errors && typeof errors === 'object') {
+      const firstKey = Object.keys(errors)[0];
+      if (firstKey && Array.isArray(errors[firstKey]) && errors[firstKey][0]) {
+        throw new Error(errors[firstKey][0]);
+      }
+    }
     throw error.response?.data || { message: 'Error creando sitio' };
   }
 }
@@ -409,6 +416,8 @@ export async function updatePlace(id, placeData, coverImage = null, climateImage
     formData.append('flora', placeData.flora);
     formData.append('infraestructura', placeData.infraestructura);
     formData.append('recomendacion', placeData.recomendacion);
+    // Sobrescribir método para compatibilidad con subida de archivos en Laravel
+    formData.append('_method', 'PUT');
     
     // Imágenes (solo si se proporcionan)
     if (coverImage) formData.append('portada', coverImage);
@@ -416,13 +425,20 @@ export async function updatePlace(id, placeData, coverImage = null, climateImage
     if (featuresImage) formData.append('caracteristicas_img', featuresImage);
     if (floraImage) formData.append('flora_img', floraImage);
     if (infrastructureImage) formData.append('infraestructura_img', infrastructureImage);
-    
-    const { data } = await api.put(`/api/places/${id}`, formData, {
+    // Usar POST con _method=PUT para asegurar parsing correcto del multipart
+    const { data } = await api.post(`/api/places/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     
     return data;
   } catch (error) {
+    const errors = error.response?.data?.errors;
+    if (errors && typeof errors === 'object') {
+      const firstKey = Object.keys(errors)[0];
+      if (firstKey && Array.isArray(errors[firstKey]) && errors[firstKey][0]) {
+        throw new Error(errors[firstKey][0]);
+      }
+    }
     throw error.response?.data || { message: 'Error actualizando sitio' };
   }
 }
@@ -456,6 +472,15 @@ export async function createReview(placeId, rating, comment) {
     return data;
   } catch (error) {
     throw error.response?.data || { message: 'Error creando reseña' };
+  }
+}
+
+export async function updateReview(reviewId, rating, comment) {
+  try {
+    const { data } = await api.put(`/api/reviews/${reviewId}`, { rating, comment });
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error actualizando reseña' };
   }
 }
 

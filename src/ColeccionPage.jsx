@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { getAllPlaces } from './services/placesApi';
+import { api } from './services/api';
 
 export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavigatePrivacidad, onNavigateSobreNosotros }) {
   const navigate = useNavigate();
@@ -12,20 +13,32 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const [carouselIndex, setCarouselIndex] = useState([0, 0, 0]);
   const [sitiosAPI, setSitiosAPI] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState('');
 
   // Cargar sitios desde la API
   useEffect(() => {
     loadSites();
   }, []);
 
-  const loadSites = async () => {
+  const loadSites = async (query = '') => {
     try {
-      const data = await getAllPlaces();
+      const data = await getAllPlaces(query);
       setSitiosAPI(data);
     } catch (error) {
       console.error('Error cargando sitios:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    setLoading(true);
+    await loadSites(searchText);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   };
 
@@ -77,7 +90,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     {
       id: 3,
       nombre: 'Paisajes Naturales',
-      imagen: '/images/Pagina_inicio/photo-1532185922611-3410b1898a1c.jpg',
+      imagen: '/images/sitios/Departamento-Risaralda-de-Colombia-10.jpg',
     },
     {
       id: 4,
@@ -163,18 +176,20 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
               <div className="flex w-full max-w-md items-center gap-2">
                 <input
                   type="text"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   placeholder="Buscar destinos..."
                   className="w-full rounded-lg border border-emerald-200 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-300"
                 />
-                <button className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 transition">Buscar</button>
+                <button onClick={handleSearch} className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 transition">Buscar</button>
               </div>
             </div>
           </div>
         </section>
 
         {/* Sección 2: Sitios Creados desde la API */}
-        {sitiosAPI.length > 0 && (
-          <section className="w-full bg-white py-16 px-0 md:px-0">
+        <section className="w-full bg-white py-16 px-0 md:px-0">
             <div className="px-6 md:px-12 mb-8 flex items-center justify-between">
               <h2 className="text-3xl font-bold">Sitios Ecoturísticos</h2>
               {(user?.role === 'admin' || user?.role === 'operator') && (
@@ -191,13 +206,25 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
               <div className="flex justify-center py-12">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-400/30 border-t-emerald-400"></div>
               </div>
+            ) : sitiosAPI.length === 0 ? (
+              searchText.trim() !== '' ? (
+                <div className="px-6 md:px-12 py-12 text-center text-slate-600">No se encontraron sitios para "{searchText}"</div>
+              ) : null
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 md:px-12">
                 {sitiosAPI.map((sitio) => (
                   <article
                     key={sitio.id}
-                    className="group cursor-pointer rounded-lg border border-emerald-100 bg-white shadow-sm shadow-emerald-100/50 overflow-hidden hover:shadow-lg transition"
-                    onClick={() => navigate(user?.role === 'admin' ? `/admin/sitio/${sitio.id}` : `/sitio/${sitio.id}`)}
+                    className="group cursor-pointer rounded-lg border border-emerald-100 bg-white shadow-sm shadow-emerald-100/50 overflow-hidden hover:shadow-lg transition relative"
+                    onClick={() => {
+                      if (user?.role === 'admin') {
+                        navigate(`/admin/sitio/${sitio.id}`);
+                      } else if (user && user.role !== 'operator') {
+                        navigate(`/turista/sitio/${sitio.id}`);
+                      } else {
+                        navigate(`/sitio/${sitio.id}`);
+                      }
+                    }}
                   >
                     <div className="h-48 w-full overflow-hidden">
                       <img
@@ -216,10 +243,10 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
               </div>
             )}
           </section>
-        )}
+        
 
         {/* Botón de Crear Sitio si no hay sitios */}
-        {sitiosAPI.length === 0 && !loading && (user?.role === 'admin' || user?.role === 'operator') && (
+        {sitiosAPI.length === 0 && !loading && searchText.trim() === '' && (user?.role === 'admin' || user?.role === 'operator') && (
           <section className="w-full bg-white py-16 px-6 md:px-12">
             <div className="max-w-2xl mx-auto text-center space-y-4">
               <h2 className="text-3xl font-bold text-slate-900">Aún no hay sitios creados</h2>

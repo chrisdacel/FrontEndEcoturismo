@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllUsers, deleteUser } from './services/adminApi';
+import { getAllUsers, deleteUser, updateUser } from './services/adminApi';
 
 export default function AdminUsersPage() {
   const navigate = useNavigate();
@@ -10,6 +10,7 @@ export default function AdminUsersPage() {
   const [filterRole, setFilterRole] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [busyId, setBusyId] = useState(null);
+  const [roleChanges, setRoleChanges] = useState({});
 
   useEffect(() => {
     loadUsers();
@@ -44,6 +45,24 @@ export default function AdminUsersPage() {
       setUsers((prev) => prev.filter((u) => u.id !== id));
     } catch (err) {
       alert(err.message || 'No se pudo eliminar');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleRoleChange = (id, role) => {
+    setRoleChanges((prev) => ({ ...prev, [id]: role }));
+  };
+
+  const saveRole = async (id) => {
+    const newRole = roleChanges[id];
+    if (!newRole) return;
+    try {
+      setBusyId(id);
+      const { user } = await updateUser(id, { role: newRole });
+      setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role: user?.role || newRole } : u)));
+    } catch (err) {
+      alert(err.message || 'No se pudo actualizar el rol');
     } finally {
       setBusyId(null);
     }
@@ -156,9 +175,27 @@ export default function AdminUsersPage() {
                   <td className="px-4 py-3 text-sm text-slate-900">{u.name} {u.last_name || ''}</td>
                   <td className="px-4 py-3 text-sm text-slate-600">{u.email}</td>
                   <td className="px-4 py-3 text-sm">
-                    <span className="inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs capitalize text-slate-700 ring-1 ring-slate-300">
-                      {u.role || 'user'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs capitalize text-slate-700 ring-1 ring-slate-300">
+                        {u.role || 'user'}
+                      </span>
+                      <select
+                        value={roleChanges[u.id] ?? u.role ?? 'user'}
+                        onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                        className="rounded-full bg-white px-2 py-1 text-xs text-slate-900 ring-1 ring-slate-300 focus:ring-2 focus:ring-emerald-400 outline-none"
+                      >
+                        <option value="user">User</option>
+                        <option value="operator">Operator</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                      <button
+                        onClick={() => saveRole(u.id)}
+                        disabled={busyId === u.id || (roleChanges[u.id] ?? u.role) === u.role}
+                        className="inline-flex items-center rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-emerald-600 disabled:opacity-50"
+                      >
+                        Guardar
+                      </button>
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span className="inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs capitalize text-slate-700 ring-1 ring-slate-300">

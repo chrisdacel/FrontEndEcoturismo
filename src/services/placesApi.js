@@ -10,14 +10,32 @@ export async function createPlace(formData) {
     });
     return data;
   } catch (error) {
-    const message = error.response?.data?.message || error.message || 'Error creando sitio';
+    console.error('Error response:', error.response?.data);
+    
+    let message = error.response?.data?.message || error.message || 'Error creando sitio';
+    const errors = error.response?.data?.errors;
+    
+    if (errors && typeof errors === 'object') {
+      // Combinar todos los errores de validación
+      const allErrors = [];
+      Object.keys(errors).forEach(field => {
+        if (Array.isArray(errors[field])) {
+          allErrors.push(...errors[field]);
+        }
+      });
+      if (allErrors.length > 0) {
+        message = allErrors.join(' | ');
+      }
+    }
+    
     throw new Error(message);
   }
 }
 
-export async function getAllPlaces() {
+export async function getAllPlaces(search) {
   try {
-    const { data } = await api.get('/api/places');
+    const config = search && search.trim() !== '' ? { params: { search: search.trim() } } : undefined;
+    const { data } = await api.get('/api/places', config);
     return data;
   } catch (error) {
     const message = error.response?.data?.message || error.message || 'Error obteniendo sitios';

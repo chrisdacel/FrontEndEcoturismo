@@ -127,3 +127,13 @@ export async function deletePlace(id) {
     throw error.response?.data || { message: 'Error eliminando sitio' };
   }
 }
+
+// ============ REVIEWS MANAGEMENT ============
+export async function getAdminReviews() {
+  try {
+    const { data } = await api.get('/api/admin/reviews');
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo reseñas' };
+  }
+}

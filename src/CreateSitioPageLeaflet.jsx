@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createPlace } from './services/placesApi';
+import { useNavigate, useParams } from 'react-router-dom';
+import { createPlace, getPlaceById } from './services/placesApi';
+import { updatePlace } from './services/api';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -18,6 +19,7 @@ L.Icon.Default.mergeOptions({
 
 export default function CreateSitioPageLeaflet() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const mapContainerRef = useRef(null);
@@ -25,6 +27,7 @@ export default function CreateSitioPageLeaflet() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const isEdit = Boolean(id);
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -55,6 +58,46 @@ export default function CreateSitioPageLeaflet() {
     flora_img: null,
     infraestructura_img: null,
   });
+
+  // Load existing place data in edit mode
+  useEffect(() => {
+    async function loadExisting() {
+      if (!isEdit) return;
+      try {
+        const data = await getPlaceById(id);
+        const p = data.place || data; // support both shapes
+        setFormData({
+          nombre: p.name || '',
+          slogan: p.slogan || '',
+          descripcion: p.description || '',
+          localizacion: p.localization || '',
+          lat: p.lat ? String(p.lat) : '',
+          lng: p.lng ? String(p.lng) : '',
+          clima: p.Weather || '',
+          caracteristicas: p.features || '',
+          flora: p.flora || '',
+          infraestructura: p.estructure || '',
+          recomendacion: p.tips || '',
+        });
+        // Existing image previews (constructed from storage paths)
+        const base = 'http://localhost:8000/storage/';
+        setImagePreviews({
+          portada: p.cover ? base + p.cover : null,
+          clima_img: p.Weather_img ? base + p.Weather_img : null,
+          caracteristicas_img: p.features_img ? base + p.features_img : null,
+          flora_img: p.flora_img ? base + p.flora_img : null,
+          infraestructura_img: p.estructure_img ? base + p.estructure_img : null,
+        });
+        if (mapRef.current && markerRef.current && p.lat && p.lng) {
+          markerRef.current.setLatLng([parseFloat(p.lat), parseFloat(p.lng)]);
+          mapRef.current.setView([parseFloat(p.lat), parseFloat(p.lng)], 13);
+        }
+      } catch (e) {
+        setError(e.message || 'No se pudo cargar el sitio');
+      }
+    }
+    loadExisting();
+  }, [isEdit, id]);
 
   // Inicializar mapa de Leaflet
   useEffect(() => {
@@ -131,37 +174,50 @@ export default function CreateSitioPageLeaflet() {
       return;
     }
 
-    if (!images.portada || !images.clima_img || !images.caracteristicas_img || !images.flora_img || !images.infraestructura_img) {
-      setError('Todas las imágenes son requeridas');
-      return;
+    if (!isEdit) {
+      if (!images.portada || !images.clima_img || !images.caracteristicas_img || !images.flora_img || !images.infraestructura_img) {
+        setError('Todas las imágenes son requeridas');
+        return;
+      }
     }
 
     try {
       setLoading(true);
 
-      // Crear FormData para enviar archivos
-      const formDataToSend = new FormData();
-      
-      // Agregar textos
-      Object.keys(formData).forEach(key => {
-        formDataToSend.append(key, formData[key]);
-      });
-
-      // Agregar imágenes
-      Object.keys(images).forEach(key => {
-        if (images[key]) {
-          formDataToSend.append(key, images[key]);
+      if (isEdit) {
+        await updatePlace(id, { ...formData }, images.portada, images.clima_img, images.caracteristicas_img, images.flora_img, images.infraestructura_img);
+      } else {
+        const formDataToSend = new FormData();
+        Object.keys(formData).forEach(key => {
+          formDataToSend.append(key, formData[key]);
+        });
+        Object.keys(images).forEach(key => {
+          if (images[key]) {
+            formDataToSend.append(key, images[key]);
+          }
+        });
+        
+        // Debug: Mostrar datos que se envían
+        console.log('=== Datos del formulario ===');
+        for (let [key, value] of formDataToSend.entries()) {
+          if (value instanceof File) {
+            console.log(`${key}: [File] ${value.name} (${(value.size / 1024).toFixed(2)} KB)`);
+          } else {
+            console.log(`${key}: ${value}`);
+          }
         }
-      });
-
-      await createPlace(formDataToSend);
+        
+        await createPlace(formDataToSend);
+      }
 
       setSuccess(true);
       setTimeout(() => {
-        navigate('/coleccion');
-      }, 2000);
+        navigate(isEdit ? `/admin/sitio/${id}` : '/coleccion');
+      }, 1500);
     } catch (err) {
+      console.error('Error completo:', err);
       setError(err.message || 'Error creando sitio');
+      window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll hacia arriba para ver el error
     } finally {
       setLoading(false);
     }
@@ -182,9 +238,9 @@ export default function CreateSitioPageLeaflet() {
               </svg>
               Volver
             </button>
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">Crear Sitio Turístico</h1>
+            <h1 className="text-4xl font-bold text-slate-900 mb-2">{isEdit ? 'Editar Sitio Turístico' : 'Crear Sitio Turístico'}</h1>
             <p className="text-slate-600">
-              Completa todos los campos para agregar un nuevo sitio ecoturístico
+              {isEdit ? 'Actualiza la información del sitio' : 'Completa todos los campos para agregar un nuevo sitio ecoturístico'}
             </p>
           </div>
 
@@ -261,17 +317,20 @@ export default function CreateSitioPageLeaflet() {
 
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Imagen de Portada *
+                    Imagen de Portada {isEdit ? '(opcional)' : '*'}
                   </label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => handleImageChange(e, 'portada')}
-                    required
+                    required={!isEdit}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   />
                   {imagePreviews.portada && (
                     <img src={imagePreviews.portada} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                  )}
+                  {isEdit && !imagePreviews.portada && (
+                    <p className="mt-2 text-xs text-slate-500">Se mantendrá la imagen actual si no seleccionas una nueva.</p>
                   )}
                 </div>
               </div>
@@ -338,17 +397,20 @@ export default function CreateSitioPageLeaflet() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Imagen del Clima *
+                    Imagen del Clima {isEdit ? '(opcional)' : '*'}
                   </label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => handleImageChange(e, 'clima_img')}
-                    required
+                    required={!isEdit}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   />
                   {imagePreviews.clima_img && (
                     <img src={imagePreviews.clima_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                  )}
+                  {isEdit && !imagePreviews.clima_img && (
+                    <p className="mt-2 text-xs text-slate-500">Se mantendrá la imagen actual si no seleccionas una nueva.</p>
                   )}
                 </div>
               </div>
@@ -375,17 +437,20 @@ export default function CreateSitioPageLeaflet() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Imagen de Características *
+                    Imagen de Características {isEdit ? '(opcional)' : '*'}
                   </label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => handleImageChange(e, 'caracteristicas_img')}
-                    required
+                    required={!isEdit}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   />
                   {imagePreviews.caracteristicas_img && (
                     <img src={imagePreviews.caracteristicas_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                  )}
+                  {isEdit && !imagePreviews.caracteristicas_img && (
+                    <p className="mt-2 text-xs text-slate-500">Se mantendrá la imagen actual si no seleccionas una nueva.</p>
                   )}
                 </div>
               </div>
@@ -412,17 +477,20 @@ export default function CreateSitioPageLeaflet() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Imagen de Flora/Fauna *
+                    Imagen de Flora/Fauna {isEdit ? '(opcional)' : '*'}
                   </label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => handleImageChange(e, 'flora_img')}
-                    required
+                    required={!isEdit}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   />
                   {imagePreviews.flora_img && (
                     <img src={imagePreviews.flora_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                  )}
+                  {isEdit && !imagePreviews.flora_img && (
+                    <p className="mt-2 text-xs text-slate-500">Se mantendrá la imagen actual si no seleccionas una nueva.</p>
                   )}
                 </div>
               </div>
@@ -449,17 +517,20 @@ export default function CreateSitioPageLeaflet() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Imagen de Infraestructura *
+                    Imagen de Infraestructura {isEdit ? '(opcional)' : '*'}
                   </label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => handleImageChange(e, 'infraestructura_img')}
-                    required
+                    required={!isEdit}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   />
                   {imagePreviews.infraestructura_img && (
                     <img src={imagePreviews.infraestructura_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                  )}
+                  {isEdit && !imagePreviews.infraestructura_img && (
+                    <p className="mt-2 text-xs text-slate-500">Se mantendrá la imagen actual si no seleccionas una nueva.</p>
                   )}
                 </div>
               </div>
@@ -501,10 +572,10 @@ export default function CreateSitioPageLeaflet() {
                 {loading ? (
                   <>
                     <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
-                    Creando...
+                    Guardando...
                   </>
                 ) : (
-                  'Crear Sitio'
+                  isEdit ? 'Actualizar Sitio' : 'Crear Sitio'
                 )}
               </button>
             </div>

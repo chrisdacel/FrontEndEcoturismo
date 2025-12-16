@@ -121,6 +121,23 @@ export default function AdminDashboardPage() {
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <button
+              onClick={() => navigate('/admin/sites')}
+              className="group bg-white rounded-lg p-6 hover:ring-emerald-200 transition text-left"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="rounded-full bg-emerald-50 p-3 group-hover:bg-emerald-100 transition">
+                  <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M5 11h14M7 15h10M9 19h6" />
+                  </svg>
+                </div>
+                <svg className="w-5 h-5 text-emerald-500 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">Gestionar Sitios</h3>
+              <p className="text-sm text-slate-600">Ver, editar y eliminar sitios turísticos</p>
+            </button>
+            <button
               onClick={() => navigate('/admin/users')}
               className="group bg-white rounded-lg p-6 hover:ring-emerald-200 transition text-left"
             >
@@ -172,6 +189,24 @@ export default function AdminDashboardPage() {
               </div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">Aprobar Operadores</h3>
               <p className="text-sm text-slate-600">Revisar solicitudes pendientes</p>
+            </button>
+
+            <button
+              onClick={() => navigate('/admin/comentarios')}
+              className="group bg-white rounded-lg p-6 hover:ring-emerald-200 transition text-left"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="rounded-full bg-red-50 p-3 group-hover:bg-red-100 transition">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h10m-9 4h8M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" />
+                  </svg>
+                </div>
+                <svg className="w-5 h-5 text-red-500 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">Gestionar Comentarios</h3>
+              <p className="text-sm text-slate-600">Ver y eliminar reseñas de los sitios</p>
             </button>
           </div>
         </div>

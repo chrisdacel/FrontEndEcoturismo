@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from './context/AuthContext';
-import { login, checkFirstTimePreferences } from './services/api';
+import { login } from './services/api';
 
 function LoginPage({ onNavigateHome, onNavigateRegister, onNavigateForgot, onNavigatePreferences }) {
   const { setUser } = useAuth();
@@ -20,13 +20,7 @@ function LoginPage({ onNavigateHome, onNavigateRegister, onNavigateForgot, onNav
       setEmail('');
       setPassword('');
       
-      // Verificar si es primera vez en preferencias
-      const isFirstTime = await checkFirstTimePreferences();
-      if (isFirstTime) {
-        onNavigatePreferences();
-      } else {
-        onNavigateHome();
-      }
+      onNavigateHome();
     } catch (err) {
       const msg = err?.message || err?.error || 'Credenciales inválidas';
       setError(typeof msg === 'string' ? msg : 'Error en inicio de sesión');

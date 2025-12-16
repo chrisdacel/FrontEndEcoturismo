@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPlaceById } from './services/placesApi';
+import { createReview, updateReview, deleteReview } from './services/api';
+import { useAuth } from './context/AuthContext';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -13,17 +15,35 @@ export default function SitioDetailPage({
 }) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [sitio, setSitio] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(null);
+  const [comment, setComment] = useState('');
+  const [rating, setRating] = useState(5);
+  const [submitting, setSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editComment, setEditComment] = useState('');
+  const [editRating, setEditRating] = useState(5);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
+
+  const calcAverage = (list) => {
+    if (!list || list.length === 0) return null;
+    const sum = list.reduce((acc, item) => acc + (item.rating || 0), 0);
+    return Math.round((sum / list.length) * 10) / 10;
+  };
 
   useEffect(() => {
     const load = async () => {
       try {
         const data = await getPlaceById(id);
         setSitio(data.place || data);
+        setReviews(data.reviews || []);
+        const avgFromApi = data.average_rating ?? null;
+        setAverageRating(avgFromApi !== null ? Number(avgFromApi) : calcAverage(data.reviews || []));
       } catch (err) {
         setError(err.message || 'Error cargando el sitio');
       } finally {
@@ -60,6 +80,72 @@ export default function SitioDetailPage({
   }, [sitio]);
 
   const storageUrl = (path) => (path ? `http://localhost:8000/storage/${path}` : '');
+
+  const handleCreateReview = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await createReview(id, rating, comment);
+      const newReview = res.review || res;
+      setReviews((prev) => {
+        const updated = [newReview, ...prev];
+        setAverageRating(calcAverage(updated));
+        return updated;
+      });
+      setComment('');
+      setRating(5);
+    } catch (err) {
+      setError(err.message || 'Error enviando reseña');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const startEdit = (review) => {
+    setEditingId(review.id);
+    setEditComment(review.comment);
+    setEditRating(review.rating);
+  };
+
+  const handleUpdateReview = async (reviewId) => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await updateReview(reviewId, editRating, editComment);
+      const updated = res.review || res;
+      setReviews((prev) => {
+        const next = prev.map((r) => (r.id === reviewId ? updated : r));
+        setAverageRating(calcAverage(next));
+        return next;
+      });
+      setEditingId(null);
+      setEditComment('');
+      setEditRating(5);
+    } catch (err) {
+      setError(err.message || 'Error actualizando reseña');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!confirm('¿Eliminar este comentario?')) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await deleteReview(reviewId);
+      setReviews((prev) => {
+        const next = prev.filter((r) => r.id !== reviewId);
+        setAverageRating(calcAverage(next));
+        return next;
+      });
+    } catch (err) {
+      setError(err.message || 'Error eliminando reseña');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -243,6 +329,145 @@ export default function SitioDetailPage({
             <p className="text-slate-600 leading-relaxed">
               {sitio.tips}
             </p>
+          </div>
+        </section>
+
+        {/* Comentarios Section */}
+        <section className="py-16 px-6 bg-emerald-50/40">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-3xl font-semibold text-emerald-700">Comentarios</h2>
+              <span className="text-sm text-slate-600">{reviews.length} comentario(s)</span>
+            </div>
+
+            <div className="mb-6 flex items-center gap-3 rounded-lg border border-emerald-100 bg-white px-4 py-3 shadow-sm">
+              <div className="text-3xl font-bold text-emerald-700">
+                {averageRating !== null ? averageRating.toFixed(1) : '—'}
+              </div>
+              <div className="text-sm text-slate-600">
+                {averageRating !== null ? `Promedio de calificación basado en ${reviews.length} reseña(s)` : 'Sin calificaciones aún'}
+              </div>
+            </div>
+
+            {error && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+            )}
+
+            {user && ['user','operator','admin'].includes(user.role) ? (
+              <form onSubmit={handleCreateReview} className="mb-8 space-y-3 bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
+                <div className="flex gap-4 items-center">
+                  <label className="text-sm font-semibold text-slate-700">Calificación</label>
+                  <select
+                    value={rating}
+                    onChange={(e) => setRating(Number(e.target.value))}
+                    className="rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
+                  >
+                    {[5,4,3,2,1].map((r) => (
+                      <option key={r} value={r}>{r} / 5</option>
+                    ))}
+                  </select>
+                </div>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  required
+                  minLength={10}
+                  maxLength={1000}
+                  placeholder="Comparte tu experiencia..."
+                  className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
+                  rows={3}
+                />
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2 text-white font-semibold hover:bg-emerald-700 disabled:opacity-60"
+                  >
+                    {submitting ? 'Enviando...' : 'Publicar comentario'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <p className="mb-8 text-sm text-slate-600">Inicia sesión para comentar.</p>
+            )}
+
+            <div className="space-y-4">
+              {reviews.map((rev) => {
+                const isOwner = user && rev.user && user.id === rev.user.id;
+                return (
+                  <div key={rev.id} className="bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">{rev.user?.name || 'Usuario'}</p>
+                        <p className="text-xs text-slate-500">{rev.created_at ? new Date(rev.created_at).toLocaleString() : ''}</p>
+                        {editingId === rev.id ? (
+                          <div className="mt-3 space-y-2">
+                            <div className="flex gap-2 items-center">
+                              <label className="text-xs font-semibold text-slate-700">Calificación</label>
+                              <select
+                                value={editRating}
+                                onChange={(e) => setEditRating(Number(e.target.value))}
+                                className="rounded-lg border border-emerald-200 px-2 py-1 text-sm"
+                              >
+                                {[5,4,3,2,1].map((r) => (
+                                  <option key={r} value={r}>{r}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <textarea
+                              value={editComment}
+                              onChange={(e) => setEditComment(e.target.value)}
+                              className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-sm"
+                              rows={3}
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleUpdateReview(rev.id)}
+                                disabled={submitting}
+                                className="rounded-full bg-emerald-600 px-4 py-2 text-white text-sm hover:bg-emerald-700 disabled:opacity-60"
+                              >
+                                Guardar
+                              </button>
+                              <button
+                                onClick={() => setEditingId(null)}
+                                className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700"
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="mt-3 text-slate-700 leading-relaxed">{rev.comment}</p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-semibold text-emerald-700">{rev.rating} / 5</div>
+                        {isOwner && (
+                          <div className="mt-2 flex gap-2 justify-end">
+                            <button
+                              className="text-xs rounded-full border border-emerald-200 px-3 py-1 text-emerald-700 hover:bg-emerald-50"
+                              onClick={() => startEdit(rev)}
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="text-xs rounded-full bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                              onClick={() => handleDeleteReview(rev.id)}
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {reviews.length === 0 && (
+                <div className="text-sm text-slate-600">Sé el primero en comentar este sitio.</div>
+              )}
+            </div>
           </div>
         </section>
       </main>

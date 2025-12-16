@@ -16,15 +16,16 @@ import ColeccionPage from './ColeccionPage';
 import QueOfrecemosPage from './QueOfrecemosPage';
 import PrivacidadPage from './PrivacidadPage';
 import SobreNosotrosPage from './SobreNosotrosPage';
-import PreferencesPage from './PreferencesPage';
-import FavoritosPage from './FavoritosPage';
 import AdminDashboardPage from './AdminDashboardPage';
 import AdminCreateOperatorPage from './AdminCreateOperatorPage';
 import AdminUsersPage from './AdminUsersPage';
 import AdminOperatorsPage from './AdminOperatorsPage';
 import AdminProfilePage from './AdminProfilePage';
+import AdminSitesPage from './AdminSitesPage';
+import AdminCommentsPage from './AdminCommentsPage';
 import ProfilePageOperador from './ProfilePageOperador';
 import ProfilePageTurista from './ProfilePageTurista';
+import OperatorSitesPage from './OperatorSitesPage';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -43,6 +44,8 @@ function AppRoutes() {
         element={
           user?.role === 'admin' ? (
             <Navigate to="/admin/dashboard" replace />
+          ) : user?.role && user?.role !== 'operator' ? (
+            <Navigate to="/turista/home" replace />
           ) : (
             <HomePage
               onNavigateLogin={() => navigate('/login')}
@@ -62,7 +65,6 @@ function AppRoutes() {
             onNavigateHome={() => navigate('/')}
             onNavigateRegister={() => navigate('/register')}
             onNavigateForgot={() => navigate('/forgot-password')}
-            onNavigatePreferences={() => navigate('/preferencias')}
           />
         }
       />
@@ -103,30 +105,8 @@ function AppRoutes() {
         path="/email-verified"
         element={<EmailVerifiedPage onNavigateHome={() => navigate('/')} onNavigateLogin={() => navigate('/login')} />}
       />
-      <Route
-        path="/preferencias"
-        element={
-          user?.role === 'admin' ? (
-            <Navigate to="/admin/dashboard" replace />
-          ) : (
-            <ProtectedRoute>
-              <PreferencesPage onNavigateHome={() => navigate('/')} onNavigateLogin={() => navigate('/login')} />
-            </ProtectedRoute>
-          )
-        }
-      />
-      <Route
-        path="/favoritos"
-        element={
-          user?.role === 'admin' ? (
-            <Navigate to="/admin/dashboard" replace />
-          ) : (
-            <ProtectedRoute>
-              <FavoritosPage />
-            </ProtectedRoute>
-          )
-        }
-      />
+      {/** Preferencias feature removed **/}
+      {/** Favoritos deshabilitado temporalmente en cliente **/}
       <Route
         path="/admin/dashboard"
         element={
@@ -156,6 +136,22 @@ function AppRoutes() {
         element={
           <AdminRoute>
             <AdminOperatorsPage />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/sites"
+        element={
+          <AdminRoute>
+            <AdminSitesPage />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/comentarios"
+        element={
+          <AdminRoute>
+            <AdminCommentsPage />
           </AdminRoute>
         }
       />
@@ -194,16 +190,12 @@ function AppRoutes() {
       <Route
         path="/coleccion"
         element={
-          user?.role === 'admin' ? (
-            <Navigate to="/admin/coleccion" replace />
-          ) : (
-            <ColeccionPage
-              onNavigateHome={() => navigate('/')}
-              onNavigateLogin={() => navigate('/login')}
-              onNavigatePrivacidad={() => navigate('/privacidad')}
-              onNavigateSobreNosotros={() => navigate('/sobre-nosotros')}
-            />
-          )
+          <ColeccionPage
+            onNavigateHome={() => navigate(user?.role === 'admin' ? '/admin/home' : '/')}
+            onNavigateLogin={() => navigate('/login')}
+            onNavigatePrivacidad={() => navigate(user?.role === 'admin' ? '/admin/privacidad' : '/privacidad')}
+            onNavigateSobreNosotros={() => navigate(user?.role === 'admin' ? '/admin/sobre-nosotros' : '/sobre-nosotros')}
+          />
         }
       />
       <Route
@@ -261,6 +253,73 @@ function AppRoutes() {
               onNavigatePrivacidad={() => navigate('/privacidad')}
             />
           )
+        }
+      />
+
+      {/* Rutas turista (usuarios logueados no admin ni operator) */}
+      <Route
+        path="/turista/home"
+        element={
+          <HomePage
+            onNavigateLogin={() => navigate('/login')}
+            onNavigateRegister={() => navigate('/register')}
+            onNavigateColeccion={() => navigate('/turista/coleccion')}
+            onNavigateOferta={() => navigate('/turista/que-ofrecemos')}
+            onNavigatePrivacidad={() => navigate('/turista/privacidad')}
+            onNavigateSobreNosotros={() => navigate('/turista/sobre-nosotros')}
+          />
+        }
+      />
+      <Route
+        path="/turista/coleccion"
+        element={
+          <ColeccionPage
+            onNavigateHome={() => navigate('/turista/home')}
+            onNavigateLogin={() => navigate('/login')}
+            onNavigatePrivacidad={() => navigate('/turista/privacidad')}
+            onNavigateSobreNosotros={() => navigate('/turista/sobre-nosotros')}
+          />
+        }
+      />
+      <Route
+        path="/turista/que-ofrecemos"
+        element={
+          <QueOfrecemosPage
+            onNavigateRegister={() => navigate('/register')}
+          />
+        }
+      />
+      <Route
+        path="/turista/privacidad"
+        element={
+          <PrivacidadPage
+            onNavigateHome={() => navigate('/turista/home')}
+            onNavigateLogin={() => navigate('/login')}
+            onNavigateRegister={() => navigate('/register')}
+          />
+        }
+      />
+      <Route
+        path="/turista/sobre-nosotros"
+        element={
+          <SobreNosotrosPage
+            onNavigateHome={() => navigate('/turista/home')}
+            onNavigateLogin={() => navigate('/login')}
+            onNavigateRegister={() => navigate('/register')}
+            onNavigatePrivacidad={() => navigate('/turista/privacidad')}
+          />
+        }
+      />
+      <Route
+        path="/turista/sitio/:id"
+        element={
+          <SitioDetailPage
+            onNavigateHome={() => navigate('/turista/home')}
+            onNavigateLogin={() => navigate('/login')}
+            onNavigateRegister={() => navigate('/register')}
+            onNavigateSobreNosotros={() => navigate('/turista/sobre-nosotros')}
+            onNavigatePrivacidad={() => navigate('/turista/privacidad')}
+          />
         }
       />
 
@@ -354,6 +413,109 @@ function AppRoutes() {
               onNavigatePrivacidad={() => navigate('/admin/privacidad')}
             />
           </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/sitio/:id/editar"
+        element={
+          <AdminRoute>
+            <CreateSitioPage />
+          </AdminRoute>
+        }
+      />
+
+      {/* Rutas operador (usuarios con rol operator) */}
+      <Route
+        path="/operador/home"
+        element={
+          <AdminOperatorRoute>
+            <HomePage
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigateColeccion={() => navigate('/operador/coleccion')}
+              onNavigateOferta={() => navigate('/operador/que-ofrecemos')}
+              onNavigatePrivacidad={() => navigate('/operador/privacidad')}
+              onNavigateSobreNosotros={() => navigate('/operador/sobre-nosotros')}
+            />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
+        path="/operador/coleccion"
+        element={
+          <AdminOperatorRoute>
+            <ColeccionPage
+              onNavigateHome={() => navigate('/operador/home')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigatePrivacidad={() => navigate('/operador/privacidad')}
+              onNavigateSobreNosotros={() => navigate('/operador/sobre-nosotros')}
+            />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
+        path="/operador/que-ofrecemos"
+        element={
+          <AdminOperatorRoute>
+            <QueOfrecemosPage
+              onNavigateRegister={() => navigate('/register')}
+            />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
+        path="/operador/privacidad"
+        element={
+          <AdminOperatorRoute>
+            <PrivacidadPage
+              onNavigateHome={() => navigate('/operador/home')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+            />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
+        path="/operador/sobre-nosotros"
+        element={
+          <AdminOperatorRoute>
+            <SobreNosotrosPage
+              onNavigateHome={() => navigate('/operador/home')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigatePrivacidad={() => navigate('/operador/privacidad')}
+            />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
+        path="/operador/sitio/:id"
+        element={
+          <AdminOperatorRoute>
+            <SitioDetailPage
+              onNavigateHome={() => navigate('/operador/home')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigateSobreNosotros={() => navigate('/operador/sobre-nosotros')}
+              onNavigatePrivacidad={() => navigate('/operador/privacidad')}
+            />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
+        path="/operador/mis-sitios"
+        element={
+          <AdminOperatorRoute>
+            <OperatorSitesPage />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
+        path="/operador/sitio/:id/editar"
+        element={
+          <AdminOperatorRoute>
+            <CreateSitioPage />
+          </AdminOperatorRoute>
         }
       />
       <Route path="*" element={<Navigate to="/" replace />} />

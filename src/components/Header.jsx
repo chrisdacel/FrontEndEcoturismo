@@ -51,6 +51,11 @@ export default function Header() {
     navigate('/admin/dashboard');
   };
 
+  const goOperatorSites = () => {
+    setMenuOpen(false);
+    navigate('/operador/mis-sitios');
+  };
+
   const isScrolled = isAuthPage ? false : scrollY > 20;
   const textColor = isScrolled ? 'text-slate-900' : 'text-white';
   const secondaryTextColor = isScrolled ? 'text-slate-700' : 'text-emerald-100/80';
@@ -58,6 +63,9 @@ export default function Header() {
 
   const baseLink = (isActive) =>
     `px-3 py-2 text-sm font-medium transition ${isActive ? (isScrolled ? 'text-slate-900' : 'text-white') : (isScrolled ? 'text-slate-700 hover:text-slate-900' : 'text-emerald-100/80 hover:text-white')}`;
+
+  const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
+  const isOperator = user && user.role === 'operator';
 
   return (
     <header
@@ -87,13 +95,26 @@ export default function Header() {
               <NavLink to="/admin/sobre-nosotros" className={({ isActive }) => baseLink(isActive)}>Sobre nosotros</NavLink>
               <NavLink to="/admin/privacidad" className={({ isActive }) => baseLink(isActive)}>Privacidad</NavLink>
             </>
+          ) : isOperator ? (
+            <>
+              <NavLink to="/operador/home" className={({ isActive }) => baseLink(isActive)}>Inicio</NavLink>
+              <NavLink to="/operador/coleccion" className={({ isActive }) => baseLink(isActive)}>Colección</NavLink>
+              <NavLink to="/operador/que-ofrecemos" className={({ isActive }) => baseLink(isActive)}>Qué ofrecemos</NavLink>
+              <NavLink to="/operador/sobre-nosotros" className={({ isActive }) => baseLink(isActive)}>Sobre nosotros</NavLink>
+              <NavLink to="/operador/privacidad" className={({ isActive }) => baseLink(isActive)}>Privacidad</NavLink>
+            </>
+          ) : isTourist ? (
+            <>
+              <NavLink to="/turista/home" className={({ isActive }) => baseLink(isActive)}>Inicio</NavLink>
+              <NavLink to="/turista/coleccion" className={({ isActive }) => baseLink(isActive)}>Colección</NavLink>
+              <NavLink to="/turista/que-ofrecemos" className={({ isActive }) => baseLink(isActive)}>Qué ofrecemos</NavLink>
+              <NavLink to="/turista/sobre-nosotros" className={({ isActive }) => baseLink(isActive)}>Sobre nosotros</NavLink>
+              <NavLink to="/turista/privacidad" className={({ isActive }) => baseLink(isActive)}>Privacidad</NavLink>
+            </>
           ) : (
             <>
               <NavLink to="/" className={({ isActive }) => baseLink(isActive)}>Inicio</NavLink>
               <NavLink to="/coleccion" className={({ isActive }) => baseLink(isActive)}>Colección</NavLink>
-              {user && user.role !== 'admin' && (
-                <NavLink to="/favoritos" className={({ isActive }) => baseLink(isActive)}>Favoritos</NavLink>
-              )}
               <NavLink to="/que-ofrecemos" className={({ isActive }) => baseLink(isActive)}>Qué ofrecemos</NavLink>
               <NavLink to="/sobre-nosotros" className={({ isActive }) => baseLink(isActive)}>Sobre nosotros</NavLink>
               <NavLink to="/privacidad" className={({ isActive }) => baseLink(isActive)}>Privacidad</NavLink>
@@ -146,22 +167,19 @@ export default function Header() {
                         Panel de Administración
                       </button>
                     )}
+                    {user.role === 'operator' && (
+                      <button
+                        onClick={goOperatorSites}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                      >
+                        Gestionar mis sitios
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
 
-              {user.role !== 'admin' && (
-                <NavLink
-                  to="/preferencias"
-                  className={({ isActive }) =>
-                    `hidden md:inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold ring-1 transition ${
-                      isActive ? 'bg-white/30 text-slate-900 ring-white/40' : 'bg-white/20 text-slate-900 ring-white/30 hover:bg-white/30'
-                    }`
-                  }
-                >
-                  Preferencias
-                </NavLink>
-              )}
+              {/* Preferencias removed */}
               <button
                 onClick={handleLogout}
                 className="inline-flex items-center rounded-full bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
