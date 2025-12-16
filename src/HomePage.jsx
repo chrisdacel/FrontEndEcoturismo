@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { useAuth } from './context/AuthContext';
 
 function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, onNavigateOferta, onNavigatePrivacidad, onNavigateSobreNosotros }) {
+  const { user } = useAuth();
   const [scrollY, setScrollY] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
   const [heroVisible, setHeroVisible] = useState(false);
@@ -122,7 +124,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
         {/* HERO */}
         <section className="relative overflow-hidden bg-cover bg-center min-h-[80vh]" style={{ backgroundImage: "url(/images/Pagina_inicio/ecoturismo.jpg)" }}>
           <div className={`absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent md:from-white md:via-white/60 md:to-black/20 transition-opacity duration-500 ${heroVisible ? 'opacity-100' : 'opacity-0'}`} />
-          <div className={`absolute bottom-8 left-6 md:bottom-12 md:left-12 z-10 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+          <div className={`absolute left-6 md:left-12 top-[25%] z-10 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
             <div className="inline-flex items-center gap-3 rounded-full bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               Ecoturismo
@@ -152,11 +154,13 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
               <p className="mt-2 text-lg font-bold text-white">Avistamiento en Ucumarí</p>
               <p className="text-sm text-white">Sábado 9:00 AM</p>
             </div>
-            <div className="rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 shadow-2xl">
-              <p className="text-xs uppercase tracking-wide text-white font-bold">FAVORITOS</p>
-              <p className="mt-2 text-lg font-bold text-white">3 nuevos sitios</p>
-              <p className="text-sm text-white">Listos para explorar</p>
-            </div>
+            {user && user.role !== 'admin' && (
+              <div className="rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 shadow-2xl">
+                <p className="text-xs uppercase tracking-wide text-white font-bold">FAVORITOS</p>
+                <p className="mt-2 text-lg font-bold text-white">3 nuevos sitios</p>
+                <p className="text-sm text-white">Listos para explorar</p>
+              </div>
+            )}
           </div>
         </section>
 
@@ -288,12 +292,14 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
                 >
                   Ver cómo funciona
                 </button>
-                <button
-                  onClick={onNavigateRegister}
-                  className="rounded-full border border-emerald-300 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:bg-emerald-50"
-                >
-                  Crear cuenta ahora
-                </button>
+                {!user && (
+                  <button
+                    onClick={onNavigateRegister}
+                    className="rounded-full border border-emerald-300 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:bg-emerald-50"
+                  >
+                    Crear cuenta ahora
+                  </button>
+                )}
               </div>
             </div>
           </div>

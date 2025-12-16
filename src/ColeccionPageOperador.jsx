@@ -84,10 +84,10 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
       {scrollToTop && (
         <button
           onClick={scrollTop}
-          className="fixed bottom-5 right-5 z-50 rounded-full bg-white shadow-lg transition hover:scale-110 md:right-0"
-          title="Volver arriba"
+          className="fixed bottom-6 right-6 z-50 rounded-full bg-emerald-500 px-3 py-3 text-white shadow-lg shadow-emerald-500/40 transition hover:scale-110 hover:bg-emerald-600"
+          aria-label="Volver arriba"
         >
-          <img src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Arriba" className="h-12 w-12" />
+          ↑
         </button>
       )}
 

@@ -1,29 +1,69 @@
 import axios from 'axios';
 
-// Crear instancia de axios con configuración base (forzamos localhost para evitar cachés de 127.0.0.1)
+// Variable para controlar reintentos
+let isRefreshing = false;
+
+// Crear instancia de axios con configuración base
 const api = axios.create({
   baseURL: 'http://localhost:8000',
   withCredentials: true, // Importante: enviar cookies con cada request
-  xsrfCookieName: 'XSRF-TOKEN', // Nombre de la cookie que envía Laravel Sanctum
-  xsrfHeaderName: 'X-XSRF-TOKEN', // Header que axios adjunta automáticamente
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
   }
 });
 
-// Interceptor para asegurar que el header X-XSRF-TOKEN siempre se envía desde la cookie
+// Interceptor de request para agregar CSRF token
 api.interceptors.request.use((config) => {
-  const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-  if (match) {
-    try {
-      config.headers['X-XSRF-TOKEN'] = decodeURIComponent(match[1]);
-    } catch (e) {
-      config.headers['X-XSRF-TOKEN'] = match[1];
-    }
+  // Obtener el token XSRF de las cookies
+  const token = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('XSRF-TOKEN='))
+    ?.split('=')[1];
+  
+  if (token) {
+    config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token);
   }
+  
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
+
+// Interceptor para manejar error 419 (CSRF token mismatch)
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Si es error 419 (CSRF token mismatch) y no hemos reintentado ya
+    if (error.response?.status === 419 && !originalRequest._retry && !isRefreshing) {
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        console.log('CSRF token expirado, obteniendo nuevo token...');
+        // Refrescar el CSRF token
+        await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+          withCredentials: true
+        });
+        
+        console.log('Token refrescado, reintentando petición original...');
+        isRefreshing = false;
+        
+        // Reintentar la petición original
+        return api(originalRequest);
+      } catch (refreshError) {
+        isRefreshing = false;
+        console.error('Error al refrescar token:', refreshError);
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 // ============ INICIALIZACIÓN ============
 /**
@@ -31,7 +71,9 @@ api.interceptors.request.use((config) => {
  */
 export async function initializeCsrfToken() {
   try {
-    await api.get('/sanctum/csrf-cookie');
+    await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+      withCredentials: true
+    });
   } catch (error) {
     console.error('Error getting CSRF token:', error);
   }
@@ -106,6 +148,58 @@ export async function logout() {
     await api.post('/api/logout');
   } catch (error) {
     throw error.response?.data || { message: 'Error al cerrar sesión' };
+  }
+}
+
+// Perfil: obtener datos
+export async function fetchProfile() {
+  try {
+    const { data } = await api.get('/api/profile');
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo perfil' };
+  }
+}
+
+// Perfil: actualizar nombre/email
+export async function updateProfile(payload) {
+  try {
+    await initializeCsrfToken(); // Refrescar token antes de actualizar
+    const { data } = await api.put('/api/profile', payload);
+    return data.user;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error actualizando perfil' };
+  }
+}
+
+// Perfil: cambiar contraseña
+export async function changePassword(current_password, password, password_confirmation) {
+  try {
+    await initializeCsrfToken(); // Refrescar token antes de actualizar
+    const { data } = await api.post('/api/profile/password', {
+      current_password,
+      password,
+      password_confirmation,
+    });
+    return data.message;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error actualizando contraseña' };
+  }
+}
+
+// Perfil: subir avatar
+export async function uploadAvatar(file) {
+  const formData = new FormData();
+  formData.append('avatar', file);
+
+  try {
+    await initializeCsrfToken(); // Refrescar token antes de subir
+    const { data } = await api.post('/api/profile/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data; // Retorna { avatar_url, user, message }
+  } catch (error) {
+    throw error.response?.data || { message: 'Error subiendo foto' };
   }
 }
 

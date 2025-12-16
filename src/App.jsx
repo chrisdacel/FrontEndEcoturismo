@@ -1,4 +1,4 @@
-﻿import { AuthProvider } from './context/AuthContext';
+﻿import { AuthProvider, useAuth } from './context/AuthContext';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import HomePage from './HomePage';
 import LoginPage from './LoginPage';
@@ -13,30 +13,43 @@ import RegistroOperador2 from './RegistroOperador2';
 import RegistroTurista1 from './RegistroTurista1';
 import RegistroTurista2 from './RegistroTurista2';
 import ColeccionPage from './ColeccionPage';
-import OfertaPage from './OfertaPage';
+import QueOfrecemosPage from './QueOfrecemosPage';
 import PrivacidadPage from './PrivacidadPage';
 import SobreNosotrosPage from './SobreNosotrosPage';
 import PreferencesPage from './PreferencesPage';
 import FavoritosPage from './FavoritosPage';
+import AdminDashboardPage from './AdminDashboardPage';
+import AdminCreateOperatorPage from './AdminCreateOperatorPage';
+import AdminUsersPage from './AdminUsersPage';
+import AdminOperatorsPage from './AdminOperatorsPage';
+import AdminProfilePage from './AdminProfilePage';
+import ProfilePageOperador from './ProfilePageOperador';
+import ProfilePageTurista from './ProfilePageTurista';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 import SitioPage from './SitioPage';
 
 function AppRoutes() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   return (
     <Routes>
       <Route
         path="/"
         element={
-          <HomePage
-            onNavigateLogin={() => navigate('/login')}
-            onNavigateRegister={() => navigate('/register')}
-            onNavigateColeccion={() => navigate('/coleccion')}
-            onNavigateOferta={() => navigate('/oferta')}
-            onNavigatePrivacidad={() => navigate('/privacidad')}
-            onNavigateSobreNosotros={() => navigate('/sobre-nosotros')}
-          />
+          user?.role === 'admin' ? (
+            <Navigate to="/admin/dashboard" replace />
+          ) : (
+            <HomePage
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigateColeccion={() => navigate('/coleccion')}
+              onNavigateOferta={() => navigate('/que-ofrecemos')}
+              onNavigatePrivacidad={() => navigate('/privacidad')}
+              onNavigateSobreNosotros={() => navigate('/sobre-nosotros')}
+            />
+          )
         }
       />
       <Route
@@ -90,73 +103,232 @@ function AppRoutes() {
       <Route
         path="/preferencias"
         element={
-          <ProtectedRoute>
-            <PreferencesPage onNavigateHome={() => navigate('/')} onNavigateLogin={() => navigate('/login')} />
-          </ProtectedRoute>
+          user?.role === 'admin' ? (
+            <Navigate to="/admin/dashboard" replace />
+          ) : (
+            <ProtectedRoute>
+              <PreferencesPage onNavigateHome={() => navigate('/')} onNavigateLogin={() => navigate('/login')} />
+            </ProtectedRoute>
+          )
         }
       />
       <Route
         path="/favoritos"
         element={
+          user?.role === 'admin' ? (
+            <Navigate to="/admin/dashboard" replace />
+          ) : (
+            <ProtectedRoute>
+              <FavoritosPage />
+            </ProtectedRoute>
+          )
+        }
+      />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <AdminRoute>
+            <AdminDashboardPage />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/create-operator"
+        element={
+          <AdminRoute>
+            <AdminCreateOperatorPage />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminRoute>
+            <AdminUsersPage />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/operators"
+        element={
+          <AdminRoute>
+            <AdminOperatorsPage />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/profile"
+        element={
+          <AdminRoute>
+            <AdminProfilePage />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/operador/profile"
+        element={
           <ProtectedRoute>
-            <FavoritosPage />
+            <ProfilePageOperador />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/turista/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePageTurista />
           </ProtectedRoute>
         }
       />
       <Route
         path="/coleccion"
         element={
-          <ColeccionPage
-            onNavigateHome={() => navigate('/')}
-            onNavigateLogin={() => navigate('/login')}
-            onNavigatePrivacidad={() => navigate('/privacidad')}
-            onNavigateSobreNosotros={() => navigate('/sobre-nosotros')}
-          />
+          user?.role === 'admin' ? (
+            <Navigate to="/admin/coleccion" replace />
+          ) : (
+            <ColeccionPage
+              onNavigateHome={() => navigate('/')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigatePrivacidad={() => navigate('/privacidad')}
+              onNavigateSobreNosotros={() => navigate('/sobre-nosotros')}
+            />
+          )
         }
       />
       <Route
-        path="/oferta"
+        path="/que-ofrecemos"
         element={
-          <OfertaPage
-            onNavigateHome={() => navigate('/')}
-            onNavigateLogin={() => navigate('/login')}
-            onNavigateRegister={() => navigate('/register')}
-            onNavigatePrivacidad={() => navigate('/privacidad')}
-            onNavigateSobreNosotros={() => navigate('/sobre-nosotros')}
-          />
+          user?.role === 'admin' ? (
+            <Navigate to="/admin/que-ofrecemos" replace />
+          ) : (
+            <QueOfrecemosPage
+              onNavigateRegister={() => navigate('/register')}
+            />
+          )
         }
       />
       <Route
         path="/privacidad"
         element={
-          <PrivacidadPage
-            onNavigateHome={() => navigate('/')}
-            onNavigateLogin={() => navigate('/login')}
-            onNavigateRegister={() => navigate('/register')}
-          />
+          user?.role === 'admin' ? (
+            <Navigate to="/admin/privacidad" replace />
+          ) : (
+            <PrivacidadPage
+              onNavigateHome={() => navigate('/')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+            />
+          )
         }
       />
       <Route
         path="/sobre-nosotros"
         element={
-          <SobreNosotrosPage
-            onNavigateHome={() => navigate('/')}
-            onNavigateLogin={() => navigate('/login')}
-            onNavigateRegister={() => navigate('/register')}
-            onNavigatePrivacidad={() => navigate('/privacidad')}
-          />
+          user?.role === 'admin' ? (
+            <Navigate to="/admin/sobre-nosotros" replace />
+          ) : (
+            <SobreNosotrosPage
+              onNavigateHome={() => navigate('/')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigatePrivacidad={() => navigate('/privacidad')}
+            />
+          )
         }
       />
       <Route
         path="/sitio"
         element={
-          <SitioPage
-            onNavigateHome={() => navigate('/')}
-            onNavigateLogin={() => navigate('/login')}
-            onNavigateRegister={() => navigate('/register')}
-            onNavigateSobreNosotros={() => navigate('/sobre-nosotros')}
-            onNavigatePrivacidad={() => navigate('/privacidad')}
-          />
+          user?.role === 'admin' ? (
+            <Navigate to="/admin/sitio" replace />
+          ) : (
+            <SitioPage
+              onNavigateHome={() => navigate('/')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigateSobreNosotros={() => navigate('/sobre-nosotros')}
+              onNavigatePrivacidad={() => navigate('/privacidad')}
+            />
+          )
+        }
+      />
+
+      {/* Rutas admin para ver las vistas públicas con prefijo admin */}
+      <Route
+        path="/admin/home"
+        element={
+          <AdminRoute>
+            <HomePage
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigateColeccion={() => navigate('/admin/coleccion')}
+              onNavigateOferta={() => navigate('/admin/que-ofrecemos')}
+              onNavigatePrivacidad={() => navigate('/admin/privacidad')}
+              onNavigateSobreNosotros={() => navigate('/admin/sobre-nosotros')}
+            />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/coleccion"
+        element={
+          <AdminRoute>
+            <ColeccionPage
+              onNavigateHome={() => navigate('/admin/home')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigatePrivacidad={() => navigate('/admin/privacidad')}
+              onNavigateSobreNosotros={() => navigate('/admin/sobre-nosotros')}
+            />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/que-ofrecemos"
+        element={
+          <AdminRoute>
+            <QueOfrecemosPage
+              onNavigateRegister={() => navigate('/register')}
+            />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/privacidad"
+        element={
+          <AdminRoute>
+            <PrivacidadPage
+              onNavigateHome={() => navigate('/admin/home')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+            />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/sobre-nosotros"
+        element={
+          <AdminRoute>
+            <SobreNosotrosPage
+              onNavigateHome={() => navigate('/admin/home')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigatePrivacidad={() => navigate('/admin/privacidad')}
+            />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/sitio"
+        element={
+          <AdminRoute>
+            <SitioPage
+              onNavigateHome={() => navigate('/admin/home')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigateSobreNosotros={() => navigate('/admin/sobre-nosotros')}
+              onNavigatePrivacidad={() => navigate('/admin/privacidad')}
+            />
+          </AdminRoute>
         }
       />
       <Route path="*" element={<Navigate to="/" replace />} />

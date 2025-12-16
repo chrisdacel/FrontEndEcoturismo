@@ -101,9 +101,10 @@ export default function ColeccionPageTurista({
       {scrollToTop && (
         <button
           onClick={scrollTop}
-          className="fixed bottom-8 right-8 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition z-50"
+          className="fixed bottom-6 right-6 z-50 rounded-full bg-emerald-500 px-3 py-3 text-white shadow-lg shadow-emerald-500/40 transition hover:scale-110 hover:bg-emerald-600"
+          aria-label="Volver arriba"
         >
-          <img src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Arriba" className="h-6 w-6" />
+          ↑
         </button>
       )}
 

@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Header() {
@@ -7,6 +7,8 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const [scrollY, setScrollY] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
   const authPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/confirmar-cuenta', '/email-verified'];
   const isAuthPage = authPaths.includes(location.pathname);
 
@@ -16,11 +18,37 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleLogout = async () => {
     try {
       await logout();
       navigate('/');
     } catch (_) {}
+  };
+
+  const goProfile = () => {
+    setMenuOpen(false);
+    if (user?.role === 'admin') {
+      navigate('/admin/profile');
+    } else if (user?.role === 'operator') {
+      navigate('/operador/profile');
+    } else {
+      navigate('/turista/profile');
+    }
+  };
+
+  const goAdminPanel = () => {
+    setMenuOpen(false);
+    navigate('/admin/dashboard');
   };
 
   const isScrolled = isAuthPage ? false : scrollY > 20;
@@ -50,47 +78,97 @@ export default function Header() {
         </Link>
 
         {/* Nav centro */}
-        <nav className="hidden gap-1 md:flex mx-auto">
-          <NavLink to="/" className={({ isActive }) => baseLink(isActive)}>Inicio</NavLink>
-          <NavLink to="/coleccion" className={({ isActive }) => baseLink(isActive)}>Colección</NavLink>
-          {user && (
-            <NavLink to="/favoritos" className={({ isActive }) => baseLink(isActive)}>Favoritos</NavLink>
+        <nav className="hidden md:flex justify-center gap-6 mx-auto">
+          {user?.role === 'admin' ? (
+            <>
+              <NavLink to="/admin/home" className={({ isActive }) => baseLink(isActive)}>Inicio</NavLink>
+              <NavLink to="/admin/coleccion" className={({ isActive }) => baseLink(isActive)}>Colección</NavLink>
+              <NavLink to="/admin/que-ofrecemos" className={({ isActive }) => baseLink(isActive)}>Qué ofrecemos</NavLink>
+              <NavLink to="/admin/sobre-nosotros" className={({ isActive }) => baseLink(isActive)}>Sobre nosotros</NavLink>
+              <NavLink to="/admin/privacidad" className={({ isActive }) => baseLink(isActive)}>Privacidad</NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink to="/" className={({ isActive }) => baseLink(isActive)}>Inicio</NavLink>
+              <NavLink to="/coleccion" className={({ isActive }) => baseLink(isActive)}>Colección</NavLink>
+              {user && user.role !== 'admin' && (
+                <NavLink to="/favoritos" className={({ isActive }) => baseLink(isActive)}>Favoritos</NavLink>
+              )}
+              <NavLink to="/que-ofrecemos" className={({ isActive }) => baseLink(isActive)}>Qué ofrecemos</NavLink>
+              <NavLink to="/sobre-nosotros" className={({ isActive }) => baseLink(isActive)}>Sobre nosotros</NavLink>
+              <NavLink to="/privacidad" className={({ isActive }) => baseLink(isActive)}>Privacidad</NavLink>
+            </>
           )}
-          <NavLink to="/sobre-nosotros" className={({ isActive }) => baseLink(isActive)}>Sobre nosotros</NavLink>
-          <NavLink to="/privacidad" className={({ isActive }) => baseLink(isActive)}>Privacidad</NavLink>
         </nav>
 
         {/* Botones derecha */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {user ? (
-            <>
-              {/* Nombre del usuario */}
-              <span className={`hidden md:inline-flex items-center text-sm font-medium transition ${textColor}`}>
-                {user.name || 'Usuario'}
-              </span>
-              <NavLink
-                to="/preferencias"
-                className={({ isActive }) =>
-                  `hidden md:inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold ring-1 transition ${
-                    isActive
-                      ? isScrolled
-                        ? 'bg-slate-200/50 text-slate-900 ring-slate-200'
-                        : 'bg-white/20 text-white ring-white/10'
-                      : isScrolled
+            <div className="flex items-center gap-2" ref={menuRef}>
+              {/* Dropdown para todos los usuarios */}
+              <div className="relative">
+                <button
+                  onClick={() => setMenuOpen((v) => !v)}
+                  className={`hidden md:inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold ring-1 transition ${
+                    isScrolled
                       ? 'bg-slate-100/50 text-slate-700 ring-slate-200 hover:bg-slate-100'
                       : 'bg-white/10 text-emerald-100 ring-white/10 hover:bg-white/20'
-                  }`
-                }
-              >
-                Preferencias
-              </NavLink>
+                  }`}
+                >
+                  <img
+                    src={user?.avatar_url || '/images/Pagina_inicio/nature-svgrepo-com.svg'}
+                    alt="Avatar"
+                    className="h-6 w-6 rounded-full object-cover ring-1 ring-white/20"
+                  />
+                  <span>{user.name || 'Usuario'}</span>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-40 rounded-xl bg-white/90 text-slate-800 shadow-lg ring-1 ring-slate-200/60 backdrop-blur">
+                    <button
+                      onClick={goProfile}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100 rounded-t-xl"
+                    >
+                      Perfil
+                    </button>
+                    {user.role === 'admin' && (
+                      <button
+                        onClick={goAdminPanel}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                      >
+                        Panel de Administración
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {user.role !== 'admin' && (
+                <NavLink
+                  to="/preferencias"
+                  className={({ isActive }) =>
+                    `hidden md:inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold ring-1 transition ${
+                      isActive ? 'bg-white/30 text-slate-900 ring-white/40' : 'bg-white/20 text-slate-900 ring-white/30 hover:bg-white/30'
+                    }`
+                  }
+                >
+                  Preferencias
+                </NavLink>
+              )}
               <button
                 onClick={handleLogout}
                 className="inline-flex items-center rounded-full bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
               >
                 Cerrar sesión
               </button>
-            </>
+            </div>
           ) : (
             <>
               <Link

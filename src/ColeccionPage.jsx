@@ -105,9 +105,10 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
       {scrollToTop && (
         <button
           onClick={scrollToTopHandler}
-          className="fixed bottom-5 right-5 z-50 rounded-full bg-white p-2 shadow-lg hover:scale-110 transition-transform"
+          className="fixed bottom-6 right-6 z-50 rounded-full bg-emerald-500 px-3 py-3 text-white shadow-lg shadow-emerald-500/40 transition hover:scale-110 hover:bg-emerald-600"
+          aria-label="Volver arriba"
         >
-          <img src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Subir" className="h-8 w-8" />
+          ↑
         </button>
       )}
 

@@ -4,9 +4,17 @@ import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/fre
 
 function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister }) {
   const [heroVisible, setHeroVisible] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
   useEffect(() => {
     const t = setTimeout(() => setHeroVisible(true), 50);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 100);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900">
@@ -19,8 +27,19 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
       </section>
 
+      {/* Scroll to top */}
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-6 right-6 z-50 rounded-full bg-emerald-500 px-3 py-3 text-white shadow-lg shadow-emerald-500/40 transition hover:scale-110 hover:bg-emerald-600"
+          aria-label="Volver arriba"
+        >
+          ↑
+        </button>
+      )}
+
       {/* Main Content */}
-      <main className="mx-auto mb-12 flex w-[90%] max-w-5xl flex-1 flex-col gap-12 px-5 md:px-10">
+      <main className="mx-auto mb-12 mt-10 md:mt-14 flex w-[90%] max-w-5xl flex-1 flex-col gap-12 px-5 md:px-10">
         <div>
           <h2 className="mb-4 text-3xl md:text-4xl font-semibold text-slate-900">Introducción</h2>
           <p className="text-base md:text-lg text-slate-700 leading-relaxed">

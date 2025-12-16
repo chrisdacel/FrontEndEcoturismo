@@ -32,6 +32,8 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
+      // Refresca el token CSRF antes de cerrar sesión para evitar 419
+      await initializeCsrfToken();
       await apiLogout();
       setUser(null);
       setError('');
