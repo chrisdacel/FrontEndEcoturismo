@@ -1,91 +1,144 @@
-function LoginPage({ onNavigateHome }) {
+import { useState } from 'react';
+import { useAuth } from './context/AuthContext';
+import { login, checkFirstTimePreferences } from './services/api';
+
+function LoginPage({ onNavigateHome, onNavigateRegister, onNavigateForgot, onNavigatePreferences }) {
+  const { setUser } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const user = await login(email, password);
+      setUser(user);
+      setEmail('');
+      setPassword('');
+      
+      // Verificar si es primera vez en preferencias
+      const isFirstTime = await checkFirstTimePreferences();
+      if (isFirstTime) {
+        onNavigatePreferences();
+      } else {
+        onNavigateHome();
+      }
+    } catch (err) {
+      const msg = err?.message || err?.error || 'Credenciales inválidas';
+      setError(typeof msg === 'string' ? msg : 'Error en inicio de sesión');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      <main className="flex min-h-screen flex-col md:flex-row">
-        <div
-          className="relative flex h-72 w-full items-center justify-center bg-black md:h-auto md:w-7/12"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('/images/inicio_sesion/photo-1532185922611-3410b1898a1c.jpg')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          <div className="flex flex-col items-center justify-center text-center text-white">
-            <h1 className="text-4xl font-extralight italic leading-[1.05] sm:text-5xl lg:text-6xl">
-              Bienvenido de nuevo
-            </h1>
-            <div className="mt-10 flex flex-col items-center text-left">
-              <h2 className="text-3xl font-bold leading-tight">Conexión</h2>
-              <p className="text-xl font-light">EcoRisaralda</p>
-            </div>
-          </div>
+    <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white">
+      <div className="mx-auto flex min-h-screen max-w-7xl items-center px-6 py-12 md:px-10">
+        {/* Lado izquierdo: mensaje/branding */}
+        <div className="hidden flex-1 md:flex md:flex-col md:pr-10">
+          <span className="text-emerald-300/80 text-xs tracking-[0.4em]">ECOTURISMO</span>
+          <h1 className="mt-6 text-5xl leading-tight font-semibold">
+            Explora destinos sostenibles y conecta con la naturaleza.
+          </h1>
+          <p className="mt-4 max-w-xl text-emerald-100/80">
+            Accede con tu cuenta para descubrir rutas verdes, alojamientos responsables y experiencias locales.
+          </p>
         </div>
 
-        <section className="flex w-full flex-col items-center justify-center bg-white px-6 py-10 md:w-5/12 md:px-10">
-          <div className="flex w-full max-w-xl flex-col gap-6">
-            <h3 className="text-center text-3xl font-bold text-[#267E1B] sm:text-4xl">Iniciar sesión</h3>
-
-            <div className="flex flex-col gap-4">
-              <label className="text-sm font-medium text-slate-700" htmlFor="correo">
-                Correo electrónico
-              </label>
-              <input
-                id="correo"
-                type="email"
-                placeholder="Ingrese su correo"
-                className="h-11 rounded-lg border border-slate-300 px-3 text-base text-slate-800 outline-none transition focus:border-[#267E1B] focus:ring-2 focus:ring-[#267E1B]/30"
-              />
+        {/* Lado derecho: formulario */}
+        <div className="w-full md:w-[420px]">
+          <div className="rounded-lg bg-white/10 backdrop-blur-md ring-1 ring-white/10 p-6 md:p-8 shadow-xl">
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold">Iniciar sesión</h2>
+              <p className="mt-1 text-sm text-emerald-100/80">Bienvenido de nuevo</p>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-slate-700" htmlFor="contrasena">
-                  Contraseña
-                </label>
-                <img
-                  src="/images/inicio_sesion/view-svgrepo-com.png"
-                  alt="Mostrar contraseña"
-                  className="h-5 w-5 cursor-pointer transition hover:scale-105"
+            {error && (
+              <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-100">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-emerald-100">Correo electrónico</label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  required
+                  disabled={loading}
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60 disabled:opacity-60"
+                  placeholder="tu@correo.com"
                 />
               </div>
-              <input
-                id="contrasena"
-                type="password"
-                placeholder="Ingrese su contraseña"
-                className="h-11 rounded-lg border border-slate-300 px-3 text-base text-slate-800 outline-none transition focus:border-[#267E1B] focus:ring-2 focus:ring-[#267E1B]/30"
-              />
-              <a href="#" className="text-xs font-semibold text-slate-600 hover:text-slate-800">
-                ¿Olvidaste tu contraseña?
-              </a>
-            </div>
 
-            <div className="flex flex-col gap-3">
+              <div>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="block text-sm font-medium text-emerald-100">Contraseña</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="text-xs text-emerald-200 hover:text-emerald-100"
+                  >
+                    {showPassword ? 'Ocultar' : 'Mostrar'}
+                  </button>
+                </div>
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  minLength={6}
+                  disabled={loading}
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60 disabled:opacity-60"
+                  placeholder="••••••••"
+                />
+                <div className="mt-2 text-right text-xs text-emerald-200">
+                  <button
+                    type="button"
+                    onClick={onNavigateForgot}
+                    className="underline underline-offset-4 hover:text-emerald-100"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                </div>
+              </div>
+
               <button
-                onClick={onNavigateHome}
-                className="flex h-11 items-center justify-center rounded-lg bg-[#267E1B] text-sm font-semibold text-white transition hover:bg-[#1f6517] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#267E1B]"
+                type="submit"
+                disabled={loading}
+                className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-60"
               >
-                Iniciar Sesión
+                {loading ? 'Iniciando…' : 'Entrar'}
               </button>
-              <a href="#" className="text-center text-xs font-semibold text-slate-700 hover:text-slate-900">
-                ¿No tienes cuenta?
-              </a>
-            </div>
 
-            <p className="text-center text-[11px] font-light text-slate-500">
-              Al registrarte aceptas nuestros{' '}
-              <a href="#" className="font-semibold text-slate-600 hover:text-slate-800">
-                términos y condiciones
-              </a>{' '}
-              y nuestra{' '}
-              <a href="#" className="font-semibold text-slate-600 hover:text-slate-800">
-                política de privacidad
-              </a>
-              .
-            </p>
+              <p className="text-center text-sm text-emerald-100/80">
+                ¿No tienes cuenta?{' '}
+                <button
+                  type="button"
+                  onClick={onNavigateRegister}
+                  className="underline underline-offset-4 hover:text-emerald-100"
+                >
+                  Crea tu cuenta
+                </button>
+              </p>
+
+              <p className="text-center text-xs text-emerald-100/70">
+                Al continuar aceptas nuestros Términos y Política de privacidad
+              </p>
+            </form>
           </div>
-        </section>
-      </main>
+        </div>
+      </div>
     </div>
   );
 }

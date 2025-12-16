@@ -3,9 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
 
 function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, onNavigateOferta, onNavigatePrivacidad, onNavigateSobreNosotros }) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [fadeIn, setFadeIn] = useState(true);
+  const [heroVisible, setHeroVisible] = useState(false);
 
   // Carousels
   const [populareIndex, setPopularesIndex] = useState(0);
@@ -47,6 +47,11 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const t = setTimeout(() => setHeroVisible(true), 50);
+    return () => clearTimeout(t);
+  }, []);
+
   // Carousel populares
   const visibleItems = 3;
   const totalItems = sitios.length;
@@ -70,286 +75,248 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
 
   // Carousel eventos
   const handleEventosChange = (index) => {
-    setEventosIndex(index);
+    setFadeIn(false);
+    setTimeout(() => {
+      setEventosIndex(index);
+      setFadeIn(true);
+    }, 300);
     clearInterval(eventosTimer);
     const timer = setInterval(() => {
-      setEventosIndex((prev) => (prev + 1) % eventos.length);
+      setFadeIn(false);
+      setTimeout(() => {
+        setEventosIndex((prev) => (prev + 1) % eventos.length);
+        setFadeIn(true);
+      }, 300);
     }, 5000);
     setEventosTimer(timer);
   };
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setEventosIndex((prev) => (prev + 1) % eventos.length);
+      setFadeIn(false);
+      setTimeout(() => {
+        setEventosIndex((prev) => (prev + 1) % eventos.length);
+        setFadeIn(true);
+      }, 300);
     }, 5000);
     setEventosTimer(timer);
     return () => clearInterval(timer);
   }, [eventos.length]);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      {/* HEADER */}
-      <header className="fixed top-0 z-50 w-full bg-white shadow-sm">
-        <div className="flex items-center justify-between px-6 py-4 md:px-12">
-          {/* Logo */}
-          <a href="#" className="flex items-center gap-2">
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">Conexion</h3>
-              <p className="text-xs text-slate-600">EcoRisaralda</p>
-            </div>
-          </a>
-
-          {/* Center - Buscador */}
-          <div className="hidden gap-4 md:flex">
-            <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="flex items-center gap-2 text-slate-700 hover:text-[#267E1B]"
-            >
-              <img src="/images/Pagina_inicio/search-svgrepo-com.svg" alt="Buscar" className="h-5 w-5" />
-              <span className="text-sm">Buscar</span>
-            </button>
-          </div>
-
-          {/* Right - Botones */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onNavigateRegister}
-              className="hidden h-10 rounded-lg border border-[#267E1B] px-4 text-sm font-semibold text-[#267E1B] transition hover:bg-[#267E1B] hover:text-white md:block"
-            >
-              Registrarse
-            </button>
-            <button
-              onClick={onNavigateLogin}
-              className="hidden h-10 rounded-lg bg-[#267E1B] px-4 text-sm font-semibold text-white transition hover:bg-[#1f6517] md:block"
-            >
-              Iniciar Sesion
-            </button>
-
-            {/* Dropdown */}
-            <div className="relative md:hidden">
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="h-10 w-10 rounded-lg hover:bg-slate-100"
-              >
-                <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="mx-auto h-6 w-6" />
-              </button>
-              {dropdownOpen && (
-                <div className="absolute right-0 top-12 w-48 rounded-lg border border-slate-200 bg-white shadow-lg">
-                  <a href="#" className="block px-4 py-3 text-sm font-semibold text-[#267E1B] hover:bg-slate-100">
-                    Inicio
-                  </a>
-                  <a href="#" className="block px-4 py-3 text-sm font-semibold text-[#267E1B] hover:bg-slate-100">
-                    Coleccion
-                  </a>
-                  <a href="#" className="block px-4 py-3 text-sm font-semibold text-[#267E1B] hover:bg-slate-100">
-                    Acerca Nosotros
-                  </a>
-                  <div className="border-t border-slate-200 px-4 py-3">
-                    <button
-                      onClick={onNavigateRegister}
-                      className="mb-2 w-full rounded-lg bg-[#267E1B] py-2 text-sm font-semibold text-white"
-                    >
-                      Registrarse
-                    </button>
-                    <button
-                      onClick={onNavigateLogin}
-                      className="w-full rounded-lg border border-[#267E1B] py-2 text-sm font-semibold text-[#267E1B]"
-                    >
-                      Iniciar Sesion
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Search Dropdown */}
-        {searchOpen && (
-          <div className="border-t border-slate-200 px-6 py-6">
-            <input
-              type="text"
-              placeholder="Escribe tu búsqueda..."
-              className="w-full rounded-lg border-2 border-[#267E1B] px-4 py-3 text-base text-slate-800 outline-none"
-            />
-          </div>
-        )}
-      </header>
+    <div className="relative min-h-screen overflow-hidden bg-white text-slate-900">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(76,175,80,0.08),transparent_35%)]" />
 
       {/* Back to top button */}
       {scrollY > 100 && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 right-6 z-40 rounded-full bg-white p-3 shadow-lg transition hover:scale-110"
+          className="fixed bottom-6 right-6 z-40 rounded-full bg-emerald-500 px-3 py-3 text-white shadow-lg shadow-emerald-500/40 transition hover:scale-110 hover:bg-emerald-600"
+          aria-label="Volver arriba"
         >
-          <img src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Arriba" className="h-6 w-6" />
+          ↑
         </button>
       )}
 
-      <main className="pt-20">
-        {/* SECCION 01 - HERO */}
-        <section className="h-96 w-full bg-cover bg-center" style={{ backgroundImage: 'linear-gradient(to right, white 28%, rgba(255, 255, 255, 0) 80%), url(/images/Pagina_inicio/ecoturismo.jpg)' }}>
-          <div className="flex h-full flex-col justify-center gap-6 pl-12">
-            <div>
-              <h1 className="text-5xl font-semibold text-slate-900">Descubre los mejores</h1>
-              <h1 className="text-5xl font-semibold text-slate-900">
-                sitios <span className="font-black text-[#267E1B]">ecoturisticos</span>
+      <main className="relative z-10">
+        {/* HERO */}
+        <section className="relative overflow-hidden bg-cover bg-center min-h-[80vh]" style={{ backgroundImage: "url(/images/Pagina_inicio/ecoturismo.jpg)" }}>
+          <div className={`absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent md:from-white md:via-white/60 md:to-black/20 transition-opacity duration-500 ${heroVisible ? 'opacity-100' : 'opacity-0'}`} />
+          <div className={`absolute bottom-8 left-6 md:bottom-12 md:left-12 z-10 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+            <div className="inline-flex items-center gap-3 rounded-full bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              Ecoturismo
+            </div>
+            <div className="mt-4 max-w-2xl space-y-4">
+              <h1 className="text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
+                Explora, guarda y personaliza tus rutas ecoturísticas en Risaralda
               </h1>
+              <p className="text-lg text-slate-700">
+                Conecta con la naturaleza, recibe eventos cercanos y guarda tus sitios favoritos. Todo sincronizado con tu perfil y preferencias.
+              </p>
             </div>
-            <p className="max-w-lg text-xl text-slate-700">
-              Explora rutas y lugares unicos donde disfrutar de la naturaleza de manera sostenible.¡Tu proxima aventura verde te espera!
-            </p>
-            <button onClick={onNavigateColeccion} className="w-fit rounded-lg bg-[#3c8428] px-7 py-3 text-xl font-semibold text-white transition hover:bg-white hover:text-[#267E1B] hover:outline hover:outline-[#267E1B]">
-              Ver más
-            </button>
+            <div className="mt-6 flex flex-wrap gap-4">
+              <button
+                onClick={onNavigateColeccion}
+                className="rounded-full bg-emerald-500 px-6 py-3 font-semibold text-white shadow-lg shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:bg-emerald-400"
+              >
+                Explorar colección
+              </button>
+            </div>
+          </div>
+          
+          {/* Cards flotantes a la derecha */}
+          <div className="absolute bottom-8 right-8 z-50 flex gap-3">
+            <div className="rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 shadow-2xl">
+              <p className="text-xs uppercase tracking-wide text-white font-bold">PRÓXIMO EVENTO</p>
+              <p className="mt-2 text-lg font-bold text-white">Avistamiento en Ucumarí</p>
+              <p className="text-sm text-white">Sábado 9:00 AM</p>
+            </div>
+            <div className="rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 shadow-2xl">
+              <p className="text-xs uppercase tracking-wide text-white font-bold">FAVORITOS</p>
+              <p className="mt-2 text-lg font-bold text-white">3 nuevos sitios</p>
+              <p className="text-sm text-white">Listos para explorar</p>
+            </div>
           </div>
         </section>
 
-        {/* SECCION 02 - POPULARES */}
+        {/* FEATURES STRIP */}
+        <section className="py-10 mt-8">
+          <div className="mx-auto grid max-w-6xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                title: 'Preferencias inteligentes',
+                desc: 'Recibe sugerencias y alertas según lo que te gusta explorar.',
+              },
+              {
+                title: 'Colección personal',
+                desc: 'Guarda sitios, crea rutas y accede offline cuando lo necesites.',
+              },
+              {
+                title: 'Eventos verificados',
+                desc: 'Calendario eco con curaduría local y notificaciones oportunas.',
+              },
+              {
+                title: 'Seguridad y acompañamiento',
+                desc: 'Consejos de acceso, clima y contactos de apoyo en cada lugar.',
+              },
+            ].map((item) => (
+              <div key={item.title}>
+                <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
+                <p className="mt-2 text-sm text-slate-600">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* POPULARES + EVENTOS */}
         <section className="w-full py-20">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-12 text-center">
-              <h2 className="text-3xl font-semibold text-slate-900">¡Mantente al día con los sitios más populares y eventos</h2>
-              <p className="mt-2 text-xl text-slate-700">siempre actualizados!</p>
-            </div>
-
-            <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
-              {/* Carousel */}
-              <div className="flex-1">
-                <div className="relative overflow-hidden">
-                  <div className="mb-4 flex gap-2">
-                    <button
-                      onClick={handlePopularesPrev}
-                      disabled={!canGoPrev}
-                      className="text-3xl font-bold text-[#208114] disabled:opacity-50"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      onClick={handlePopularesNext}
-                      disabled={!canGoNext}
-                      className="text-3xl font-bold text-[#208114] disabled:opacity-50"
-                    >
-                      ›
-                    </button>
-                  </div>
-                  <div className="flex gap-4 transition-transform duration-700" style={{ transform: `translateX(-${populareIndex * (100 / visibleItems)}%)` }}>
-                    {sitios.map((sitio) => (
-                      <div key={sitio.id} className="min-w-[calc(100%/3)] flex-shrink-0">
-                        <img src={sitio.image} alt={sitio.title} className="h-72 w-full rounded-lg object-cover" />
-                        <h5 className="mt-3 font-bold text-slate-900">{sitio.title}</h5>
-                        <p className="text-sm text-slate-600">{sitio.location}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right text */}
-              <div className="flex flex-1 flex-col justify-start gap-6 pt-6 lg:pt-0">
-                <h2 className="text-4xl font-bold">
-                  Más <span className="text-[#267E1B]">Populares</span>
-                </h2>
-                <p className="text-lg text-slate-700">
-                  Descubre los sitios Ecoturisticos más populares y vive la naturaleza en su maxima expresion
-                </p>
-                <a href="#" className="w-fit rounded-lg bg-[#267E1B] px-8 py-3 font-semibold text-white transition hover:bg-[#1f6517]">
-                  Más informacion
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECCION 03 - EVENTOS */}
-        <section className="w-full bg-slate-900 py-20">
           <div className="mx-auto max-w-7xl px-6">
-            <h3 className="mb-12 text-center text-2xl font-semibold text-white underline">EVENTOS</h3>
-            <div className="relative h-80 overflow-hidden rounded-lg">
-              {eventos.map((evento, idx) => (
-                <div
-                  key={evento.id}
-                  className={`absolute inset-0 flex flex-col items-center justify-center bg-cover bg-center transition-opacity duration-700 ${
-                    idx === eventosIndex ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  style={{
-                    backgroundImage: `linear-gradient(rgba(0,0,0,0.516), rgba(0,0,0,0.505)), ${evento.image}`,
-                  }}
+            <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.25em] text-emerald-700">Agenda viva</p>
+                <h2 className="text-3xl font-semibold text-slate-900">Sitios populares y eventos en tiempo real</h2>
+                <p className="mt-2 text-slate-600">Desliza para ver los destinos más guardados y los eventos que se vienen.</p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={onNavigateColeccion}
+                  className="rounded-full border border-emerald-200 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:border-emerald-400 hover:bg-emerald-50"
                 >
-                  <h1 className="text-5xl font-bold text-white">{evento.title}</h1>
-                  <button className="mt-8 rounded-lg border-3 border-white px-6 py-3 font-semibold text-white transition hover:bg-white hover:text-black">
-                    Más informacion
-                  </button>
+                  Ver colección completa
+                </button>
+              </div>
+            </div>
+
+            {/* Carousel eventos */}
+            <div className="relative overflow-hidden rounded-lg border border-emerald-100 shadow-lg shadow-emerald-100/50 min-h-96 bg-slate-900">
+                {/* Background image con crossfade */}
+                <div 
+                  className={`absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-in-out ${fadeIn ? 'opacity-100' : 'opacity-0'}`}
+                  style={{ backgroundImage: eventos[eventosIndex]?.image || 'none' }}
+                />
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
+
+                <div className={`relative flex h-full flex-col justify-end gap-2 p-8 transition-all duration-500 transform ${fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                  <p className="text-xs uppercase tracking-[0.2em] text-white/80">Próximo evento</p>
+                  <h3 className="text-3xl font-bold text-white">{eventos[eventosIndex]?.title}</h3>
+                  <p className="text-white/90">Recibe alertas y guarda en tu agenda.</p>
                 </div>
-              ))}
 
-              {/* Flechas navegación */}
-              <button
-                onClick={() => handleEventosChange((eventosIndex - 1 + eventos.length) % eventos.length)}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-6xl font-bold text-white opacity-50 hover:opacity-100"
-              >
-                ‹
-              </button>
-              <button
-                onClick={() => handleEventosChange((eventosIndex + 1) % eventos.length)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-6xl font-bold text-white opacity-50 hover:opacity-100"
-              >
-                ›
-              </button>
+                {/* Flechas navegación */}
+                <button
+                  onClick={() => handleEventosChange((eventosIndex - 1 + eventos.length) % eventos.length)}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-3 py-2 text-2xl font-bold text-white transition hover:bg-black/60"
+                  aria-label="Evento anterior"
+                >
+                  &lt;
+                </button>
+                <button
+                  onClick={() => handleEventosChange((eventosIndex + 1) % eventos.length)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-3 py-2 text-2xl font-bold text-white transition hover:bg-black/60"
+                  aria-label="Siguiente evento"
+                >
+                  &gt;
+                </button>
 
-              {/* Dots */}
-              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-3">
+                {/* Dots */}
+              </div>
+
+              {/* Dots fuera de la card */}
+              <div className="mt-4 flex justify-center gap-3">
                 {eventos.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleEventosChange(idx)}
-                    className={`h-3 w-3 rounded-full transition ${idx === eventosIndex ? 'bg-white' : 'bg-white/50'}`}
+                    className={`h-2.5 w-2.5 rounded-full transition ${idx === eventosIndex ? 'bg-emerald-600' : 'bg-emerald-200'}`}
+                    aria-label={`Ir al evento ${idx + 1}`}
                   />
                 ))}
-              </div>
             </div>
           </div>
         </section>
 
-        {/* SECCION 04 - BENEFICIOS */}
-        <section className="w-full py-20">
+        {/* BENEFICIOS */}
+        <section className="pb-20">
           <div className="mx-auto max-w-7xl px-6">
-            <h2 className="mb-16 text-center text-3xl font-semibold text-slate-900">Descubre todos los beneficios</h2>
-            <div className="grid gap-12 sm:grid-cols-3 md:gap-24">
+            <div className="mb-10 text-center">
+              <p className="text-sm uppercase tracking-[0.25em] text-emerald-700">Por qué usar Conexión EcoRisaralda</p>
+              <h2 className="mt-2 text-3xl font-semibold text-slate-900">Diseñado para viajeros conscientes</h2>
+              <p className="mt-3 text-slate-600">Configura, guarda y comparte experiencias sostenibles mientras recibes la mejor curaduría local.</p>
+            </div>
+
+            <div className="grid gap-10 md:grid-cols-3">
               {beneficios.map((beneficio) => (
-                <div key={beneficio.id} className="flex flex-col items-center gap-6 text-center">
-                  <img src={beneficio.image} alt={beneficio.title} className="h-24 w-24" />
-                  <p className="text-lg text-slate-700">{beneficio.title}</p>
+                <div key={beneficio.id} className="flex min-h-64 w-full flex-col gap-4 rounded-lg border border-emerald-100 bg-emerald-50/30 p-6 text-center shadow-sm shadow-emerald-100/50">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-emerald-100/50">
+                    <img src={beneficio.image} alt={beneficio.title} className="h-10 w-10" />
+                  </div>
+                  <p className="text-base font-semibold text-slate-900 leading-snug">{beneficio.title}</p>
+                  <p className="text-sm text-slate-600 leading-relaxed">Optimiza tu viaje con herramientas pensadas para seguridad, personalización y comunidad.</p>
                 </div>
               ))}
             </div>
-            <div className="mt-12 flex justify-center">
-              <button onClick={onNavigateOferta} className="rounded-lg bg-[#3c8428] px-8 py-3 font-semibold text-white transition hover:bg-white hover:text-[#267E1B] hover:outline hover:outline-[#267E1B]">
-                  Leer más
+
+            <div className="mt-12 flex flex-col items-center gap-4 rounded-lg bg-transparent px-6 py-8 text-center">
+              <h3 className="text-2xl font-semibold text-slate-900">Configura tus preferencias en minutos</h3>
+              <p className="max-w-2xl text-slate-700">Activa notificaciones, selecciona categorías de interés y guarda sitios para recibir recordatorios antes de tus salidas.</p>
+              <div className="flex flex-wrap justify-center gap-3">
+                <button
+                  onClick={onNavigateOferta}
+                  className="rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-emerald-700"
+                >
+                  Ver cómo funciona
                 </button>
+                <button
+                  onClick={onNavigateRegister}
+                  className="rounded-full border border-emerald-300 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:bg-emerald-50"
+                >
+                  Crear cuenta ahora
+                </button>
+              </div>
             </div>
           </div>
         </section>
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-[#267E1B] bg-slate-200 py-12">
-        <div className="mx-auto max-w-7xl px-6">
+      <footer className="border-t border-emerald-100 bg-emerald-50/50">
+        <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {/* Col 1 */}
             <div>
               <h3 className="mb-2 text-lg font-bold text-slate-900">Conexion</h3>
               <p className="mb-4 text-sm text-slate-700">EcoRisaralda</p>
-              <div className="flex gap-4 text-lg text-[#4caf50]">
+              <div className="flex gap-4 text-lg text-emerald-600">
                 <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
                 <a href="#"><FontAwesomeIcon icon={faLinkedin} /></a>
                 <a href="#"><FontAwesomeIcon icon={faYoutube} /></a>
                 <a href="#"><FontAwesomeIcon icon={faInstagram} /></a>
               </div>
-              <div className="mt-4 text-sm">
+              <div className="mt-4 text-sm text-slate-700">
                 🌐
-                <select className="ml-2 rounded px-2 py-1">
+                <select className="ml-2 rounded border border-emerald-200 bg-white px-2 py-1 text-slate-700 outline-none">
                   <option>Español</option>
                   <option>English</option>
                 </select>
@@ -360,9 +327,9 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
             <div>
               <h4 className="mb-4 font-bold text-slate-900">Información</h4>
               <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="#" className="hover:underline">Conexión EcoRisaralda</a></li>
-                <li><a href="#" className="hover:underline">Descripcion</a></li>
-                <li><a href="#" className="hover:underline">Lema</a></li>
+                <li><a href="#" className="hover:text-slate-900">Conexión EcoRisaralda</a></li>
+                <li><a href="#" className="hover:text-slate-900">Descripción</a></li>
+                <li><a href="#" className="hover:text-slate-900">Lema</a></li>
               </ul>
             </div>
 
@@ -370,9 +337,9 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
             <div>
               <h4 className="mb-4 font-bold text-slate-900">Navegación rápida</h4>
               <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="#" className="hover:underline">Inicio</a></li>
-                <li><button onClick={onNavigateSobreNosotros} className="hover:underline text-left">Sobre nosotros</button></li>
-                <li><button onClick={onNavigatePrivacidad} className="hover:underline text-left">Políticas</button></li>
+                <li><button onClick={onNavigateColeccion} className="text-left hover:text-slate-900">Inicio</button></li>
+                <li><button onClick={onNavigateSobreNosotros} className="text-left hover:text-slate-900">Sobre nosotros</button></li>
+                <li><button onClick={onNavigatePrivacidad} className="text-left hover:text-slate-900">Políticas</button></li>
               </ul>
             </div>
 
@@ -380,14 +347,14 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
             <div>
               <h4 className="mb-4 font-bold text-slate-900">Contacto y soporte</h4>
               <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="mailto:ecorisaralda@contacto.com" className="hover:underline">ecorisaralda@contacto.com</a></li>
-                <li><a href="#" className="hover:underline">300 445 80055</a></li>
-                <li><a href="#" className="hover:underline">Preguntas</a></li>
+                <li><a href="mailto:ecorisaralda@contacto.com" className="hover:text-slate-900">ecorisaralda@contacto.com</a></li>
+                <li><a href="#" className="hover:text-slate-900">300 445 80055</a></li>
+                <li><a href="#" className="hover:text-slate-900">Preguntas</a></li>
               </ul>
             </div>
           </div>
 
-          <div className="mt-12 border-t border-slate-300 pt-6 text-center text-sm text-slate-600">
+          <div className="mt-12 border-t border-emerald-100 pt-6 text-center text-sm text-slate-600">
             <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
             <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
           </div>

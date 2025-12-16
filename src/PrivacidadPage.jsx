@@ -1,45 +1,29 @@
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
 
 function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister }) {
+  const [heroVisible, setHeroVisible] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setHeroVisible(true), 50);
+    return () => clearTimeout(t);
+  }, []);
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900">
-      {/* Header */}
-      <header className="fixed top-0 z-50 w-full bg-white shadow-sm">
-        <div className="flex items-center justify-between px-6 py-4 md:px-12">
-          <button onClick={onNavigateHome} className="flex items-center gap-2 hover:opacity-80">
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
-            <div>
-              <h3 className="text-sm font-bold">Conexion</h3>
-              <p className="text-xs text-slate-600">EcoRisaralda</p>
-            </div>
-          </button>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onNavigateRegister}
-              className="h-10 rounded-lg bg-[#267E1B] px-6 text-sm font-semibold text-white transition hover:bg-white hover:text-[#267E1B] hover:border hover:border-[#267E1B]"
-            >
-              Registrarse
-            </button>
-            <button
-              onClick={onNavigateLogin}
-              className="h-10 rounded-lg border-2 border-[#267E1B] px-6 text-sm font-semibold text-[#267E1B] transition hover:bg-[#267E1B] hover:text-white"
-            >
-              Iniciar Sesión
-            </button>
-            <button className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-8 w-8" />
-            </button>
-          </div>
+      {/* Hero: más alto, texto inferior izquierda, overlay con crossfade */}
+      <section className="relative min-h-[70vh] w-full overflow-hidden bg-cover bg-center" style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.jpg')" }}>
+        <div className={`absolute inset-0 bg-gradient-to-r from-white via-white/70 to-transparent md:from-white md:via-white/50 md:to-black/10 transition-opacity duration-500 ${heroVisible ? 'opacity-100' : 'opacity-0'}`} />
+        <div className={`absolute bottom-8 left-6 md:bottom-12 md:left-12 z-10 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900">Política de Privacidad</h1>
+          <p className="mt-3 max-w-2xl text-base md:text-lg text-slate-700 leading-relaxed">Cómo protegemos tus datos y qué derechos tienes.</p>
         </div>
-      </header>
+      </section>
 
       {/* Main Content */}
-      <main className="mx-auto mt-32 mb-12 flex w-[90%] max-w-5xl flex-1 flex-col gap-12 px-5 md:px-10">
+      <main className="mx-auto mb-12 flex w-[90%] max-w-5xl flex-1 flex-col gap-12 px-5 md:px-10">
         <div>
-          <h1 className="mb-12 text-3xl font-bold text-[#267E1B] md:text-4xl">Política de Privacidad</h1>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-3xl md:text-4xl font-semibold text-slate-900">Introducción</h2>
+          <p className="text-base md:text-lg text-slate-700 leading-relaxed">
             En Conexión EcoRisaralda valoramos y protegemos tu privacidad. Esta Política de Privacidad
             describe cómo recopilamos, usamos y protegemos los datos personales que nos facilitas al registrarte
             como Turista o Empleado, así como al navegar y utilizar nuestra web de ecoturismo.
@@ -47,16 +31,16 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">1. Responsable del tratamiento</h2>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">1. Responsable del tratamiento</h2>
+          <p className="text-base md:text-lg text-slate-700 leading-relaxed">
             La entidad responsable del tratamiento de tus datos es EcoRisaralda,
             con domicilio en Calle 21 55 a y correo de contacto conexion@ecorisaralda.co.
           </p>
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">2. Datos que recopilamos</h2>
-          <ul className="list-inside list-disc space-y-2 text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">2. Datos que recopilamos</h2>
+          <ul className="list-inside list-disc space-y-2 text-base md:text-lg text-slate-700 leading-relaxed">
             <li>Datos de identificación: nombre, apellidos, dirección de correo electrónico, fecha de nacimiento.</li>
             <li>Datos de acceso: nombre de usuario, contraseña en formato cifrado.</li>
             <li>Datos de perfil (opcional): fotografía, preferencias de viaje, intereses ecológicos.</li>
@@ -66,11 +50,11 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">3. Finalidades del tratamiento</h2>
-          <p className="mb-4 text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">3. Finalidades del tratamiento</h2>
+          <p className="mb-4 text-base md:text-lg text-slate-700 leading-relaxed">
             Recogemos y tratamos tus datos para las siguientes finalidades:
           </p>
-          <ul className="list-inside list-disc space-y-2 text-lg text-gray-600 leading-relaxed">
+          <ul className="list-inside list-disc space-y-2 text-base md:text-lg text-slate-700 leading-relaxed">
             <li>Registro y autenticación: permitir el acceso seguro a tu cuenta de Turista o Empleado.</li>
             <li>Gestión de beneficios: otorgar y personalizar descuentos, notificaciones y recomendaciones adaptadas a turísticas</li>
             <li>Comunicación: enviarte correos electrónicos o notificaciones push sobre eventos, ofertas y cambios en el servicio.</li>
@@ -80,9 +64,9 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">4. Legitimación</h2>
-          <p className="mb-4 text-lg text-gray-600 leading-relaxed">El tratamiento de tus datos se basa en:</p>
-          <ul className="list-inside list-disc space-y-2 text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">4. Legitimación</h2>
+          <p className="mb-4 text-base md:text-lg text-slate-700 leading-relaxed">El tratamiento de tus datos se basa en:</p>
+          <ul className="list-inside list-disc space-y-2 text-base md:text-lg text-slate-700 leading-relaxed">
             <li>Tu consentimiento al aceptar esta Política y al marcar las casillas de registro</li>
             <li>La ejecución de un contrato cuando accedes a funciones de pago o beneficios exclusivos.</li>
             <li>El interés legítimo en mejorar y proteger la plataforma, siempre garantizando la mínima intrusión</li>
@@ -90,11 +74,11 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">5. Destinatarios de los datos</h2>
-          <p className="mb-4 text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">5. Destinatarios de los datos</h2>
+          <p className="mb-4 text-base md:text-lg text-slate-700 leading-relaxed">
             No cederemos ni compartiremos tus datos personales con terceros salvo en los siguientes casos:
           </p>
-          <ul className="list-inside list-disc space-y-2 text-lg text-gray-600 leading-relaxed">
+          <ul className="list-inside list-disc space-y-2 text-base md:text-lg text-slate-700 leading-relaxed">
             <li>Proveedores de servicios que colaboran en el envío de correos o gestión de datos (hosting, servidores de correo).</li>
             <li>Autoridades competentes, si legalmente se nos requiere.</li>
             <li>Empresas colaboradoras, solo si marcas expresamente tu consentimiento para promociones conjuntas.</li>
@@ -102,9 +86,9 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">6. Derechos de los usuarios</h2>
-          <p className="mb-4 text-lg text-gray-600 leading-relaxed">Como usuario, tienes derecho a:</p>
-          <ul className="list-inside list-disc space-y-2 text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">6. Derechos de los usuarios</h2>
+          <p className="mb-4 text-base md:text-lg text-slate-700 leading-relaxed">Como usuario, tienes derecho a:</p>
+          <ul className="list-inside list-disc space-y-2 text-base md:text-lg text-slate-700 leading-relaxed">
             <li>Acceder a tus datos y conocer qué tratamos.</li>
             <li>Rectificar información inexacta o incompleta</li>
             <li>Suprimir tus datos ("derecho al olvido").</li>
@@ -117,8 +101,8 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">7. Conservación de los datos</h2>
-          <ul className="list-inside list-disc space-y-2 text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">7. Conservación de los datos</h2>
+          <ul className="list-inside list-disc space-y-2 text-base md:text-lg text-slate-700 leading-relaxed">
             <li>Los datos de cuenta y perfil se conservarán mientras mantengas tu usuario activo</li>
             <li>Los datos de navegación y actividad se guardarán, de forma agregada y anónima, hasta 24 meses para fines estadísticos</li>
             <li>Una vez cancelada tu cuenta, tu información personal será bloqueada y eliminada en un plazo máximo de 30 días, salvo obligación legal en contrario.</li>
@@ -126,16 +110,16 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">8. Seguridad</h2>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">8. Seguridad</h2>
+          <p className="text-base md:text-lg text-slate-700 leading-relaxed">
             Implementamos medidas técnicas y organizativas apropiadas para garantizar la seguridad e
             integridad de tus datos, como cifrado SSL, almacenamiento en servidores seguros y protocolos de control de acceso.
           </p>
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">9. Menores de edad</h2>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">9. Menores de edad</h2>
+          <p className="text-base md:text-lg text-slate-700 leading-relaxed">
             Nuestro sitio no está dirigido a menores de 16 años. Si eres menor, no
             debes registrarte. Si tenemos conocimiento de que hemos recogido datos de un menor
             sin consentimiento parental, procederemos a su eliminación inmediata
@@ -143,9 +127,9 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">10. Cookies y tecnologías similares</h2>
-          <p className="mb-4 text-lg text-gray-600 leading-relaxed">Utilizamos cookies propias y de terceros para:</p>
-          <ul className="list-inside list-disc space-y-2 text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">10. Cookies y tecnologías similares</h2>
+          <p className="mb-4 text-base md:text-lg text-slate-700 leading-relaxed">Utilizamos cookies propias y de terceros para:</p>
+          <ul className="list-inside list-disc space-y-2 text-base md:text-lg text-slate-700 leading-relaxed">
             <li>Mejorar tu experiencia de navegación</li>
             <li>Analizar el uso del sitio.</li>
             <li>
@@ -156,8 +140,8 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-[#267E1B]">11. Modificaciones de la política</h2>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <h2 className="mb-4 text-2xl md:text-3xl font-semibold text-slate-900">11. Modificaciones de la política</h2>
+          <p className="text-base md:text-lg text-slate-700 leading-relaxed">
             Nos reservamos el derecho de actualizar esta Política de Privacidad en cualquier momento.
             Publicaremos la versión vigente con la fecha de la
             última actualización y, si los cambios son sustanciales, te informaremos por correo
@@ -165,65 +149,71 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
         </div>
 
         <div>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <p className="text-base md:text-lg text-slate-700 leading-relaxed">
             Si tienes cualquier duda o solicitud relacionada con tus datos personales, no dudes en
             contactarnos en contacto conexion@ecorisaralda.co.
           </p>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="mt-auto border-t border-[#267E1B] bg-gray-200 px-6 py-12 md:px-12">
-        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
-          <div>
-            <h2 className="mb-1 text-xl font-bold text-slate-900">Conexion</h2>
-            <p className="mb-4 text-sm text-gray-700">EcoRisaralda</p>
-            <div className="flex gap-4 text-lg text-[#4caf50]">
-              <a href="#" className="transition hover:scale-125"><FontAwesomeIcon icon={faFacebook} /></a>
-              <a href="#" className="transition hover:scale-125"><FontAwesomeIcon icon={faLinkedin} /></a>
-              <a href="#" className="transition hover:scale-125"><FontAwesomeIcon icon={faYoutube} /></a>
-              <a href="#" className="transition hover:scale-125"><FontAwesomeIcon icon={faInstagram} /></a>
+      {/* Footer (estilo Home) */}
+      <footer className="border-t border-emerald-100 bg-emerald-50/50">
+        <div className="mx-auto max-w-7xl px-6 py-12">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Col 1 */}
+            <div>
+              <h3 className="mb-2 text-lg font-bold text-slate-900">Conexion</h3>
+              <p className="mb-4 text-sm text-slate-700">EcoRisaralda</p>
+              <div className="flex gap-4 text-lg text-emerald-600">
+                <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
+                <a href="#"><FontAwesomeIcon icon={faLinkedin} /></a>
+                <a href="#"><FontAwesomeIcon icon={faYoutube} /></a>
+                <a href="#"><FontAwesomeIcon icon={faInstagram} /></a>
+              </div>
+              <div className="mt-4 text-sm text-slate-700">
+                🌐
+                <select className="ml-2 rounded border border-emerald-200 bg-white px-2 py-1 text-slate-700 outline-none">
+                  <option>Español</option>
+                  <option>English</option>
+                </select>
+              </div>
             </div>
-            <div className="mt-4 flex items-center gap-2">
-              <span>🌐</span>
-              <select className="rounded border px-2 py-1 text-sm">
-                <option>Español</option>
-                <option>English</option>
-              </select>
+
+            {/* Col 2 */}
+            <div>
+              <h4 className="mb-4 font-bold text-slate-900">Información</h4>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li><a href="#" className="hover:text-slate-900">Conexión EcoRisaralda</a></li>
+                <li><a href="#" className="hover:text-slate-900">Descripción</a></li>
+                <li><a href="#" className="hover:text-slate-900">Lema</a></li>
+              </ul>
+            </div>
+
+            {/* Col 3 */}
+            <div>
+              <h4 className="mb-4 font-bold text-slate-900">Navegación rápida</h4>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li><button onClick={onNavigateHome} className="text-left hover:text-slate-900">Inicio</button></li>
+                <li><button className="text-left hover:text-slate-900">Sobre nosotros</button></li>
+                <li><button className="text-left hover:text-slate-900">Políticas</button></li>
+              </ul>
+            </div>
+
+            {/* Col 4 */}
+            <div>
+              <h4 className="mb-4 font-bold text-slate-900">Contacto y soporte</h4>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li><a href="mailto:ecorisaralda@contacto.com" className="hover:text-slate-900">ecorisaralda@contacto.com</a></li>
+                <li><a href="#" className="hover:text-slate-900">300 445 80055</a></li>
+                <li><a href="#" className="hover:text-slate-900">Preguntas</a></li>
+              </ul>
             </div>
           </div>
 
-          <div>
-            <h4 className="mb-3 font-bold text-slate-900">Información</h4>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li><a href="#" onClick={onNavigateHome} className="hover:underline">Conexión EcoRisaralda</a></li>
-              <li><a href="#" onClick={onNavigateHome} className="hover:underline">Descripción</a></li>
-              <li><a href="#" onClick={onNavigateHome} className="hover:underline">Lema</a></li>
-            </ul>
+          <div className="mt-12 border-t border-emerald-100 pt-6 text-center text-sm text-slate-600">
+            <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
+            <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
           </div>
-
-          <div>
-            <h4 className="mb-3 font-bold text-slate-900">Navegación rápida</h4>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li><a href="#" onClick={onNavigateHome} className="hover:underline">Inicio</a></li>
-              <li><a href="#" className="hover:underline">Sobre nosotros</a></li>
-              <li><a href="#" className="hover:underline">Políticas</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-3 font-bold text-slate-900">Contacto y soporte</h4>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li><a href="mailto:ecorisaralda@contacto.com" className="hover:underline">ecorisaralda@contacto.com</a></li>
-              <li><a href="#" className="hover:underline">300 445 80055</a></li>
-              <li><a href="#" className="hover:underline">Preguntas</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-400 pt-6 text-center text-sm text-gray-700">
-          <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
-          <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
         </div>
       </footer>
     </div>

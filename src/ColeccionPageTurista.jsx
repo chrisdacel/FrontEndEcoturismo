@@ -62,7 +62,7 @@ export default function ColeccionPageTurista({
   };
 
   return (
-    <div className="min-h-screen bg-white font-['Albert_Sans']">
+    <div className="min-h-screen coleccion-shell font-['Albert_Sans']">
       {/* Header */}
       <header className="bg-white shadow-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -110,7 +110,7 @@ export default function ColeccionPageTurista({
       <main>
         {/* Hero Section with Search */}
         <section
-          className="relative h-96 bg-cover bg-center flex items-center justify-center"
+          className="coleccion-hero relative h-96 bg-cover bg-center flex items-center justify-center"
           style={{ backgroundImage: "url('/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg')" }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -121,7 +121,7 @@ export default function ColeccionPageTurista({
                 placeholder="Buscar destinos..."
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
-                className="flex-1 px-6 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="coleccion-pill-input flex-1 px-6 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition">
                 Buscar
@@ -140,14 +140,14 @@ export default function ColeccionPageTurista({
                 <button
                   onClick={() => handleCarouselPrev(0)}
                   disabled={carouselIndex[0] === 0}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="coleccion-carousel-nav absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:cursor-not-allowed"
                 >
                   <span className="text-2xl font-bold text-gray-700">&lsaquo;</span>
                 </button>
                 <button
                   onClick={() => handleCarouselNext(0)}
                   disabled={carouselIndex[0] >= sitios.length - 4}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="coleccion-carousel-nav absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:cursor-not-allowed"
                 >
                   <span className="text-2xl font-bold text-gray-700">&rsaquo;</span>
                 </button>
@@ -157,7 +157,7 @@ export default function ColeccionPageTurista({
                     <div
                       key={index}
                       onClick={onNavigateSitio}
-                      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition"
+                      className="coleccion-card bg-white rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition"
                     >
                       <img src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
                       <div className="p-4">
@@ -177,14 +177,14 @@ export default function ColeccionPageTurista({
                 <button
                   onClick={() => handleCarouselPrev(1)}
                   disabled={carouselIndex[1] === 0}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="coleccion-carousel-nav absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:cursor-not-allowed"
                 >
                   <span className="text-2xl font-bold text-gray-700">&lsaquo;</span>
                 </button>
                 <button
                   onClick={() => handleCarouselNext(1)}
                   disabled={carouselIndex[1] >= sitios.length - 4}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="coleccion-carousel-nav absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:cursor-not-allowed"
                 >
                   <span className="text-2xl font-bold text-gray-700">&rsaquo;</span>
                 </button>
@@ -194,7 +194,7 @@ export default function ColeccionPageTurista({
                     <div
                       key={index}
                       onClick={onNavigateSitio}
-                      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition"
+                      className="coleccion-card bg-white rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition"
                     >
                       <img src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
                       <div className="p-4">
@@ -214,14 +214,14 @@ export default function ColeccionPageTurista({
                 <button
                   onClick={() => handleCarouselPrev(2)}
                   disabled={carouselIndex[2] === 0}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="coleccion-carousel-nav absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:cursor-not-allowed"
                 >
                   <span className="text-2xl font-bold text-gray-700">&lsaquo;</span>
                 </button>
                 <button
                   onClick={() => handleCarouselNext(2)}
                   disabled={carouselIndex[2] >= sitios.length - 4}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="coleccion-carousel-nav absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg disabled:cursor-not-allowed"
                 >
                   <span className="text-2xl font-bold text-gray-700">&rsaquo;</span>
                 </button>
@@ -255,16 +255,16 @@ export default function ColeccionPageTurista({
                 <div
                   key={index}
                   onClick={onNavigateSitio}
-                  className="relative group cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition"
+                  className="coleccion-reco-card relative group cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition"
                 >
                   <img src={item.img} alt={item.title} className="w-full h-64 object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                       <h3 className="text-xl font-bold mb-1">{item.title}</h3>
                       <p className="text-sm">{item.desc}</p>
                     </div>
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white bg-gradient-to-t from-black to-transparent group-hover:opacity-0 transition-opacity">
+                  <div className="absolute bottom-0 left-0 right-0 z-20 p-4 text-white bg-gradient-to-t from-black to-transparent group-hover:opacity-0 transition-opacity">
                     <h3 className="text-lg font-bold">{item.title}</h3>
                   </div>
                 </div>

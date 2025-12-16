@@ -63,6 +63,13 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     },
   ];
 
+  // Imágenes del hero (ubica las imágenes adjuntas en estas rutas)
+  const heroShots = [
+    { id: 'h1', nombre: 'Palmas de cera', imagen: '/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg' },
+    { id: 'h2', nombre: 'Bandera de Colombia', imagen: '/images/Coleccion_sitios_ecoturisticos/paisaje_02.jpeg' },
+    { id: 'h3', nombre: 'Colibrí en juncos', imagen: '/images/Coleccion_sitios_ecoturisticos/paisaje_03.jpeg' },
+  ];
+
   // Scroll to top button
   useEffect(() => {
     const handleScroll = () => {
@@ -93,40 +100,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      {/* Header */}
-      <header className="fixed top-0 z-50 w-full bg-white shadow-sm">
-        <div className="flex items-center justify-between px-6 py-4 md:px-12">
-          <button onClick={onNavigateHome} className="flex items-center gap-2 hover:opacity-80">
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">Conexion</h3>
-              <p className="text-xs text-slate-600">EcoRisaralda</p>
-            </div>
-          </button>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onNavigateHome}
-              className="hidden h-10 rounded-lg bg-[#267E1B] px-6 text-sm font-semibold text-white transition hover:bg-[#1f6517] md:block"
-            >
-              Registrarse
-            </button>
-            <button
-              onClick={onNavigateLogin}
-              className="hidden h-10 rounded-lg border-2 border-[#267E1B] px-6 text-sm font-semibold text-[#267E1B] transition hover:bg-[#267E1B] hover:text-white md:block"
-            >
-              Iniciar Sesión
-            </button>
-
-            {/* Mobile Menu */}
-            <button className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-8 w-8" />
-            </button>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen coleccion-shell text-slate-900">
       {/* Scroll to Top Button */}
       {scrollToTop && (
         <button
@@ -137,187 +111,141 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
         </button>
       )}
 
-      <main className="pt-20">
-        {/* Sección 1: Carrusel Principal */}
-        <section className="w-full bg-white py-20">
-          <div className="flex flex-col gap-12 md:flex-row md:items-center md:gap-8 px-6 md:px-12">
-            {/* Izquierda: Imágenes */}
-            <div className="flex-1 flex justify-center items-center gap-4">
-              <img
-                src={sitios[0].imagen}
-                alt="Principal"
-                className="h-96 w-56 rounded-lg object-cover shadow-lg"
-              />
+      <main className="pt-6">
+        {/* Sección 1: Hero con trío de imágenes y buscador */}
+        <section className="relative w-full py-16 md:py-20 coleccion-hero">
+          <div className="relative z-10 flex flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-between md:gap-10 md:px-12">
+            {/* Izquierda: trío de imágenes verticales */}
+            <div className="w-full max-w-3xl md:max-w-2xl flex justify-center">
+              <div className="flex w-full max-w-2xl gap-4 md:gap-5">
+                {heroShots.map((shot, idx) => (
+                  <div key={shot.id} className="flex items-end">
+                    <img
+                      src={shot.imagen}
+                      alt={shot.nombre}
+                      className={`object-cover rounded-[22px] shadow-lg w-[120px] h-[280px] md:w-[150px] md:h-[340px] lg:w-[170px] lg:h-[400px] ${idx === 1 ? 'h-[300px] md:h-[360px] lg:h-[430px]' : ''}`}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Derecha: Título y Buscador */}
-            <div className="flex-1 flex flex-col items-center gap-8">
-              <div className="text-center">
-                <h1 className="text-4xl md:text-5xl font-bold text-[#267E1B] mb-4">
-                  Conoce los mejores destinos
-                </h1>
-                <h1 className="text-4xl md:text-5xl font-bold text-[#267E1B]">
-                  turísticos en un clic
-                </h1>
+            <div className="relative z-10 flex-1 max-w-xl md:max-w-lg lg:max-w-xl flex flex-col items-center md:items-start gap-6 md:gap-8">
+              <div className="text-center md:text-left space-y-2">
+                <h1 className="text-4xl md:text-5xl font-bold text-slate-900">Explora y conecta con la naturaleza</h1>
+                <p className="text-slate-700">Busca sitios, actividades y experiencias sostenibles.</p>
               </div>
-
-              <div className="relative w-full max-w-md">
+              <div className="flex w-full max-w-md items-center gap-2">
                 <input
                   type="text"
-                  placeholder="Buscar en EcoRisaralda..."
-                  className="w-full rounded-full border-2 border-[#267E1B] px-6 py-3 focus:outline-none focus:ring-2 focus:ring-[#267E1B]"
+                  placeholder="Buscar destinos..."
+                  className="w-full rounded-lg border border-emerald-200 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-300"
                 />
-                <img
-                  src="/images/Pagina_inicio/search-svgrepo-com.svg"
-                  alt="Buscar"
-                  className="absolute right-4 top-1/2 h-6 w-6 -translate-y-1/2"
-                />
+                <button className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 transition">Buscar</button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Sección 2: Carruseles de Sitios */}
-        <section className="w-full bg-white py-16 px-6 md:px-12">
-          {[0, 1, 2].map((carouselNum) => (
-            <div key={carouselNum} className="mb-12">
-              <div className="relative flex items-center gap-4">
-                {/* Botón Anterior */}
-                <button
-                  onClick={() => handleCarouselPrev(carouselNum)}
-                  disabled={carouselIndex[carouselNum] === 0}
-                  className="text-3xl font-bold text-[#267E1B] hover:scale-125 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  ‹
-                </button>
+        {/* Sección 3: Recomendaciones (scroll lateral) */}
+        <section className="w-full bg-white py-16 px-0 md:px-0 mb-20">
+          <h2 className="mb-8 px-6 md:px-12 text-3xl font-bold">Recomendaciones</h2>
 
-                {/* Carrusel */}
-                <div className="flex-1 overflow-hidden">
-                  <div className="flex gap-4 transition-transform duration-500"
-                    style={{
-                      transform: `translateX(-${carouselIndex[carouselNum] * (100 / 4)}%)`,
-                    }}
-                  >
-                    {sitios.map((sitio) => (
-                      <div
-                        key={sitio.id}
-                        className="flex-shrink-0 w-1/4 flex flex-col gap-2"
-                      >
-                        <img
-                          src={sitio.imagen}
-                          alt={sitio.nombre}
-                          className="h-48 w-full rounded-lg object-cover"
-                        />
-                        <h5 className="font-bold text-slate-900 text-sm">{sitio.nombre}</h5>
-                        <p className="text-xs text-gray-600">{sitio.ubicacion}</p>
-                      </div>
-                    ))}
+          {/* Carril con scroll horizontal y snap */}
+          <div className="overflow-x-auto scrollbar-none px-6 md:px-12">
+            <div className="flex gap-6 md:gap-8 snap-x snap-mandatory">
+              {recomendaciones.map((rec) => (
+                <article
+                  key={rec.id}
+                  className="group relative shrink-0 snap-start w-[260px] sm:w-[300px] md:w-[340px] aspect-[9/16] rounded-[26px] overflow-hidden shadow-xl cursor-pointer"
+                >
+                  {/* Imagen */}
+                  <img
+                    src={rec.imagen}
+                    alt={rec.nombre}
+                    className="absolute inset-0 h-full w-full object-cover rounded-[26px] origin-center transform transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+
+                  {/* Gradiente y contenido que aparecen en hover */}
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-[26px]" />
+
+                  <div className="absolute inset-0 flex flex-col justify-between p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-[26px]">
+                    <div className="relative z-10 space-y-1 text-white">
+                      <p className="text-white/80 text-xs font-semibold">Recomendado</p>
+                      <h3 className="text-2xl font-bold leading-tight">{rec.nombre}</h3>
+                      <p className="text-sm">Explora este destino increíble</p>
+                    </div>
+                    <div className="relative z-10 flex items-center justify-between">
+                      <div className="rounded-full bg-white/20 text-white text-xs px-3 py-1 backdrop-blur">Más destinos</div>
+                      <button className="grid place-items-center h-8 w-8 rounded-full bg-black/40 text-white backdrop-blur hover:bg-black/60 transition">+</button>
+                    </div>
                   </div>
-                </div>
-
-                {/* Botón Siguiente */}
-                <button
-                  onClick={() => handleCarouselNext(carouselNum)}
-                  disabled={carouselIndex[carouselNum] >= sitios.length - 4}
-                  className="text-3xl font-bold text-[#267E1B] hover:scale-125 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                  ›
-                </button>
-              </div>
+                </article>
+              ))}
             </div>
-          ))}
-        </section>
-
-        {/* Sección 3: Recomendaciones */}
-        <section className="w-full bg-white py-16 px-6 md:px-12 mb-20">
-          <h2 className="mb-12 text-center text-3xl font-bold">Recomendaciones</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {recomendaciones.map((rec) => (
-              <div key={rec.id} className="group relative cursor-pointer">
-                <img
-                  src={rec.imagen}
-                  alt={rec.nombre}
-                  className="h-80 w-full rounded-lg object-cover shadow-lg"
-                />
-                {/* Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                  <div className="text-center text-white">
-                    <h4 className="text-xl font-bold mb-2">{rec.nombre}</h4>
-                    <p className="text-sm">Explora este destino increíble</p>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[#267E1B] bg-gray-200 px-6 py-12 md:px-12">
-        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
-          {/* Columna 1 */}
-          <div>
-            <h2 className="mb-2 text-xl font-bold text-slate-900">Conexion</h2>
-            <p className="mb-4 text-sm text-gray-700">EcoRisaralda</p>
-            <div className="flex gap-4 text-lg text-[#267E1B]">
-              <a href="#" className="hover:scale-125 transition">
-                <FontAwesomeIcon icon={faFacebook} />
-              </a>
-              <a href="#" className="hover:scale-125 transition">
-                <FontAwesomeIcon icon={faLinkedin} />
-              </a>
-              <a href="#" className="hover:scale-125 transition">
-                <FontAwesomeIcon icon={faYoutube} />
-              </a>
-              <a href="#" className="hover:scale-125 transition">
-                <FontAwesomeIcon icon={faInstagram} />
-              </a>
+      {/* Footer (estilo Home) */}
+      <footer className="border-t border-emerald-100 bg-emerald-50/50">
+        <div className="mx-auto max-w-7xl px-6 py-12">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Col 1 */}
+            <div>
+              <h3 className="mb-2 text-lg font-bold text-slate-900">Conexion</h3>
+              <p className="mb-4 text-sm text-slate-700">EcoRisaralda</p>
+              <div className="flex gap-4 text-lg text-emerald-600">
+                <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
+                <a href="#"><FontAwesomeIcon icon={faLinkedin} /></a>
+                <a href="#"><FontAwesomeIcon icon={faYoutube} /></a>
+                <a href="#"><FontAwesomeIcon icon={faInstagram} /></a>
+              </div>
+              <div className="mt-4 text-sm text-slate-700">
+                🌐
+                <select className="ml-2 rounded border border-emerald-200 bg-white px-2 py-1 text-slate-700 outline-none">
+                  <option>Español</option>
+                  <option>English</option>
+                </select>
+              </div>
             </div>
-            <div className="mt-4">
-              <span className="mr-2">🌐</span>
-              <select className="rounded border px-2 py-1">
-                <option>Español</option>
-                <option>English</option>
-              </select>
+
+            {/* Col 2 */}
+            <div>
+              <h4 className="mb-4 font-bold text-slate-900">Información</h4>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li><a href="#" className="hover:text-slate-900">Conexión EcoRisaralda</a></li>
+                <li><a href="#" className="hover:text-slate-900">Descripción</a></li>
+                <li><a href="#" className="hover:text-slate-900">Lema</a></li>
+              </ul>
+            </div>
+
+            {/* Col 3 */}
+            <div>
+              <h4 className="mb-4 font-bold text-slate-900">Navegación rápida</h4>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li><button onClick={onNavigateHome} className="text-left hover:text-slate-900">Inicio</button></li>
+                <li><button onClick={onNavigateSobreNosotros} className="text-left hover:text-slate-900">Sobre nosotros</button></li>
+                <li><button onClick={onNavigatePrivacidad} className="text-left hover:text-slate-900">Políticas</button></li>
+              </ul>
+            </div>
+
+            {/* Col 4 */}
+            <div>
+              <h4 className="mb-4 font-bold text-slate-900">Contacto y soporte</h4>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li><a href="mailto:ecorisaralda@contacto.com" className="hover:text-slate-900">ecorisaralda@contacto.com</a></li>
+                <li><a href="#" className="hover:text-slate-900">300 445 80055</a></li>
+                <li><a href="#" className="hover:text-slate-900">Preguntas</a></li>
+              </ul>
             </div>
           </div>
 
-          {/* Columna 2 */}
-          <div>
-            <h4 className="mb-4 font-bold text-slate-900">Información</h4>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li><a href="#" className="hover:underline">Conexión EcoRisaralda</a></li>
-              <li><a href="#" className="hover:underline">Descripción</a></li>
-              <li><a href="#" className="hover:underline">Lema</a></li>
-            </ul>
+          <div className="mt-12 border-t border-emerald-100 pt-6 text-center text-sm text-slate-600">
+            <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
+            <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
           </div>
-
-          {/* Columna 3 */}
-          <div>
-            <h4 className="mb-4 font-bold text-slate-900">Navegación rápida</h4>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li><a href="#" onClick={onNavigateHome} className="hover:underline">Inicio</a></li>
-              <li><button onClick={onNavigateSobreNosotros} className="hover:underline text-left">Sobre nosotros</button></li>
-              <li><button onClick={onNavigatePrivacidad} className="hover:underline text-left">Políticas</button></li>
-            </ul>
-          </div>
-
-          {/* Columna 4 */}
-          <div>
-            <h4 className="mb-4 font-bold text-slate-900">Contacto y soporte</h4>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li><a href="mailto:ecorisaralda@contacto.com" className="hover:underline">ecorisaralda@contacto.com</a></li>
-              <li><a href="#" className="hover:underline">300 445 80055</a></li>
-              <li><a href="#" className="hover:underline">Preguntas</a></li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Footer Bottom */}
-        <div className="border-t border-gray-400 pt-6 text-center text-sm text-gray-700">
-          <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
-          <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
         </div>
       </footer>
     </div>

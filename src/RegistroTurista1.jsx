@@ -107,12 +107,50 @@ export default function RegistroTurista1({ onNavigateHome, onNavigateLogin, onNa
           </ul>
         </div>
 
-        {/* Next Button */}
+        {/* Términos y Condiciones */}
+        <div className="flex w-full max-w-[35vw] flex-col gap-2 md:max-w-none">
+          <div className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              id="terminos"
+              checked={formData.terminos}
+              onChange={(e) => setFormData({ ...formData, terminos: e.target.checked })}
+              className="mt-1 h-3 w-3"
+            />
+            <label htmlFor="terminos" className="text-xs text-gray-600 md:text-sm">
+              He leído y acepto los{' '}
+              <a href="#" className="text-[#267E1B] hover:underline">
+                Términos y condiciones
+              </a>
+              {' '}de Conexión EcoRisaralda
+            </label>
+          </div>
+
+          <div className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              id="privacidad"
+              checked={formData.privacidad}
+              onChange={(e) => setFormData({ ...formData, privacidad: e.target.checked })}
+              className="mt-1 h-3 w-3"
+            />
+            <label htmlFor="privacidad" className="text-xs text-gray-600 md:text-sm">
+              He leído y aceptado la{' '}
+              <a href="#" className="text-[#267E1B] hover:underline">
+                política de privacidad
+              </a>
+              {' '}de Conexión EcoRisaralda
+            </label>
+          </div>
+        </div>
+
+        {/* Finalizar Button */}
         <button
-          onClick={onNavigateNext}
-          className="w-full max-w-[35vw] rounded-md bg-[#267E1B] py-2.5 text-sm font-semibold text-white transition-all hover:border hover:border-[#267E1B] hover:bg-white hover:text-[#267E1B] md:max-w-none"
+          onClick={handleSubmit}
+          disabled={!formData.terminos || !formData.privacidad}
+          className="w-full max-w-[35vw] rounded-md bg-[#267E1B] py-2.5 text-sm font-semibold text-white transition-all hover:border hover:border-[#267E1B] hover:bg-white hover:text-[#267E1B] disabled:opacity-50 md:max-w-none"
         >
-          Siguiente
+          Finalizar
         </button>
       </main>
     </div>

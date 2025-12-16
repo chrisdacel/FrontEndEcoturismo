@@ -5,6 +5,7 @@ import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/fre
 function SobreNosotrosPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigatePrivacidad }) {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [heroVisible, setHeroVisible] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,141 +15,105 @@ function SobreNosotrosPageOperador({ userName = "Jane Mar", onNavigateHome, onNa
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const t = setTimeout(() => setHeroVisible(true), 50);
+    return () => clearTimeout(t);
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white text-slate-900">
-      {/* Header */}
-      <header className="fixed top-0 z-50 w-full bg-white shadow-md">
-        <div className="flex items-center justify-between px-6 py-4 md:px-12">
-          <button onClick={onNavigateHome} className="flex items-center gap-2 hover:opacity-80">
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
-            <div>
-              <h3 className="text-sm font-bold">Conexion</h3>
-              <p className="text-xs text-slate-600">EcoRisaralda</p>
-              <p className="text-xs font-semibold text-[#267E1B]">OPERADOR</p>
-            </div>
-          </button>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="flex items-center gap-2 hover:opacity-80"
-            >
-              <img src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-6 w-6" />
-              <span className="hidden md:inline text-sm">Buscar</span>
-            </button>
-
-            <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100">
-              <img src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="Usuario" className="h-6 w-6" />
-              <span className="text-sm font-medium">{userName}</span>
-            </div>
-
-            <button className="hidden md:block">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.png" alt="Favoritos" className="h-6 w-6" />
-            </button>
-
-            <button className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-8 w-8" />
-            </button>
-          </div>
-        </div>
-
-        {searchOpen && (
-          <div className="border-t border-gray-200 bg-white px-6 py-4 md:px-12">
-            <input
-              type="text"
-              placeholder="Escribe tu búsqueda..."
-              className="w-full rounded-lg border-2 border-[#267E1B] px-4 py-2 text-lg outline-none focus:border-[#267E1B]"
-            />
-          </div>
-        )}
-      </header>
+    <div className="flex min-h-screen flex-col bg.white text-slate-900">
 
       {/* Scroll to Top Button */}
       {showScrollTop && (
         <button
-          onClick={scrollToTop}
-          className="fixed bottom-5 right-5 z-50 rounded-full bg-white shadow-lg transition hover:scale-110 md:right-0"
-          title="Volver arriba"
-        >
-          <img src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Arriba" className="h-12 w-12" />
-        </button>
-      )}
+          {/* Footer (estilo Home) */}
+          <footer className="border-t border-emerald-100 bg-emerald-50/50">
+            <div className="mx-auto max-w-7xl px-6 py-12">
+              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                {/* Col 1 */}
+                <div>
+                  <h3 className="mb-2 text-lg font-bold text-slate-900">Conexion</h3>
+                  <p className="mb-4 text-sm text-slate-700">EcoRisaralda</p>
+                  <div className="flex gap-4 text-lg text-emerald-600">
+                    <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
+                    <a href="#"><FontAwesomeIcon icon={faLinkedin} /></a>
+                    <a href="#"><FontAwesomeIcon icon={faYoutube} /></a>
+                    <a href="#"><FontAwesomeIcon icon={faInstagram} /></a>
+                  </div>
+                  <div className="mt-4 text-sm text-slate-700">
+                    🌐
+                    <select className="ml-2 rounded border border-emerald-200 bg-white px-2 py-1 text-slate-700 outline-none">
+                      <option>Español</option>
+                      <option>English</option>
+                    </select>
+                  </div>
+                </div>
 
-      {/* Main Content */}
-      <main className="mt-16 flex flex-col">
-        {/* Hero Section */}
-        <section className="relative h-[40rem] w-full bg-cover bg-center" style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.jpg')" }}>
-          <h1 className="absolute bottom-[10%] left-[5%] text-6xl font-semibold text-white md:text-8xl lg:text-[100px]" style={{ textShadow: '-4px 0 2px rgba(0, 0, 0, 0.819)' }}>
-            Sobre Nosotros
-          </h1>
-        </section>
+                {/* Col 2 */}
+                <div>
+                  <h4 className="mb-4 font-bold text-slate-900">Información</h4>
+                  <ul className="space-y-2 text-sm text-slate-700">
+                    <li><a href="#" className="hover:text-slate-900">Conexión EcoRisaralda</a></li>
+                    <li><a href="#" className="hover:text-slate-900">Descripción</a></li>
+                    <li><a href="#" className="hover:text-slate-900">Lema</a></li>
+                  </ul>
+                </div>
 
-        {/* Description 01 */}
-        <div className="flex flex-col items-center justify-center gap-2 bg-white px-5 py-10 md:px-10">
-          <p className="text-center text-lg text-gray-500 md:text-xl lg:text-2xl">
-            En Conexión EcoRisaralda somos un equipo de apasionados por la naturaleza y el turismo responsable.
-          </p>
-          <p className="text-center text-lg text-gray-500 md:text-xl lg:text-2xl">
-            Nacimos con la misión de acercarte los rincones más auténticos y sostenibles del mundo, aquellos que
-          </p>
-          <p className="text-center text-lg text-gray-500 md:text-xl lg:text-2xl">
-            muchos desconocen pero que ofrecen experiencias inolvidables
-          </p>
-        </div>
+                {/* Col 3 */}
+                <div>
+                  <h4 className="mb-4 font-bold text-slate-900">Navegación rápida</h4>
+                  <ul className="space-y-2 text-sm text-slate-700">
+                    <li><button onClick={onNavigateHome} className="text-left hover:text-slate-900">Inicio</button></li>
+                    <li><button onClick={onNavigatePrivacidad} className="text-left hover:text-slate-900">Políticas</button></li>
+                  </ul>
+                </div>
 
-        {/* Section 02 - Content Rows */}
-        <section className="mx-auto flex w-[90%] flex-col gap-6 bg-white py-8">
-          {/* Row 1 - Nuestra Misión */}
-          <div className="flex flex-col items-center gap-12 md:flex-row md:justify-between">
-            <div className="flex w-full flex-col justify-center gap-8 md:w-[45%]">
-              <h1 className="text-3xl font-bold text-[#267E1B] md:text-4xl">Nuestra Misión</h1>
-              <p className="text-justify text-lg text-gray-500 md:text-xl lg:text-2xl">
-                Te ayudamos a descubrir destinos ecoturísticos cuidadosamente seleccionados, ofreciéndote
-                toda la información práctica que necesitas: cómo llegar, actividades disponibles,
-                alojamientos sostenibles y recomendaciones locales. Queremos que planifiques tu aventura
-                con confianza y que, al mismo tiempo, contribuyas al cuidado del medio ambiente y al
-                desarrollo de las comunidades anfitrionas.
-              </p>
+                {/* Col 4 */}
+                <div>
+                  <h4 className="mb-4 font-bold text-slate-900">Contacto y soporte</h4>
+                  <ul className="space-y-2 text-sm text-slate-700">
+                    <li><a href="mailto:ecorisaralda@contacto.com" className="hover:text-slate-900">ecorisaralda@contacto.com</a></li>
+                    <li><a href="#" className="hover:text-slate-900">300 445 80055</a></li>
+                    <li><a href="#" className="hover:text-slate-900">Preguntas</a></li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="mt-12 border-t border-emerald-100 pt-6 text-center text-sm text-slate-600">
+                <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
+                <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
+              </div>
             </div>
-            <div className="flex w-full items-center justify-center md:w-[50%]">
-              <img src="/images/Sobre_Nosotros/fondo ciudad.jpg" alt="Ciudad" className="h-[15rem] w-full md:h-auto md:w-[90%]" />
-            </div>
-          </div>
-
-          {/* Row 2 - ¿Qué Ofrecemos? */}
-          <div className="flex flex-col items-center gap-12 md:flex-row md:justify-between">
-            <div className="flex w-full flex-col justify-center gap-8 md:w-[45%]">
-              <h1 className="text-3xl font-bold text-[#267E1B] md:text-4xl">¿Qué Ofrecemos?</h1>
-              <ul className="flex flex-col gap-2 text-gray-500">
-                <li className="text-lg md:text-xl lg:text-2xl">• Guías completas de cada lugar: datos de interés, horarios, tarifas y consejos de conservación.</li>
-                <li className="text-lg md:text-xl lg:text-2xl">• Recomendaciones personalizadas según tus gustos y nivel de aventura.</li>
-                <li className="text-lg md:text-xl lg:text-2xl">• Notificaciones actuales sobre eventos y novedades en tus destinos favoritos.</li>
-                <li className="text-lg md:text-xl lg:text-2xl">• Opiniones de otros viajeros, para que conozcas de primera mano experiencias reales.</li>
-                <li className="text-lg md:text-xl lg:text-2xl">• Chatbot 24/7, listo para resolver tus dudas al instante.</li>
+          </footer>
+                <li className="text-base md:text-lg leading-relaxed">• Guías completas de cada lugar: datos de interés, horarios, tarifas y consejos de conservación.</li>
+                <li className="text-base md:text-lg leading-relaxed">• Recomendaciones personalizadas según tus gustos y nivel de aventura.</li>
+                <li className="text-base md:text-lg leading-relaxed">• Notificaciones actuales sobre eventos y novedades en tus destinos favoritos.</li>
+                <li className="text-base md:text-lg leading-relaxed">• Opiniones de otros viajeros, para que conozcas de primera mano experiencias reales.</li>
+                <li className="text-base md:text-lg leading-relaxed">• Chatbot 24/7, listo para resolver tus dudas al instante.</li>
               </ul>
             </div>
             <div className="flex w-full items-center justify-center md:w-[50%]">
-              <img src="/images/Sobre_Nosotros/ecoturismo.jpg" alt="Ecoturismo" className="h-[15rem] w-full md:h-auto md:w-[90%]" />
+              <img src="/images/Sobre_Nosotros/ecoturismo.jpg" alt="Ecoturismo" className="h-[15rem] w-full md:h-auto md:w-[90%] rounded-lg border border-emerald-100 shadow-lg" />
             </div>
           </div>
 
           {/* Row 3 - Nuestros Valores */}
           <div className="flex flex-col items-center gap-12 md:flex-row md:justify-between">
-            <div className="flex w-full flex-col justify-center gap-8 md:w-[45%]">
-              <h1 className="text-3xl font-bold text-[#267E1B] md:text-4xl">Nuestros Valores</h1>
-              <ul className="flex flex-col gap-2 text-gray-500">
-                <li className="text-lg md:text-xl lg:text-2xl">• Sostenibilidad: promovemos prácticas que minimizan el impacto ambiental.</li>
-                <li className="text-lg md:text-xl lg:text-2xl">• Autenticidad: destacamos proyectos y comunidades locales de verdadera riqueza cultural.</li>
-                <li className="text-lg md:text-xl lg:text-2xl">• Transparencia: toda la información está verificada y actualizada regularmente.</li>
-                <li className="text-lg md:text-xl lg:text-2xl">• Comunidad: creemos en el poder de compartir experiencias para inspirar a otros viajeros.</li>
+            <div className="flex w-full flex-col justify-center gap-6 md:w-[45%]">
+              <h1 className="text-3xl md:text-4xl font-semibold text-slate-900">Nuestros Valores</h1>
+              <ul className="flex flex-col gap-2 text-slate-700">
+                <li className="text-base md:text-lg leading-relaxed">• Sostenibilidad: promovemos prácticas que minimizan el impacto ambiental.</li>
+                <li className="text-base md:text-lg leading-relaxed">• Autenticidad: destacamos proyectos y comunidades locales de verdadera riqueza cultural.</li>
+                <li className="text-base md:text-lg leading-relaxed">• Transparencia: toda la información está verificada y actualizada regularmente.</li>
+                <li className="text-base md:text-lg leading-relaxed">• Comunidad: creemos en el poder de compartir experiencias para inspirar a otros viajeros.</li>
               </ul>
             </div>
             <div className="flex w-full items-center justify-center md:w-[50%]">
-              <img src="/images/Sobre_Nosotros/ecoturismo.jpg" alt="Ecoturismo valores" className="h-[15rem] w-full md:h-auto md:w-[90%]" />
+              <img src="/images/Sobre_Nosotros/ecoturismo.jpg" alt="Ecoturismo valores" className="h-[15rem] w-full md:h-auto md:w-[90%] rounded-lg border border-emerald-100 shadow-lg" />
             </div>
           </div>
         </section>

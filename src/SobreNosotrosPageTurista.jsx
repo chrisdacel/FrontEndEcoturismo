@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFacebook, faInstagram, faLinkedin, faYoutube } from '@fortawesome/free-brands-svg-icons';
 
 export default function SobreNosotrosPageTurista({ 
   userName = "Jane Mar",
@@ -7,6 +9,7 @@ export default function SobreNosotrosPageTurista({
 }) {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [heroVisible, setHeroVisible] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,65 +19,17 @@ export default function SobreNosotrosPageTurista({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const t = setTimeout(() => setHeroVisible(true), 50);
+    return () => clearTimeout(t);
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen bg-white font-['Albert_Sans']">
-      {/* Header */}
-      <header className="bg-white shadow-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2 cursor-pointer" onClick={onNavigateHome}>
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-12 w-12" />
-            <div className="flex flex-col leading-tight">
-              <h3 className="text-lg font-bold text-gray-800">Conexion</h3>
-              <h5 className="text-sm text-gray-600">EcoRisaralda</h5>
-              <h6 className="text-xs text-green-600 font-semibold">USUARIO</h6>
-            </div>
-          </div>
-
-          {/* Right side */}
-          <div className="flex items-center gap-4">
-            {/* Search button */}
-            <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-            >
-              <img src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-5 w-5" />
-              <span className="text-sm text-gray-700">Buscar</span>
-            </button>
-
-            {/* User display */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50">
-              <img src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-6 w-6" />
-              <span className="text-sm font-medium text-gray-800">{userName}</span>
-            </div>
-
-            {/* Favorites icon */}
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.png" alt="Favoritos" className="h-6 w-6" />
-            </button>
-
-            {/* Dropdown menu */}
-            <div className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-6 w-6 cursor-pointer" />
-            </div>
-          </div>
-        </div>
-
-        {/* Search dropdown */}
-        {searchOpen && (
-          <div className="border-t bg-white px-4 py-3">
-            <input
-              type="text"
-              placeholder="Escribe tu búsqueda..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-        )}
-      </header>
 
       {/* Scroll to top button */}
       {showScrollTop && (
@@ -87,30 +42,28 @@ export default function SobreNosotrosPageTurista({
       )}
 
       <main>
-        {/* Hero Section */}
+        {/* Hero Section más alta, texto en inferior izquierda */}
         <section
-          className="relative flex items-center justify-center bg-cover bg-center"
-          style={{ 
-            backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.jpg')",
-            height: '40rem'
-          }}
+          className="relative overflow-hidden bg-cover bg-center min-h-[80vh]"
+          style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.jpg')" }}
         >
-          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-          <h1 className="relative z-10 text-5xl md:text-6xl font-bold text-white" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.7)' }}>
-            Sobre Nosotros
-          </h1>
+          <div className={`absolute inset-0 bg-gradient-to-r from-white via-white/70 to-transparent md:from-white md:via-white/50 md:to-black/10 transition-opacity duration-500 ${heroVisible ? 'opacity-100' : 'opacity-0'}`} />
+          <div className={`absolute bottom-8 left-6 md:bottom-12 md:left-12 z-10 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900">Sobre Nosotros</h1>
+            <p className="mt-3 max-w-2xl text-base md:text-lg text-slate-700 leading-relaxed">Conectamos viajeros con experiencias sostenibles y auténticas en Risaralda.</p>
+          </div>
         </section>
 
         {/* Description Intro */}
         <section className="py-12 px-4 bg-white">
           <div className="max-w-4xl mx-auto text-center">
-            <p className="text-lg text-gray-700 leading-relaxed mb-2">
+            <p className="text-base md:text-lg text-slate-700 leading-relaxed mb-2">
               En Conexión EcoRisaralda somos un equipo de apasionados por la naturaleza y el turismo responsable.
             </p>
-            <p className="text-lg text-gray-700 leading-relaxed mb-2">
+            <p className="text-base md:text-lg text-slate-700 leading-relaxed mb-2">
               Nacimos con la misión de acercarte los rincones más auténticos y sostenibles del mundo, aquellos que
             </p>
-            <p className="text-lg text-gray-700 leading-relaxed">
+            <p className="text-base md:text-lg text-slate-700 leading-relaxed">
               muchos desconocen pero que ofrecen experiencias inolvidables
             </p>
           </div>
@@ -122,7 +75,7 @@ export default function SobreNosotrosPageTurista({
             <div className="flex flex-col md:flex-row gap-12 items-center">
               {/* Text column - 45% width */}
               <div className="w-full md:w-[45%]">
-                <h2 className="text-3xl font-bold text-green-700 mb-6">Nuestra Misión</h2>
+                <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 mb-6">Nuestra Misión</h2>
                 <p className="text-gray-700 leading-relaxed">
                   Te ayudamos a descubrir destinos ecoturísticos
                   cuidadosamente seleccionados, ofreciéndote
@@ -140,7 +93,7 @@ export default function SobreNosotrosPageTurista({
                 <img
                   src="/images/Sobre_Nosotros/fondo ciudad.jpg"
                   alt="Nuestra Misión"
-                  className="w-full h-80 object-cover rounded-lg shadow-lg"
+                  className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg"
                 />
               </div>
             </div>
@@ -153,7 +106,7 @@ export default function SobreNosotrosPageTurista({
             <div className="flex flex-col md:flex-row gap-12 items-center">
               {/* Text column - 45% width */}
               <div className="w-full md:w-[45%]">
-                <h2 className="text-3xl font-bold text-green-700 mb-6">¿Qué Ofrecemos?</h2>
+                <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 mb-6">¿Qué Ofrecemos?</h2>
                 <ul className="space-y-3 text-gray-700">
                   <li className="flex items-start gap-2">
                     <span className="text-green-600 font-bold mt-1">•</span>
@@ -182,7 +135,7 @@ export default function SobreNosotrosPageTurista({
                 <img
                   src="/images/Sobre_Nosotros/ecoturismo.jpg"
                   alt="Qué Ofrecemos"
-                  className="w-full h-80 object-cover rounded-lg shadow-lg"
+                  className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg"
                 />
               </div>
             </div>
@@ -195,7 +148,7 @@ export default function SobreNosotrosPageTurista({
             <div className="flex flex-col md:flex-row gap-12 items-center">
               {/* Text column - 45% width */}
               <div className="w-full md:w-[45%]">
-                <h2 className="text-3xl font-bold text-green-700 mb-6">Nuestros Valores</h2>
+                <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 mb-6">Nuestros Valores</h2>
                 <ul className="space-y-3 text-gray-700">
                   <li className="flex items-start gap-2">
                     <span className="text-green-600 font-bold mt-1">•</span>
@@ -220,7 +173,7 @@ export default function SobreNosotrosPageTurista({
                 <img
                   src="/images/Sobre_Nosotros/ecoturismo.jpg"
                   alt="Nuestros Valores"
-                  className="w-full h-80 object-cover rounded-lg shadow-lg"
+                  className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg"
                 />
               </div>
             </div>
@@ -230,10 +183,10 @@ export default function SobreNosotrosPageTurista({
         {/* Description Closing */}
         <section className="py-12 px-4 bg-white">
           <div className="max-w-4xl mx-auto text-center">
-            <p className="text-lg text-gray-700 leading-relaxed mb-2">
+            <p className="text-base md:text-lg text-slate-700 leading-relaxed mb-2">
               Únete a nosotros y conviértete en un viajero consciente. Descubre, respeta y disfruta de la naturaleza — ¡tu
             </p>
-            <p className="text-lg text-gray-700 leading-relaxed">
+            <p className="text-base md:text-lg text-slate-700 leading-relaxed">
               próxima gran aventura te espera!
             </p>
           </div>
@@ -241,25 +194,18 @@ export default function SobreNosotrosPageTurista({
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
+      {/* Footer (estilo Home) */}
+      <footer className="border-t border-emerald-100 bg-emerald-50/50">
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
           {/* Column 1 */}
           <div>
             <h2 className="text-2xl font-bold mb-2">Conexion</h2>
             <p className="text-gray-400 mb-4">EcoRisaralda</p>
             <div className="flex gap-4 mb-4">
-              <a href="#" className="text-gray-400 hover:text-white transition">
-                <i className="fab fa-facebook text-xl"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition">
-                <i className="fab fa-linkedin text-xl"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition">
-                <i className="fab fa-youtube text-xl"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition">
-                <i className="fab fa-instagram text-xl"></i>
-              </a>
+                <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
+                <a href="#"><FontAwesomeIcon icon={faLinkedin} /></a>
+                <a href="#"><FontAwesomeIcon icon={faYoutube} /></a>
+                <a href="#"><FontAwesomeIcon icon={faInstagram} /></a>
             </div>
             <div className="flex items-center gap-2">
               <span>🌐</span>
