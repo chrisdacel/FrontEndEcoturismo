@@ -69,11 +69,16 @@ api.interceptors.response.use(
 /**
  * Obtener CSRF token para SPA (ejecutar una sola vez al inicio)
  */
+export { api }; // Exportar la instancia de axios para que otros servicios la usen
+
 export async function initializeCsrfToken() {
   try {
+    // Obtener CSRF cookie para sesión
+    console.log('Initializing CSRF token...');
     await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
       withCredentials: true
     });
+    console.log('CSRF cookie obtained');
   } catch (error) {
     console.error('Error getting CSRF token:', error);
   }
@@ -108,9 +113,15 @@ export async function register(name, email, password, role = 'turist', lastName 
  */
 export async function login(email, password) {
   try {
-    const { data } = await api.post('/api/login', { email, password });
+    console.log('Attempting login with email:', email);
+    const { data } = await api.post('/api/login', { email, password });    
+    
+    console.log('Login response:', data);
+    console.log('Session-based auth established via cookies');
+    
     return data.user;
   } catch (error) {
+    console.error('Login error:', error.response?.data || error.message);
     throw error.response?.data || { message: 'Credenciales inválidas' };
   }
 }
@@ -145,8 +156,11 @@ export async function resetPassword(token, email, password, passwordConfirmation
  */
 export async function logout() {
   try {
+    console.log('Logging out...');
     await api.post('/api/logout');
+    console.log('Logout successful');
   } catch (error) {
+    console.error('Logout error:', error.response?.data || error.message);
     throw error.response?.data || { message: 'Error al cerrar sesión' };
   }
 }
@@ -200,6 +214,17 @@ export async function uploadAvatar(file) {
     return data; // Retorna { avatar_url, user, message }
   } catch (error) {
     throw error.response?.data || { message: 'Error subiendo foto' };
+  }
+}
+
+// Perfil: eliminar avatar
+export async function deleteAvatar() {
+  try {
+    await initializeCsrfToken();
+    const { data } = await api.delete('/api/profile/avatar');
+    return data; // Retorna { avatar_url: null, user, message }
+  } catch (error) {
+    throw error.response?.data || { message: 'Error eliminando foto' };
   }
 }
 

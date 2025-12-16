@@ -66,51 +66,51 @@ export default function AdminCreateOperatorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white">
+    <div className="min-h-screen bg-white">
       <section className="relative pt-24 pb-16 px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="mb-8">
             <button
               onClick={() => navigate('/admin/dashboard')}
-              className="inline-flex items-center gap-2 text-emerald-300 hover:text-emerald-200 transition mb-4"
+              className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition mb-4"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Volver al dashboard
             </button>
-            <h1 className="text-4xl font-bold text-white mb-2">Crear Usuario</h1>
-            <p className="text-emerald-100/80">
+            <h1 className="text-4xl font-bold text-slate-900 mb-2">Crear Usuario</h1>
+            <p className="text-slate-600">
               Crea credenciales para un nuevo operador o administrador
             </p>
           </div>
 
           {/* Success Message */}
           {success && (
-            <div className="mb-6 rounded-xl bg-green-500/20 p-4 ring-1 ring-green-500/30">
+            <div className="mb-6 rounded-xl bg-green-50 p-4 ring-1 ring-green-200">
               <div className="flex items-center gap-3">
-                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-green-100">Usuario creado exitosamente. Redirigiendo...</p>
+                <p className="text-green-800">Usuario creado exitosamente. Redirigiendo...</p>
               </div>
             </div>
           )}
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 rounded-xl bg-red-500/20 p-4 ring-1 ring-red-500/30">
-              <p className="text-red-100">{error}</p>
+            <div className="mb-6 rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
+              <p className="text-red-800">{error}</p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur rounded-2xl p-8 ring-1 ring-white/10">
+          <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50 p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Nombre */}
               <div>
-                <label className="block text-sm font-medium text-emerald-100/80 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Nombre *
                 </label>
                 <input
@@ -119,14 +119,14 @@ export default function AdminCreateOperatorPage() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-white ring-1 ring-white/20 focus:ring-2 focus:ring-emerald-400 outline-none transition"
+                  className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="Juan"
                 />
               </div>
 
               {/* Apellido */}
               <div>
-                <label className="block text-sm font-medium text-emerald-100/80 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Apellido
                 </label>
                 <input
@@ -134,14 +134,14 @@ export default function AdminCreateOperatorPage() {
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleChange}
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-white ring-1 ring-white/20 focus:ring-2 focus:ring-emerald-400 outline-none transition"
+                  className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="Pérez"
                 />
               </div>
 
               {/* Email */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-emerald-100/80 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Correo Electrónico *
                 </label>
                 <input
@@ -150,14 +150,14 @@ export default function AdminCreateOperatorPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-white ring-1 ring-white/20 focus:ring-2 focus:ring-emerald-400 outline-none transition"
+                  className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="correo@ejemplo.com"
                 />
               </div>
 
               {/* Rol */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-emerald-100/80 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Rol *
                 </label>
                 <select
@@ -165,7 +165,7 @@ export default function AdminCreateOperatorPage() {
                   value={formData.role}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-white ring-1 ring-white/20 focus:ring-2 focus:ring-emerald-400 outline-none transition"
+                  className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                 >
                   <option value="operator">Operador</option>
                   <option value="admin">Administrador</option>
@@ -175,7 +175,7 @@ export default function AdminCreateOperatorPage() {
 
               {/* Contraseña */}
               <div>
-                <label className="block text-sm font-medium text-emerald-100/80 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Contraseña *
                 </label>
                 <input
@@ -185,14 +185,14 @@ export default function AdminCreateOperatorPage() {
                   onChange={handleChange}
                   required
                   minLength={8}
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-white ring-1 ring-white/20 focus:ring-2 focus:ring-emerald-400 outline-none transition"
+                  className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="Mínimo 8 caracteres"
                 />
               </div>
 
               {/* Confirmar Contraseña */}
               <div>
-                <label className="block text-sm font-medium text-emerald-100/80 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Confirmar Contraseña *
                 </label>
                 <input
@@ -201,14 +201,14 @@ export default function AdminCreateOperatorPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-white ring-1 ring-white/20 focus:ring-2 focus:ring-emerald-400 outline-none transition"
+                  className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="Repite la contraseña"
                 />
               </div>
 
               {/* País */}
               <div>
-                <label className="block text-sm font-medium text-emerald-100/80 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   País
                 </label>
                 <input
@@ -216,14 +216,14 @@ export default function AdminCreateOperatorPage() {
                   name="country"
                   value={formData.country}
                   onChange={handleChange}
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-white ring-1 ring-white/20 focus:ring-2 focus:ring-emerald-400 outline-none transition"
+                  className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="Colombia"
                 />
               </div>
 
               {/* Fecha de Nacimiento */}
               <div>
-                <label className="block text-sm font-medium text-emerald-100/80 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Fecha de Nacimiento
                 </label>
                 <input
@@ -231,7 +231,7 @@ export default function AdminCreateOperatorPage() {
                   name="birth_date"
                   value={formData.birth_date}
                   onChange={handleChange}
-                  className="w-full rounded-lg bg-white/10 px-4 py-3 text-white ring-1 ring-white/20 focus:ring-2 focus:ring-emerald-400 outline-none transition"
+                  className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                 />
               </div>
             </div>
@@ -241,7 +241,7 @@ export default function AdminCreateOperatorPage() {
               <button
                 type="button"
                 onClick={() => navigate('/admin/dashboard')}
-                className="rounded-full px-6 py-3 text-emerald-100 hover:bg-white/10 transition"
+                className="rounded-full px-6 py-3 text-slate-700 hover:bg-slate-100 border border-emerald-200 transition"
               >
                 Cancelar
               </button>
@@ -256,12 +256,7 @@ export default function AdminCreateOperatorPage() {
                     Creando...
                   </>
                 ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Crear Usuario
-                  </>
+                  'Crear Usuario'
                 )}
               </button>
             </div>

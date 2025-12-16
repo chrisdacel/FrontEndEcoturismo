@@ -44,57 +44,57 @@ export default function AdminOperatorsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a]">
+      <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-emerald-400/30 border-t-emerald-400"></div>
-          <p className="text-sm text-emerald-100/70">Cargando operadores...</p>
+          <p className="text-sm text-slate-600">Cargando operadores...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white px-4 pb-16">
+    <div className="min-h-screen bg-white px-4 pb-16">
       <div className="max-w-5xl mx-auto pt-24">
         <div className="flex items-center justify-between mb-6">
           <div>
             <button
               onClick={() => navigate('/admin/dashboard')}
-              className="inline-flex items-center gap-2 text-emerald-300 hover:text-emerald-200 transition mb-2"
+              className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition mb-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Volver
             </button>
-            <h1 className="text-3xl font-bold">Operadores pendientes</h1>
-            <p className="text-emerald-100/70">Aprueba o rechaza solicitudes</p>
+            <h1 className="text-3xl font-bold text-slate-900">Operadores pendientes</h1>
+            <p className="text-slate-600">Aprueba o rechaza solicitudes</p>
           </div>
         </div>
 
         {error && (
-          <div className="mb-4 rounded-xl bg-red-500/20 p-4 ring-1 ring-red-500/30 text-red-100">
+          <div className="mb-4 rounded-xl bg-red-50 p-4 ring-1 ring-red-200 text-red-800">
             {error}
           </div>
         )}
 
-        <div className="overflow-x-auto bg-white/5 backdrop-blur rounded-2xl ring-1 ring-white/10">
-          <table className="min-w-full divide-y divide-white/10">
-            <thead className="bg-white/5">
+        <div className="overflow-x-auto bg-white rounded-lg">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-white">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-emerald-100/70">Nombre</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-emerald-100/70">Email</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-emerald-100/70">Estado</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-emerald-100/70">Acciones</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">Nombre</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">Email</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">Estado</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-700">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-200">
               {operators.map((op) => (
-                <tr key={op.id} className="hover:bg-white/5">
-                  <td className="px-4 py-3 text-sm text-white">{op.name} {op.last_name || ''}</td>
-                  <td className="px-4 py-3 text-sm text-emerald-100/80">{op.email}</td>
+                <tr key={op.id} className="hover:bg-slate-50">
+                  <td className="px-4 py-3 text-sm text-slate-900">{op.name} {op.last_name || ''}</td>
+                  <td className="px-4 py-3 text-sm text-slate-600">{op.email}</td>
                   <td className="px-4 py-3 text-sm">
-                    <span className="inline-flex rounded-full bg-white/10 px-2 py-1 text-xs capitalize text-emerald-100/80 ring-1 ring-white/10">
+                    <span className="inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs capitalize text-slate-700 ring-1 ring-slate-300">
                       {op.status || 'pending'}
                     </span>
                   </td>
@@ -120,7 +120,7 @@ export default function AdminOperatorsPage() {
               ))}
               {operators.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-emerald-100/70">No hay operadores pendientes</td>
+                  <td colSpan={4} className="px-4 py-6 text-center text-slate-600">No hay operadores pendientes</td>
                 </tr>
               )}
             </tbody>

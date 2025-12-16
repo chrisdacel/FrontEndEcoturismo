@@ -1,10 +1,33 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import { getAllPlaces } from './services/placesApi';
 
 export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavigatePrivacidad, onNavigateSobreNosotros }) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [scrollToTop, setScrollToTop] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState([0, 0, 0]);
+  const [sitiosAPI, setSitiosAPI] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Cargar sitios desde la API
+  useEffect(() => {
+    loadSites();
+  }, []);
+
+  const loadSites = async () => {
+    try {
+      const data = await getAllPlaces();
+      setSitiosAPI(data);
+    } catch (error) {
+      console.error('Error cargando sitios:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Datos de sitios
   const sitios = [
@@ -148,6 +171,68 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
             </div>
           </div>
         </section>
+
+        {/* Sección 2: Sitios Creados desde la API */}
+        {sitiosAPI.length > 0 && (
+          <section className="w-full bg-white py-16 px-0 md:px-0">
+            <div className="px-6 md:px-12 mb-8 flex items-center justify-between">
+              <h2 className="text-3xl font-bold">Sitios Ecoturísticos</h2>
+              {(user?.role === 'admin' || user?.role === 'operator') && (
+                <button
+                  onClick={() => navigate('/crear-sitio')}
+                  className="rounded-full bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-600 transition"
+                >
+                  + Crear Sitio
+                </button>
+              )}
+            </div>
+
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-400/30 border-t-emerald-400"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 md:px-12">
+                {sitiosAPI.map((sitio) => (
+                  <article
+                    key={sitio.id}
+                    className="group cursor-pointer rounded-lg border border-emerald-100 bg-white shadow-sm shadow-emerald-100/50 overflow-hidden hover:shadow-lg transition"
+                    onClick={() => navigate(user?.role === 'admin' ? `/admin/sitio/${sitio.id}` : `/sitio/${sitio.id}`)}
+                  >
+                    <div className="h-48 w-full overflow-hidden">
+                      <img
+                        src={`http://localhost:8000/storage/${sitio.cover}`}
+                        alt={sitio.name}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-2">{sitio.name}</h3>
+                      <p className="text-sm text-slate-600 mb-2">{sitio.slogan}</p>
+                      <p className="text-xs text-emerald-600">📍 {sitio.localization.substring(0, 60)}...</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Botón de Crear Sitio si no hay sitios */}
+        {sitiosAPI.length === 0 && !loading && (user?.role === 'admin' || user?.role === 'operator') && (
+          <section className="w-full bg-white py-16 px-6 md:px-12">
+            <div className="max-w-2xl mx-auto text-center space-y-4">
+              <h2 className="text-3xl font-bold text-slate-900">Aún no hay sitios creados</h2>
+              <p className="text-slate-600">Sé el primero en agregar un sitio ecoturístico</p>
+              <button
+                onClick={() => navigate('/crear-sitio')}
+                className="rounded-full bg-emerald-500 px-8 py-4 font-semibold text-white hover:bg-emerald-600 transition"
+              >
+                + Crear Primer Sitio
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* Sección 3: Recomendaciones (scroll lateral) */}
         <section className="w-full bg-white py-16 px-0 md:px-0 mb-20">

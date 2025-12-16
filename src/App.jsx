@@ -28,7 +28,10 @@ import ProfilePageTurista from './ProfilePageTurista';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import AdminOperatorRoute from './components/AdminOperatorRoute';
 import SitioPage from './SitioPage';
+import SitioDetailPage from './SitioDetailPage';
+import CreateSitioPage from './CreateSitioPageLeaflet'; // Versión con Leaflet (OpenStreetMap)
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -157,6 +160,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/crear-sitio"
+        element={
+          <AdminOperatorRoute>
+            <CreateSitioPage />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
         path="/admin/profile"
         element={
           <AdminRoute>
@@ -237,12 +248,12 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/sitio"
+        path="/sitio/:id"
         element={
           user?.role === 'admin' ? (
-            <Navigate to="/admin/sitio" replace />
+            <Navigate to={`/admin/sitio/${window.location.pathname.split('/').pop()}`} replace />
           ) : (
-            <SitioPage
+            <SitioDetailPage
               onNavigateHome={() => navigate('/')}
               onNavigateLogin={() => navigate('/login')}
               onNavigateRegister={() => navigate('/register')}
@@ -318,10 +329,24 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/admin/sitio"
+        path="/admin/sitio/preview"
         element={
           <AdminRoute>
             <SitioPage
+              onNavigateHome={() => navigate('/admin/home')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigateSobreNosotros={() => navigate('/admin/sobre-nosotros')}
+              onNavigatePrivacidad={() => navigate('/admin/privacidad')}
+            />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/sitio/:id"
+        element={
+          <AdminRoute>
+            <SitioDetailPage
               onNavigateHome={() => navigate('/admin/home')}
               onNavigateLogin={() => navigate('/login')}
               onNavigateRegister={() => navigate('/register')}
