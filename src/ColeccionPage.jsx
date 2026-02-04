@@ -1,10 +1,24 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { getAllPlaces } from './services/placesApi';
 import { api } from './services/api';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix para los iconos de Leaflet en Vite/React
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+});
 
 export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavigatePrivacidad, onNavigateSobreNosotros }) {
   const navigate = useNavigate();
@@ -14,14 +28,13 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const [sitiosAPI, setSitiosAPI] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
+  const mapRef = useRef(null);
+  const mapContainerRef = useRef(null);
+  const markersLayerRef = useRef(null);
 
-  // Cargar sitios desde la API
-  useEffect(() => {
-    loadSites();
-  }, []);
-
-  const loadSites = async (query = '') => {
+  const loadSites = useCallback(async (query = searchText) => {
     try {
+      setLoading(true);
       const data = await getAllPlaces(query);
       setSitiosAPI(data);
     } catch (error) {
@@ -29,7 +42,20 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchText]);
+
+  // Cargar sitios desde la API
+  useEffect(() => {
+    loadSites();
+  }, [loadSites]);
+
+  // Refrescar sitios periódicamente para mantener el mapa actualizado
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      loadSites();
+    }, 30000);
+    return () => clearInterval(intervalId);
+  }, [loadSites]);
 
   const handleSearch = async () => {
     setLoading(true);
@@ -114,6 +140,77 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Inicializar mapa
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+
+    const map = L.map(mapContainerRef.current).setView([4.8087, -75.6906], 9);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap',
+    }).addTo(map);
+
+    mapRef.current = map;
+    markersLayerRef.current = L.layerGroup().addTo(map);
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+      markersLayerRef.current = null;
+    };
+  }, []);
+
+  // Pintar pines en el mapa cuando cambian los sitios
+  useEffect(() => {
+    if (!mapRef.current || !markersLayerRef.current) return;
+
+    const layer = markersLayerRef.current;
+    layer.clearLayers();
+
+    const bounds = [];
+    sitiosAPI.forEach((sitio) => {
+      const lat = parseFloat(sitio.lat);
+      const lng = parseFloat(sitio.lng);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        const marker = L.marker([lat, lng]);
+        const imageUrl = sitio.cover ? `http://localhost:8000/api/files/${sitio.cover}` : '';
+        const popupHtml = `
+          <div class="popup-card" style="display:flex;gap:10px;align-items:center;cursor:pointer;max-width:260px;">
+            ${imageUrl ? `<img src="${imageUrl}" alt="${sitio.name || 'Sitio'}" style="width:72px;height:60px;object-fit:cover;border-radius:8px;flex:0 0 auto;" />` : ''}
+            <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+              <strong style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">${sitio.name || 'Sitio'}</strong>
+              <span style="font-size:12px;color:#64748b;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:160px;">${(sitio.localization || '').toString()}</span>
+              <span style="font-size:12px;color:#059669;">Ver detalles</span>
+            </div>
+          </div>
+        `;
+        marker.bindPopup(popupHtml);
+        marker.on('popupopen', (e) => {
+          const popupEl = e.popup.getElement();
+          const card = popupEl?.querySelector('.popup-card');
+          if (card && !card.dataset.bound) {
+            card.dataset.bound = 'true';
+            card.addEventListener('click', () => {
+              if (user?.role === 'admin') {
+                navigate(`/admin/sitio/${sitio.id}`);
+              } else if (user && user.role !== 'operator') {
+                navigate(`/turista/sitio/${sitio.id}`);
+              } else {
+                navigate(`/sitio/${sitio.id}`);
+              }
+            });
+          }
+        });
+        marker.addTo(layer);
+        bounds.push([lat, lng]);
+      }
+    });
+
+    if (bounds.length > 0) {
+      mapRef.current.fitBounds(bounds, { padding: [30, 30] });
+    }
+  }, [sitiosAPI]);
 
   const scrollToTopHandler = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -228,7 +325,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                   >
                     <div className="h-48 w-full overflow-hidden">
                       <img
-                        src={`http://localhost:8000/storage/${sitio.cover}`}
+                        src={`http://localhost:8000/api/files/${sitio.cover}`}
                         alt={sitio.name}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                       />
@@ -297,6 +394,17 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Sección 4: Mapa de sitios turísticos */}
+        <section className="w-full bg-white pb-20">
+          <div className="px-6 md:px-12 mb-6">
+            <h2 className="text-3xl font-bold">Mapa de sitios turísticos</h2>
+            <p className="text-slate-600 mt-2">Explora los sitios agregados en tiempo real.</p>
+          </div>
+          <div className="px-6 md:px-12">
+            <div ref={mapContainerRef} className="w-full h-[520px] rounded-2xl ring-1 ring-emerald-100 shadow-lg" />
           </div>
         </section>
       </main>

@@ -93,7 +93,6 @@ function SobreNosotrosPageOperador({ userName = "Jane Mar", onNavigateHome, onNa
                 <li className="text-base md:text-lg leading-relaxed">• Recomendaciones personalizadas según tus gustos y nivel de aventura.</li>
                 <li className="text-base md:text-lg leading-relaxed">• Notificaciones actuales sobre eventos y novedades en tus destinos favoritos.</li>
                 <li className="text-base md:text-lg leading-relaxed">• Opiniones de otros viajeros, para que conozcas de primera mano experiencias reales.</li>
-                <li className="text-base md:text-lg leading-relaxed">• Chatbot 24/7, listo para resolver tus dudas al instante.</li>
               </ul>
             </div>
             <div className="flex w-full items-center justify-center md:w-[50%]">

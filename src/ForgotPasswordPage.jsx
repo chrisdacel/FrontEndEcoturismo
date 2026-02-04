@@ -18,7 +18,7 @@ export default function ForgotPasswordPage({ onNavigateLogin, onNavigateRegister
     setLoading(true);
     try {
       const message = await requestPasswordReset(email.trim());
-      setSuccess(message || 'Te enviamos un enlace a tu correo (Mailtrap).');
+      setSuccess(message || 'Te enviamos el enlace de recuperación a tu correo.');
     } catch (err) {
       const msg = err?.message || err?.error || 'No se pudo enviar el enlace';
       setError(typeof msg === 'string' ? msg : 'No se pudo enviar el enlace');

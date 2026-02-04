@@ -57,7 +57,7 @@ export default function FavoritosPage() {
     navigate(`${prefix}/sitio/${id}`);
   };
 
-  const storageUrl = (path) => (path ? `http://localhost:8000/storage/${path}` : '');
+  const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
 
   if (loading) {
     return (

@@ -67,7 +67,7 @@ function RolesPage({ onNavigateHome, onNavigateLogin, onNavigateRegistroOp, onNa
           </div>
           <h1 className="mb-4 text-4xl font-bold text-[#267E1B] drop-shadow-lg">Turista</h1>
           <p className="w-72 rounded-lg border border-slate-500 bg-white px-3 py-2 text-sm text-slate-700 shadow-md transition-all duration-300 group-hover:block">
-            El usuario estándar de Conexión EcoRisaralda, podrás tener acceso a elegir tus preferencias y se te recomendarán los sitios de tu gusto, guardar tus sitios favoritos, tener acceso a nuestro chatbot y dejar tus reseñas
+            El usuario estándar de Conexión EcoRisaralda, podrás tener acceso a elegir tus preferencias y se te recomendarán los sitios de tu gusto, guardar tus sitios favoritos y dejar tus reseñas
           </p>
         </button>
       </main>

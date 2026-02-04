@@ -16,7 +16,7 @@ export async function createPlace(formData) {
     const errors = error.response?.data?.errors;
     
     if (errors && typeof errors === 'object') {
-      // Combinar todos los errores de validación
+      // Combinar todos los errores de validación con saltos de línea
       const allErrors = [];
       Object.keys(errors).forEach(field => {
         if (Array.isArray(errors[field])) {
@@ -24,7 +24,7 @@ export async function createPlace(formData) {
         }
       });
       if (allErrors.length > 0) {
-        message = allErrors.join(' | ');
+        message = allErrors.join('\n');
       }
     }
     

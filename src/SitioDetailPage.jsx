@@ -79,7 +79,7 @@ export default function SitioDetailPage({
     };
   }, [sitio]);
 
-  const storageUrl = (path) => (path ? `http://localhost:8000/storage/${path}` : '');
+  const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
 
   const handleCreateReview = async (e) => {
     e.preventDefault();

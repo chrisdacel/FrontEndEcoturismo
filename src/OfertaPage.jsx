@@ -43,12 +43,6 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
       description: 'Descubre experiencias únicas según tus gustos e intereses',
       image: '/images/loqueofrecemos/medios-de-comunicacion-social (2).png',
     },
-    {
-      id: 'seccion7',
-      title: 'Nuestro chatbot te ayuda',
-      description: 'Resuelve tus dudas al instante con nuestro chatbot turístico',
-      image: '/images/loqueofrecemos/robotica (1).png',
-    },
   ];
 
   const sections = [
@@ -96,15 +90,6 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
         'Descubre actividades, destinos y eventos ajustados a tus gustos. Te ayudamos a planear el viaje perfecto, ya sea aventura, relax o cultura.',
       image: '/images/loqueofrecemos/contagiarte_de_ritmos_locales_GettyImages-627027011-scaled.jpg',
       cta: 'Regístrate para tu personalización',
-    },
-    {
-      id: 'seccion7',
-      intro: 'Resuelve tus dudas al instante',
-      title: 'Nuestro chatbot te ayuda',
-      description:
-        'Un asistente virtual disponible 24/7 para responder preguntas sobre destinos, actividades o detalles logísticos y guiarte en tu experiencia ecoturística.',
-      image: '/images/loqueofrecemos/photo-1515378960530-7c0da6231fb1.jpg',
-      cta: 'Habla con el chatbot',
     },
   ];
 

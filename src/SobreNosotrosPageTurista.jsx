@@ -124,10 +124,6 @@ export default function SobreNosotrosPageTurista({
                     <span className="text-green-600 font-bold mt-1">•</span>
                     <span>Opiniones de otros viajeros, para que conozcas de primera mano experiencias reales.</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold mt-1">•</span>
-                    <span>Chatbot 24/7, listo para resolver tus dudas al instante.</span>
-                  </li>
                 </ul>
               </div>
               {/* Image column - 50% width */}

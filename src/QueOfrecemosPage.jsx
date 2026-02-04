@@ -17,7 +17,6 @@ function QueOfrecemosPage({ onNavigateRegister }) {
     { id: 'seccion4', title: 'Notificaciones personalizadas', description: 'Recibe notificaciones a tu medida, con lo que realmente te interesa', image: '/images/loqueofrecemos/notificacion.png' },
     { id: 'seccion5', title: 'Mantente al día', description: 'No te pierdas los nuevos eventos y actividades ecológicas', image: '/images/loqueofrecemos/calendario (1).png' },
     { id: 'seccion6', title: 'Recomendaciones personalizadas', description: 'Descubre experiencias únicas según tus gustos e intereses', image: '/images/loqueofrecemos/medios-de-comunicacion-social (2).png' },
-    { id: 'seccion7', title: 'Nuestro chatbot te ayuda', description: 'Resuelve tus dudas al instante con nuestro chatbot turístico', image: '/images/loqueofrecemos/robotica (1).png' },
   ];
 
   const sections = [
@@ -26,7 +25,6 @@ function QueOfrecemosPage({ onNavigateRegister }) {
     { id: 'seccion4', intro: 'Notificaciones a tu medida', title: 'Notificaciones personalizadas', description: 'Recibe alertas adaptadas a tus intereses: nuevos eventos, ofertas especiales y novedades en tus lugares favoritos para que no te pierdas nada.', image: '/images/loqueofrecemos/photo-1560483647-6a049edeef29.jpg', cta: 'Regístrate para personalización' },
     { id: 'seccion5', intro: 'No te pierdas de nada', title: 'Mantente al día', description: 'Entérate de festivales, actividades y experiencias en tus destinos preferidos. Mantén tu agenda ecológica actualizada y disfruta cada momento.', image: '/images/loqueofrecemos/calendar-pencil-and-clock-as-tiempo-background-jlwr8f81osug906i.jpg', cta: 'Conoce los nuevos eventos' },
     { id: 'seccion6', intro: 'Planes que se adaptan a ti', title: 'Recomendaciones personalizadas', description: 'Descubre actividades, destinos y eventos ajustados a tus gustos. Te ayudamos a planear el viaje perfecto, ya sea aventura, relax o cultura.', image: '/images/loqueofrecemos/contagiarte_de_ritmos_locales_GettyImages-627027011-scaled.jpg', cta: 'Regístrate para tu personalización' },
-    { id: 'seccion7', intro: 'Resuelve tus dudas al instante', title: 'Nuestro chatbot te ayuda', description: 'Un asistente virtual disponible 24/7 para responder preguntas sobre destinos, actividades o detalles logísticos y guiarte en tu experiencia ecoturística.', image: '/images/loqueofrecemos/photo-1515378960530-7c0da6231fb1.jpg', cta: 'Habla con el chatbot' },
   ];
 
   return (

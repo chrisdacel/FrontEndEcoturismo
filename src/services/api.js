@@ -432,14 +432,25 @@ export async function updatePlace(id, placeData, coverImage = null, climateImage
     
     return data;
   } catch (error) {
+    console.error('Error response:', error.response?.data);
+    
+    let message = error.response?.data?.message || error.message || 'Error actualizando sitio';
     const errors = error.response?.data?.errors;
+    
     if (errors && typeof errors === 'object') {
-      const firstKey = Object.keys(errors)[0];
-      if (firstKey && Array.isArray(errors[firstKey]) && errors[firstKey][0]) {
-        throw new Error(errors[firstKey][0]);
+      // Combinar todos los errores de validación con saltos de línea
+      const allErrors = [];
+      Object.keys(errors).forEach(field => {
+        if (Array.isArray(errors[field])) {
+          allErrors.push(...errors[field]);
+        }
+      });
+      if (allErrors.length > 0) {
+        message = allErrors.join('\n');
       }
     }
-    throw error.response?.data || { message: 'Error actualizando sitio' };
+    
+    throw new Error(message);
   }
 }
 
