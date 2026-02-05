@@ -15,16 +15,67 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [ageError, setAgeError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const calculateAge = (dateString) => {
+    if (!dateString) return null;
+    const birthDate = new Date(dateString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const validatePassword = (pwd) => {
+    if (!pwd) {
+      setPasswordError('');
+      return false;
+    }
+    
+    if (pwd.length < 8 || pwd.length > 15) {
+      setPasswordError('La contraseña debe tener entre 8 y 15 caracteres');
+      return false;
+    }
+    
+    if (!/[A-Z]/.test(pwd)) {
+      setPasswordError('La contraseña debe incluir al menos una letra mayúscula');
+      return false;
+    }
+    
+    if (!/[a-z]/.test(pwd)) {
+      setPasswordError('La contraseña debe incluir al menos una letra minúscula');
+      return false;
+    }
+    
+    if (!/[0-9]/.test(pwd)) {
+      setPasswordError('La contraseña debe incluir al menos un dígito');
+      return false;
+    }
+    
+    setPasswordError('');
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (password.length < 8) {
-      setError('La contraseña debe tener mínimo 8 caracteres');
+    const age = calculateAge(birthDate);
+    if (age !== null && age < 16) {
+      setError('Debes ser mayor de 16 años para registrarte');
       return;
     }
+
+    if (!validatePassword(password)) {
+      setError(passwordError);
+      return;
+    }
+    
     if (password !== password2) {
       setError('Las contraseñas no coinciden');
       return;
@@ -32,7 +83,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
 
     try {
       setLoading(true);
-      const user = await apiRegister(
+      await apiRegister(
         name.trim(),
         email.trim(),
         password,
@@ -41,7 +92,6 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
         country.trim() || null,
         birthDate || null
       );
-      setUser(user);
       setSuccess('Registro exitoso. Te enviamos un correo para confirmar la cuenta.');
       setName('');
       setLastName('');
@@ -50,14 +100,14 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
       setBirthDate('');
       setPassword('');
       setPassword2('');
-      // Redirigir a confirmar cuenta
+      // Redirigir a confirmar cuenta después de 2 segundos
       setTimeout(() => {
         if (onNavigateConfirm) {
           onNavigateConfirm();
-        } else if (onNavigateHome) {
-          onNavigateHome();
+        } else if (onNavigateLogin) {
+          onNavigateLogin();
         }
-      }, 600);
+      }, 2000);
     } catch (err) {
       const msg = err?.message || err?.error || 'No se pudo registrar';
       setError(typeof msg === 'string' ? msg : 'Error en el registro');
@@ -160,10 +210,21 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                   <input
                     type="date"
                     value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
+                    onChange={(e) => {
+                      setBirthDate(e.target.value);
+                      const age = calculateAge(e.target.value);
+                      if (age !== null && age < 16) {
+                        setAgeError('Debes ser mayor de 16 años para registrarte');
+                      } else {
+                        setAgeError('');
+                      }
+                    }}
                     required
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
                   />
+                  {ageError && (
+                    <p className="mt-1 text-xs text-red-300">{ageError}</p>
+                  )}
                 </div>
               </div>
 
@@ -173,12 +234,19 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                   <input
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      validatePassword(e.target.value);
+                    }}
                     required
                     minLength={8}
+                    maxLength={15}
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
-                    placeholder="Mínimo 8 caracteres"
+                    placeholder="8-15 caracteres"
                   />
+                  {passwordError && (
+                    <p className="mt-1 text-xs text-red-300">{passwordError}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-emerald-100">Confirmar contraseña</label>
@@ -188,6 +256,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                     onChange={(e) => setPassword2(e.target.value)}
                     required
                     minLength={8}
+                    maxLength={15}
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
                     placeholder="Repite tu contraseña"
                   />
@@ -196,7 +265,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || ageError !== '' || passwordError !== ''}
                 className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-60"
               >
                 {loading ? 'Creando cuenta…' : 'Crear cuenta'}

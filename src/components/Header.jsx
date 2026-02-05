@@ -62,7 +62,7 @@ export default function Header() {
   const dotColor = isScrolled ? 'bg-emerald-500' : 'bg-emerald-400';
 
   const baseLink = (isActive) =>
-    `px-3 py-2 text-sm font-medium transition ${isActive ? (isScrolled ? 'text-slate-900' : 'text-white') : (isScrolled ? 'text-slate-700 hover:text-slate-900' : 'text-emerald-100/80 hover:text-white')}`;
+    `px-3 py-2 text-sm font-medium transition ${isActive ? 'text-emerald-500' : (isScrolled ? 'text-slate-700 hover:text-emerald-500' : 'text-emerald-100/80 hover:text-emerald-500')}`;
 
   const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
   const isOperator = user && user.role === 'operator';

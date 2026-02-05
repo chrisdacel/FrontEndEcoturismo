@@ -100,7 +100,7 @@ export async function register(name, email, password, role = 'turist', lastName 
     if (birthDate) payload.birth_date = birthDate; // formato YYYY-MM-DD
 
     const { data } = await api.post('/api/register', payload);
-    return data.user;
+    return data;
   } catch (error) {
     throw error.response?.data || { message: 'Error en registro' };
   }
@@ -505,6 +505,20 @@ export async function deleteReview(reviewId) {
     return data;
   } catch (error) {
     throw error.response?.data || { message: 'Error eliminando reseña' };
+  }
+}
+
+/**
+ * Reaccionar a una reseña (like/dislike)
+ * @param {number} reviewId - ID de la reseña
+ * @param {string} type - 'like' o 'dislike'
+ */
+export async function reactToReview(reviewId, type) {
+  try {
+    const { data } = await api.post(`/api/reviews/${reviewId}/react`, { type });
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error agregando reacción' };
   }
 }
 

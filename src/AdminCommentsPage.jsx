@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAdminReviews } from './services/adminApi';
-import { deleteReview } from './services/api';
+import { getAdminReviews, restrictReview, unrestrictReview } from './services/adminApi';
 import { useNavigate } from 'react-router-dom';
 
 export default function AdminCommentsPage() {
@@ -26,13 +25,23 @@ export default function AdminCommentsPage() {
     loadReviews();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!confirm('¿Eliminar esta reseña?')) return;
+  const handleRestrict = async (id) => {
+    if (!confirm('¿Restringir esta reseña?')) return;
     try {
-      await deleteReview(id);
-      setReviews((prev) => prev.filter((r) => r.id !== id));
+      await restrictReview(id);
+      setReviews((prev) => prev.map((r) => r.id === id ? { ...r, is_restricted: true } : r));
     } catch (err) {
-      alert(err?.message || 'Error eliminando reseña');
+      alert(err?.message || 'Error restringiendo reseña');
+    }
+  };
+
+  const handleUnrestrict = async (id) => {
+    if (!confirm('¿Desrestringir esta reseña?')) return;
+    try {
+      await unrestrictReview(id);
+      setReviews((prev) => prev.map((r) => r.id === id ? { ...r, is_restricted: false } : r));
+    } catch (err) {
+      alert(err?.message || 'Error desrestringiendo reseña');
     }
   };
 
@@ -52,7 +61,7 @@ export default function AdminCommentsPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">Gestionar Comentarios</h1>
-            <p className="text-sm text-slate-600">Revisa y elimina reseñas de todos los sitios</p>
+            <p className="text-sm text-slate-600">Revisa y restringe reseñas de todos los sitios</p>
           </div>
         </div>
 
@@ -81,15 +90,27 @@ export default function AdminCommentsPage() {
                     <td className="px-4 py-3 text-slate-800">{r.place?.name || '—'}</td>
                     <td className="px-4 py-3 text-slate-800">{r.user?.name || '—'}</td>
                     <td className="px-4 py-3 text-slate-800">{r.rating} / 5</td>
-                    <td className="px-4 py-3 text-slate-700 max-w-xs break-words">{r.comment}</td>
+                    <td className="px-4 py-3 text-slate-700 max-w-xs break-words">{r.is_restricted ? '[ Contenido restringido ]' : r.comment}</td>
                     <td className="px-4 py-3 text-slate-600 text-xs">{r.created_at ? new Date(r.created_at).toLocaleString() : '—'}</td>
                     <td className="px-4 py-3">
-                      <button
-                        className="inline-flex items-center rounded-full bg-red-500 px-3 py-1.5 text-white text-xs shadow-sm hover:bg-red-600"
-                        onClick={() => handleDelete(r.id)}
-                      >
-                        Eliminar
-                      </button>
+                      {r.is_restricted ? (
+                        <div className="flex gap-2 items-center">
+                          <span className="text-xs text-gray-500 font-semibold">Restringido</span>
+                          <button
+                            className="inline-flex items-center rounded-full bg-green-500 px-3 py-1.5 text-white text-xs shadow-sm hover:bg-green-600"
+                            onClick={() => handleUnrestrict(r.id)}
+                          >
+                            Desrestringir
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          className="inline-flex items-center rounded-full bg-orange-500 px-3 py-1.5 text-white text-xs shadow-sm hover:bg-orange-600"
+                          onClick={() => handleRestrict(r.id)}
+                        >
+                          Restringir
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

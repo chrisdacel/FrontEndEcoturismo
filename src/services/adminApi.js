@@ -137,3 +137,21 @@ export async function getAdminReviews() {
     throw error.response?.data || { message: 'Error obteniendo reseñas' };
   }
 }
+
+export async function restrictReview(id) {
+  try {
+    const { data } = await api.post(`/api/admin/reviews/${id}/restrict`);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error restringiendo reseña' };
+  }
+}
+
+export async function unrestrictReview(id) {
+  try {
+    const { data } = await api.post(`/api/admin/reviews/${id}/unrestrict`);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error desrestringiendo reseña' };
+  }
+}

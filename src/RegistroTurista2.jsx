@@ -11,13 +11,36 @@ export default function RegistroTurista2({ onNavigateHome, onNavigateLogin, onNa
     terminos: false,
     privacidad: false
   });
+  const [ageError, setAgeError] = useState('');
 
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const years = Array.from({ length: 33 }, (_, i) => 2025 - i);
 
+  const calculateAge = (year, month, day) => {
+    if (!year || !month || !day) return null;
+    const birthDate = new Date(year, month - 1, day);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const validateAge = () => {
+    const age = calculateAge(formData.anio, formData.mes, formData.dia);
+    if (age !== null && age < 16) {
+      setAgeError('Debes ser mayor de 16 años para registrarte');
+      return false;
+    }
+    setAgeError('');
+    return true;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí iría la lógica de envío del formulario
+    if (!validateAge()) return;
     if (formData.terminos && formData.privacidad) {
       onNavigatePreferencias();
     }
@@ -108,7 +131,16 @@ export default function RegistroTurista2({ onNavigateHome, onNavigateLogin, onNa
           <div className="flex gap-2 md:gap-3">
             <select
               value={formData.mes}
-              onChange={(e) => setFormData({ ...formData, mes: e.target.value })}
+              onChange={(e) => {
+                const newFormData = { ...formData, mes: e.target.value };
+                setFormData(newFormData);
+                const age = calculateAge(newFormData.anio, newFormData.mes, newFormData.dia);
+                if (age !== null && age < 16) {
+                  setAgeError('Debes ser mayor de 16 años para registrarte');
+                } else {
+                  setAgeError('');
+                }
+              }}
               className="flex-1 rounded-md border border-gray-500 px-2 py-2 text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#267E1B] md:text-sm"
             >
               <option value="">Mes</option>
@@ -128,7 +160,16 @@ export default function RegistroTurista2({ onNavigateHome, onNavigateLogin, onNa
 
             <select
               value={formData.dia}
-              onChange={(e) => setFormData({ ...formData, dia: e.target.value })}
+              onChange={(e) => {
+                const newFormData = { ...formData, dia: e.target.value };
+                setFormData(newFormData);
+                const age = calculateAge(newFormData.anio, newFormData.mes, newFormData.dia);
+                if (age !== null && age < 16) {
+                  setAgeError('Debes ser mayor de 16 años para registrarte');
+                } else {
+                  setAgeError('');
+                }
+              }}
               className="flex-1 rounded-md border border-gray-500 px-2 py-2 text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#267E1B] md:text-sm"
             >
               <option value="">Día</option>
@@ -139,7 +180,16 @@ export default function RegistroTurista2({ onNavigateHome, onNavigateLogin, onNa
 
             <select
               value={formData.anio}
-              onChange={(e) => setFormData({ ...formData, anio: e.target.value })}
+              onChange={(e) => {
+                const newFormData = { ...formData, anio: e.target.value };
+                setFormData(newFormData);
+                const age = calculateAge(newFormData.anio, newFormData.mes, newFormData.dia);
+                if (age !== null && age < 16) {
+                  setAgeError('Debes ser mayor de 16 años para registrarte');
+                } else {
+                  setAgeError('');
+                }
+              }}
               className="flex-1 rounded-md border border-gray-500 px-2 py-2 text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#267E1B] md:text-sm"
             >
               <option value="">Año</option>
@@ -148,6 +198,9 @@ export default function RegistroTurista2({ onNavigateHome, onNavigateLogin, onNa
               ))}
             </select>
           </div>
+          {ageError && (
+            <p className="mt-1 text-xs text-red-600">{ageError}</p>
+          )}
         </div>
 
         {/* Términos y Condiciones */}
@@ -190,7 +243,7 @@ export default function RegistroTurista2({ onNavigateHome, onNavigateLogin, onNa
         {/* Finalizar Button */}
         <button
           onClick={handleSubmit}
-          disabled={!formData.terminos || !formData.privacidad}
+          disabled={!formData.terminos || !formData.privacidad || ageError !== ''}
           className="w-full max-w-[35vw] rounded-md bg-[#267E1B] py-2.5 text-sm font-semibold text-white transition-all hover:border hover:border-[#267E1B] hover:bg-white hover:text-[#267E1B] disabled:opacity-50 md:max-w-none"
         >
           Finalizar

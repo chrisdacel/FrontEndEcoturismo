@@ -1,10 +1,45 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPlaceById } from './services/placesApi';
-import { createReview, updateReview, deleteReview } from './services/api';
+import { createReview, updateReview, deleteReview, reactToReview } from './services/api';
 import { useAuth } from './context/AuthContext';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
+// Star Rating Component
+function StarRating({ rating, onRatingChange, size = 'medium' }) {
+  const [hoverRating, setHoverRating] = useState(0);
+  const sizeClasses = {
+    small: 'w-4 h-4',
+    medium: 'w-6 h-6',
+    large: 'w-8 h-8'
+  };
+
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          onClick={() => onRatingChange(star)}
+          onMouseEnter={() => setHoverRating(star)}
+          onMouseLeave={() => setHoverRating(0)}
+          className="transition-transform hover:scale-110"
+        >
+          <svg
+            className={`${sizeClasses[size]} transition-colors`}
+            fill={(hoverRating || rating) >= star ? '#f59e0b' : 'none'}
+            stroke={(hoverRating || rating) >= star ? '#f59e0b' : '#cbd5e1'}
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function SitioDetailPage({
   onNavigateHome,
@@ -19,7 +54,11 @@ export default function SitioDetailPage({
   const [sitio, setSitio] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [commentError, setCommentError] = useState(null);
+  const [editError, setEditError] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [filteredReviews, setFilteredReviews] = useState([]);
+  const [filterType, setFilterType] = useState('recent');
   const [averageRating, setAverageRating] = useState(null);
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState(5);
@@ -35,6 +74,32 @@ export default function SitioDetailPage({
     const sum = list.reduce((acc, item) => acc + (item.rating || 0), 0);
     return Math.round((sum / list.length) * 10) / 10;
   };
+
+  const handleCommentChange = (e) => {
+    setComment(e.target.value);
+    setCommentError(null);
+  };
+
+  // Aplicar filtros a las reseñas
+  useEffect(() => {
+    let sorted = [...reviews];
+    
+    switch (filterType) {
+      case 'recent':
+        sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        break;
+      case 'highest':
+        sorted.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'lowest':
+        sorted.sort((a, b) => a.rating - b.rating);
+        break;
+      default:
+        break;
+    }
+    
+    setFilteredReviews(sorted);
+  }, [reviews, filterType]);
 
   useEffect(() => {
     const load = async () => {
@@ -84,7 +149,7 @@ export default function SitioDetailPage({
   const handleCreateReview = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
+    setCommentError(null);
     try {
       const res = await createReview(id, rating, comment);
       const newReview = res.review || res;
@@ -96,7 +161,7 @@ export default function SitioDetailPage({
       setComment('');
       setRating(5);
     } catch (err) {
-      setError(err.message || 'Error enviando reseña');
+      setCommentError(err.message || 'Error enviando reseña');
     } finally {
       setSubmitting(false);
     }
@@ -106,11 +171,12 @@ export default function SitioDetailPage({
     setEditingId(review.id);
     setEditComment(review.comment);
     setEditRating(review.rating);
+    setEditError(null);
   };
 
   const handleUpdateReview = async (reviewId) => {
     setSubmitting(true);
-    setError(null);
+    setEditError(null);
     try {
       const res = await updateReview(reviewId, editRating, editComment);
       const updated = res.review || res;
@@ -123,7 +189,7 @@ export default function SitioDetailPage({
       setEditComment('');
       setEditRating(5);
     } catch (err) {
-      setError(err.message || 'Error actualizando reseña');
+      setEditError(err.message || 'Error actualizando reseña');
     } finally {
       setSubmitting(false);
     }
@@ -132,7 +198,7 @@ export default function SitioDetailPage({
   const handleDeleteReview = async (reviewId) => {
     if (!confirm('¿Eliminar este comentario?')) return;
     setSubmitting(true);
-    setError(null);
+    setCommentError(null);
     try {
       await deleteReview(reviewId);
       setReviews((prev) => {
@@ -141,9 +207,51 @@ export default function SitioDetailPage({
         return next;
       });
     } catch (err) {
-      setError(err.message || 'Error eliminando reseña');
+      setCommentError(err.message || 'Error eliminando reseña');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleReaction = async (reviewId, type) => {
+    if (!user) {
+      alert('Debes iniciar sesión para reaccionar');
+      return;
+    }
+    
+    try {
+      await reactToReview(reviewId, type);
+      
+      // Actualizar el estado local
+      setReviews((prev) => prev.map((r) => {
+        if (r.id === reviewId) {
+          const currentReaction = r.user_reaction;
+          let newLikesCount = r.likes_count || 0;
+          let newDislikesCount = r.dislikes_count || 0;
+          
+          // Si ya tenía esta reacción, quitarla (toggle)
+          if (currentReaction === type) {
+            if (type === 'like') newLikesCount--;
+            else newDislikesCount--;
+            return { ...r, user_reaction: null, likes_count: newLikesCount, dislikes_count: newDislikesCount };
+          }
+          
+          // Si tenía otra reacción, cambiarla
+          if (currentReaction) {
+            if (currentReaction === 'like') newLikesCount--;
+            else newDislikesCount--;
+          }
+          
+          // Agregar la nueva reacción
+          if (type === 'like') newLikesCount++;
+          else newDislikesCount++;
+          
+          return { ...r, user_reaction: type, likes_count: newLikesCount, dislikes_count: newDislikesCount };
+        }
+        return r;
+      }));
+    } catch (err) {
+      alert(err.message || 'Error al reaccionar');
     }
   };
 
@@ -335,41 +443,51 @@ export default function SitioDetailPage({
         {/* Comentarios Section */}
         <section className="py-16 px-6 bg-emerald-50/40">
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-3xl font-semibold text-emerald-700">Comentarios</h2>
-              <span className="text-sm text-slate-600">{reviews.length} comentario(s)</span>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-3xl font-semibold text-emerald-700">Comentarios</h2>
+                <span className="text-sm text-slate-600">{reviews.length} comentario(s)</span>
+              </div>
+              
+              {/* Filtro de comentarios */}
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-semibold text-slate-700">Ordenar por:</label>
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="rounded-lg border border-emerald-200 px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-emerald-300"
+                >
+                  <option value="recent">Más recientes</option>
+                  <option value="highest">Mejor calificación</option>
+                  <option value="lowest">Peor calificación</option>
+                </select>
+              </div>
             </div>
 
             <div className="mb-6 flex items-center gap-3 rounded-lg border border-emerald-100 bg-white px-4 py-3 shadow-sm">
-              <div className="text-3xl font-bold text-emerald-700">
-                {averageRating !== null ? averageRating.toFixed(1) : '—'}
+              <div className="flex flex-col items-center gap-1">
+                <div className="text-3xl font-bold text-emerald-700">
+                  {averageRating !== null ? averageRating.toFixed(1) : '—'}
+                </div>
+                {averageRating !== null && (
+                  <StarRating rating={Math.round(averageRating)} onRatingChange={() => {}} size="small" />
+                )}
               </div>
               <div className="text-sm text-slate-600">
                 {averageRating !== null ? `Promedio de calificación basado en ${reviews.length} reseña(s)` : 'Sin calificaciones aún'}
               </div>
             </div>
 
-            {error && (
-              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
-            )}
-
             {user && ['user','operator','admin'].includes(user.role) ? (
               <form onSubmit={handleCreateReview} className="mb-8 space-y-3 bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
                 <div className="flex gap-4 items-center">
                   <label className="text-sm font-semibold text-slate-700">Calificación</label>
-                  <select
-                    value={rating}
-                    onChange={(e) => setRating(Number(e.target.value))}
-                    className="rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
-                  >
-                    {[5,4,3,2,1].map((r) => (
-                      <option key={r} value={r}>{r} / 5</option>
-                    ))}
-                  </select>
+                  <StarRating rating={rating} onRatingChange={setRating} size="medium" />
+                  <span className="text-sm text-slate-600">({rating}/5)</span>
                 </div>
                 <textarea
                   value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  onChange={handleCommentChange}
                   required
                   minLength={10}
                   maxLength={1000}
@@ -377,6 +495,9 @@ export default function SitioDetailPage({
                   className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
                   rows={3}
                 />
+                {commentError && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{commentError}</div>
+                )}
                 <div className="flex justify-end">
                   <button
                     type="submit"
@@ -392,34 +513,30 @@ export default function SitioDetailPage({
             )}
 
             <div className="space-y-4">
-              {reviews.map((rev) => {
+              {filteredReviews.map((rev) => {
                 const isOwner = user && rev.user && user.id === rev.user.id;
                 return (
                   <div key={rev.id} className="bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
+                    <div className={editingId === rev.id ? "flex flex-col gap-3" : "flex items-start justify-between gap-3"}>
+                      <div className="flex-1">
                         <p className="text-sm font-semibold text-slate-900">{rev.user?.name || 'Usuario'}</p>
                         <p className="text-xs text-slate-500">{rev.created_at ? new Date(rev.created_at).toLocaleString() : ''}</p>
                         {editingId === rev.id ? (
-                          <div className="mt-3 space-y-2">
+                          <div className="w-full mt-3 space-y-2">
                             <div className="flex gap-2 items-center">
                               <label className="text-xs font-semibold text-slate-700">Calificación</label>
-                              <select
-                                value={editRating}
-                                onChange={(e) => setEditRating(Number(e.target.value))}
-                                className="rounded-lg border border-emerald-200 px-2 py-1 text-sm"
-                              >
-                                {[5,4,3,2,1].map((r) => (
-                                  <option key={r} value={r}>{r}</option>
-                                ))}
-                              </select>
+                              <StarRating rating={editRating} onRatingChange={setEditRating} size="small" />
+                              <span className="text-xs text-slate-600">({editRating}/5)</span>
                             </div>
                             <textarea
                               value={editComment}
                               onChange={(e) => setEditComment(e.target.value)}
-                              className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-sm"
+                              className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
                               rows={3}
                             />
+                            {editError && (
+                              <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{editError}</div>
+                            )}
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleUpdateReview(rev.id)}
@@ -436,12 +553,56 @@ export default function SitioDetailPage({
                               </button>
                             </div>
                           </div>
+                        ) : rev.is_restricted ? (
+                          <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                            <p className="text-sm text-yellow-800 flex items-start gap-2">
+                              <span className="text-lg">⚠️</span>
+                              <span><strong>Contenido restringido:</strong> Este comentario ha sido restringido por violar nuestras políticas de bienestar comunitario.</span>
+                            </p>
+                          </div>
                         ) : (
-                          <p className="mt-3 text-slate-700 leading-relaxed">{rev.comment}</p>
+                          <>
+                            <p className="mt-3 text-slate-700 leading-relaxed">{rev.comment}</p>
+                            
+                            {/* Botones de Like/Dislike */}
+                            <div className="mt-3 flex items-center gap-4">
+                              <button
+                                onClick={() => handleReaction(rev.id, 'like')}
+                                className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm transition ${
+                                  rev.user_reaction === 'like'
+                                    ? 'bg-emerald-100 text-emerald-700 font-semibold'
+                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                }`}
+                              >
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                                </svg>
+                                <span>{rev.likes_count || 0}</span>
+                              </button>
+                              
+                              <button
+                                onClick={() => handleReaction(rev.id, 'dislike')}
+                                className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm transition ${
+                                  rev.user_reaction === 'dislike'
+                                    ? 'bg-red-100 text-red-700 font-semibold'
+                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                }`}
+                              >
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M18 9.5a1.5 1.5 0 11-3 0v-6a1.5 1.5 0 013 0v6zM14 9.667v-5.43a2 2 0 00-1.105-1.79l-.05-.025A4 4 0 0011.055 2H5.64a2 2 0 00-1.962 1.608l-1.2 6A2 2 0 004.44 12H8v4a2 2 0 002 2 1 1 0 001-1v-.667a4 4 0 01.8-2.4l1.4-1.866a4 4 0 00.8-2.4z" />
+                                </svg>
+                                <span>{rev.dislikes_count || 0}</span>
+                              </button>
+                            </div>
+                          </>
                         )}
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-semibold text-emerald-700">{rev.rating} / 5</div>
+                      {!editingId || editingId !== rev.id ? (
+                        <div className="text-right">
+                        <div className="flex flex-col items-end gap-1">
+                          <StarRating rating={rev.rating} onRatingChange={() => {}} size="small" />
+                          <span className="text-xs text-slate-600">({rev.rating}/5)</span>
+                        </div>
                         {isOwner && (
                           <div className="mt-2 flex gap-2 justify-end">
                             <button
@@ -459,6 +620,7 @@ export default function SitioDetailPage({
                           </div>
                         )}
                       </div>
+                      ) : null}
                     </div>
                   </div>
                 );
