@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPlaceById } from './services/placesApi';
-import { createReview, updateReview, deleteReview, reactToReview } from './services/api';
+import { api, createReview, updateReview, deleteReview, reactToReview, logPlaceVisit } from './services/api';
 import { useAuth } from './context/AuthContext';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -87,8 +87,11 @@ export default function SitioDetailPage({
   const [editingId, setEditingId] = useState(null);
   const [editComment, setEditComment] = useState('');
   const [editRating, setEditRating] = useState(5);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
 
   const calcAverage = (list) => {
     if (!list || list.length === 0) return null;
@@ -139,6 +142,11 @@ export default function SitioDetailPage({
     load();
   }, [id]);
 
+  useEffect(() => {
+    if (!isTourist || !user || !id) return;
+    logPlaceVisit(id).catch(() => {});
+  }, [id, isTourist, user]);
+
   // Inicializar mapa cuando sitio esté cargado
   useEffect(() => {
     if (sitio && sitio.lat && sitio.lng && mapRef.current && !mapInstanceRef.current) {
@@ -166,6 +174,90 @@ export default function SitioDetailPage({
   }, [sitio]);
 
   const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
+  const labelList = Array.isArray(sitio?.label)
+    ? sitio.label
+    : Array.isArray(sitio?.labels)
+      ? sitio.labels
+      : [];
+  const labelBadges = labelList.length > 0 ? labelList : [{ name: 'Sin etiqueta' }];
+  const getLabelStyle = (label) => {
+    const rawColor = label?.color;
+    if (!rawColor) return null;
+    const color = rawColor.startsWith('#') ? rawColor : `#${rawColor}`;
+    return {
+      backgroundColor: `${color}26`,
+      borderColor: `${color}66`,
+      color,
+    };
+  };
+  const openingStatusLabels = {
+    open: 'Abierto',
+    closed_temporarily: 'Cerrado temporalmente',
+    open_with_restrictions: 'Abierto con restricciones',
+  };
+  const openingStatusStyles = {
+    open: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    closed_temporarily: 'bg-rose-50 text-rose-700 border-rose-200',
+    open_with_restrictions: 'bg-amber-50 text-amber-700 border-amber-200',
+  };
+  const daysOfWeek = [
+    { key: 'lunes', label: 'Lunes' },
+    { key: 'martes', label: 'Martes' },
+    { key: 'miercoles', label: 'Miercoles' },
+    { key: 'jueves', label: 'Jueves' },
+    { key: 'viernes', label: 'Viernes' },
+    { key: 'sabado', label: 'Sabado' },
+    { key: 'domingo', label: 'Domingo' },
+  ];
+  const openDaysMap = (sitio && typeof sitio.open_days === 'object' && sitio.open_days !== null)
+    ? sitio.open_days
+    : {};
+  const openDaysList = daysOfWeek.filter((day) => Boolean(openDaysMap[day.key])).map((day) => day.label);
+
+  useEffect(() => {
+    let active = true;
+    if (!isTourist) {
+      setIsFavorite(false);
+      return undefined;
+    }
+
+    api.get('/api/favorites')
+      .then((response) => {
+        if (!active) return;
+        const ids = new Set((response.data || []).map((fav) => fav.id));
+        setIsFavorite(ids.has(Number(id)) || ids.has(id));
+      })
+      .catch(() => {
+        if (active) setIsFavorite(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [id, isTourist]);
+
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      onNavigateLogin?.();
+      return;
+    }
+    if (!isTourist || favoriteLoading) return;
+
+    try {
+      setFavoriteLoading(true);
+      if (isFavorite) {
+        await api.delete(`/api/places/${id}/favorite`);
+        setIsFavorite(false);
+      } else {
+        await api.post(`/api/places/${id}/favorite`);
+        setIsFavorite(true);
+      }
+    } catch (_) {
+      // Silenciar para evitar ruidos en UI
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
 
   const handleCreateReview = async (e) => {
     e.preventDefault();
@@ -309,16 +401,50 @@ export default function SitioDetailPage({
           style={{ backgroundImage: `url('${storageUrl(sitio.cover)}')` }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
+          {isTourist && (
+            <button
+              type="button"
+              onClick={handleToggleFavorite}
+              disabled={favoriteLoading}
+              className={`absolute right-5 top-5 z-20 inline-flex h-12 w-12 items-center justify-center rounded-full ring-1 backdrop-blur transition ${
+                isFavorite
+                  ? 'bg-emerald-600 text-white ring-emerald-200'
+                  : 'bg-white/85 text-emerald-700 ring-white/60 hover:bg-white'
+              } ${favoriteLoading ? 'opacity-70' : ''}`}
+              aria-label="Guardar en favoritos"
+              title="Guardar en favoritos"
+            >
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+              </svg>
+            </button>
+          )}
           <div className="relative z-10 w-full">
             <div className="mx-auto max-w-7xl px-6 py-16">
               <div className="max-w-2xl">
-                <span className="inline-flex items-center gap-3 rounded-full bg-emerald-50/20 px-4 py-2 text-sm text-emerald-100 ring-1 ring-white/20">
-                  Ecoturismo
-                </span>
                 <h1 className="mt-4 text-4xl md:text-5xl font-bold leading-tight text-white">{sitio.name}</h1>
                 <p className="mt-3 text-lg md:text-xl text-emerald-100/90 max-w-xl">
                   {sitio.slogan}
                 </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {labelBadges.map((label) => {
+                    const labelText = label?.name || label;
+                    const labelStyle = getLabelStyle(label);
+                    return (
+                      <span
+                        key={labelText}
+                        style={labelStyle || undefined}
+                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold backdrop-blur ${
+                          labelStyle
+                            ? 'border'
+                            : 'bg-emerald-50/20 text-emerald-100 ring-1 ring-white/20'
+                        }`}
+                      >
+                        {labelText}
+                      </span>
+                    );
+                  })}
+                </div>
                 <div className="mt-6">
                   <button 
                     className="rounded-full bg-emerald-600 px-6 py-3 font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:-translate-y-0.5 hover:bg-emerald-700"
@@ -461,6 +587,40 @@ export default function SitioDetailPage({
           </div>
         </section>
 
+        <section className="py-16 px-6 bg-emerald-50/30">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl font-semibold text-emerald-700 mb-6 text-center">Contacto y disponibilidad</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm shadow-emerald-100/40">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Contacto</h3>
+                <p className="text-slate-600 whitespace-pre-line break-words">
+                  {sitio.contact_info || 'No disponible.'}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm shadow-emerald-100/40">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Estado del sitio</h3>
+                <div className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-semibold ${openingStatusStyles[sitio.opening_status] || 'bg-slate-50 text-slate-700 border-slate-200'}`}>
+                  {openingStatusLabels[sitio.opening_status] || 'Estado no disponible'}
+                </div>
+                <div className="mt-4">
+                  <h4 className="text-sm font-semibold text-slate-700 mb-2">Dias abiertos</h4>
+                  {openDaysList.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {openDaysList.map((day) => (
+                        <span key={day} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          {day}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-500">No disponible.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Comentarios Section */}
         <section className="py-16 px-6 bg-emerald-50/40">
           <div className="max-w-4xl mx-auto">
@@ -542,29 +702,32 @@ export default function SitioDetailPage({
 
             <div className="space-y-4 max-w-4xl mx-auto">
               {filteredReviews.map((rev) => {
-                const isOwner = user && rev.user && user.id === rev.user.id;
+                const hasUser = Boolean(rev.user && rev.user.id);
+                const isOwner = user && hasUser && user.id === rev.user.id;
+                const displayName = hasUser ? (rev.user?.name || 'Usuario') : '[usuario no encontrado]';
+                const avatarInitial = hasUser && rev.user?.name ? rev.user.name.charAt(0).toUpperCase() : 'U';
                 return (
                   <div key={rev.id} className="group bg-white rounded-lg border border-emerald-100 p-4 shadow-sm overflow-hidden">
                     <div className={editingId === rev.id ? "flex flex-col gap-3" : "flex items-start justify-between gap-3"}>
                       <div className="flex items-start gap-3 flex-1 min-w-0">
                         {/* Avatar del usuario */}
                         <div className="flex-shrink-0">
-                          {rev.user?.image ? (
+                          {hasUser && rev.user?.image ? (
                             <img 
                               src={`http://localhost:8000/api/files/${rev.user.image}`}
-                              alt={rev.user?.name}
+                              alt={displayName}
                               className="w-10 h-10 rounded-full object-cover border border-emerald-200"
                             />
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-semibold text-sm">
-                              {rev.user?.name ? rev.user.name.charAt(0).toUpperCase() : 'U'}
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm ${hasUser ? 'bg-emerald-600 text-white' : 'bg-slate-300 text-slate-700'}`}>
+                              {avatarInitial}
                             </div>
                           )}
                         </div>
                         
                         {/* Nombre y fecha */}
                         <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-semibold truncate ${isOwner ? 'text-emerald-700' : 'text-slate-900'}`}>{rev.user?.name || 'Usuario'}</p>
+                          <p className={`text-sm font-semibold truncate ${isOwner ? 'text-emerald-700' : 'text-slate-900'}`}>{displayName}</p>
                           <p className="text-xs text-slate-500">{rev.created_at ? new Date(rev.created_at).toLocaleString() : ''}</p>
                         
                         {/* Contenido del comentario */}

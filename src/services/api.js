@@ -228,6 +228,17 @@ export async function deleteAvatar() {
   }
 }
 
+// Perfil: eliminar cuenta
+export async function deleteAccount(current_password) {
+  try {
+    await initializeCsrfToken();
+    const { data } = await api.post('/api/profile/delete', { current_password });
+    return data.message || 'Cuenta eliminada';
+  } catch (error) {
+    throw error.response?.data || { message: 'Error eliminando cuenta' };
+  }
+}
+
 // Reenviar correo de verificación
 export async function resendVerificationEmail() {
   try {
@@ -341,6 +352,46 @@ export async function fetchUserPlaces() {
 }
 
 /**
+ * Obtener recomendaciones basadas en preferencias del usuario
+ */
+export async function fetchRecommendations() {
+  try {
+    const { data } = await api.get('/api/recommendations');
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo recomendaciones' };
+  }
+}
+
+// ============ HISTORIAL (TURISTA) ============
+export async function logPlaceVisit(placeId) {
+  try {
+    const { data } = await api.post(`/api/places/${placeId}/visit`);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error registrando visita' };
+  }
+}
+
+export async function fetchUserHistory(limit = 8) {
+  try {
+    const { data } = await api.get('/api/user/history', { params: { limit } });
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo historial' };
+  }
+}
+
+export async function fetchUserReviews(limit = 8) {
+  try {
+    const { data } = await api.get('/api/user/reviews', { params: { limit } });
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo comentarios' };
+  }
+}
+
+/**
  * Crear nuevo sitio turístico (solo operador/admin, requiere autenticación)
  * @param {object} placeData - Datos del sitio (nombre, slogan, descripción, etc.)
  * @param {File} coverImage - Imagen de portada
@@ -365,6 +416,23 @@ export async function createPlace(placeData, coverImage, climateImage, featuresI
     formData.append('flora', placeData.flora);
     formData.append('infraestructura', placeData.infraestructura);
     formData.append('recomendacion', placeData.recomendacion);
+    if (placeData.contacto !== undefined) {
+      formData.append('contacto', placeData.contacto ?? '');
+    }
+    if (placeData.estado_apertura !== undefined) {
+      formData.append('estado_apertura', placeData.estado_apertura ?? '');
+    }
+    if (placeData.dias_abiertos !== undefined) {
+      const openDaysValue = typeof placeData.dias_abiertos === 'string'
+        ? placeData.dias_abiertos
+        : JSON.stringify(placeData.dias_abiertos);
+      formData.append('dias_abiertos', openDaysValue);
+    }
+    if (Array.isArray(placeData.preferences)) {
+      placeData.preferences.forEach((prefId) => {
+        formData.append('preferences[]', prefId);
+      });
+    }
     
     // Imágenes
     formData.append('portada', coverImage);
@@ -416,6 +484,23 @@ export async function updatePlace(id, placeData, coverImage = null, climateImage
     formData.append('flora', placeData.flora);
     formData.append('infraestructura', placeData.infraestructura);
     formData.append('recomendacion', placeData.recomendacion);
+    if (placeData.contacto !== undefined) {
+      formData.append('contacto', placeData.contacto ?? '');
+    }
+    if (placeData.estado_apertura !== undefined) {
+      formData.append('estado_apertura', placeData.estado_apertura ?? '');
+    }
+    if (placeData.dias_abiertos !== undefined) {
+      const openDaysValue = typeof placeData.dias_abiertos === 'string'
+        ? placeData.dias_abiertos
+        : JSON.stringify(placeData.dias_abiertos);
+      formData.append('dias_abiertos', openDaysValue);
+    }
+    if (Array.isArray(placeData.preferences)) {
+      placeData.preferences.forEach((prefId) => {
+        formData.append('preferences[]', prefId);
+      });
+    }
     // Sobrescribir método para compatibilidad con subida de archivos en Laravel
     formData.append('_method', 'PUT');
     

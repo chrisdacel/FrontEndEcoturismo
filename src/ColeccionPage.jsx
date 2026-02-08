@@ -4,7 +4,7 @@ import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/fre
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { getAllPlaces } from './services/placesApi';
-import { api } from './services/api';
+import { api, fetchRecommendations } from './services/api';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -28,6 +28,10 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const [sitiosAPI, setSitiosAPI] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
+  const [recommendations, setRecommendations] = useState([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+  const [randomRecommendations, setRandomRecommendations] = useState([]);
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const markersLayerRef = useRef(null);
@@ -62,9 +66,85 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     await loadSites(searchText);
   };
 
+  const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
+
+  const loadFavorites = useCallback(async () => {
+    if (!isTourist) return;
+    try {
+      const response = await api.get('/api/favorites');
+      const ids = new Set((response.data || []).map((fav) => fav.id));
+      setFavoriteIds(ids);
+    } catch (error) {
+      console.error('Error cargando favoritos:', error);
+    }
+  }, [isTourist]);
+
+  useEffect(() => {
+    loadFavorites();
+  }, [loadFavorites]);
+
+  useEffect(() => {
+    const loadRecommendations = async () => {
+      if (!isTourist) return;
+      try {
+        setRecommendationsLoading(true);
+        const data = await fetchRecommendations();
+        setRecommendations(Array.isArray(data) ? data : []);
+      } catch (error) {
+        setRecommendations([]);
+      } finally {
+        setRecommendationsLoading(false);
+      }
+    };
+    loadRecommendations();
+  }, [isTourist]);
+
+  useEffect(() => {
+    if (!isTourist) return;
+
+    if (recommendations.length > 0) {
+      setRandomRecommendations([]);
+      return;
+    }
+
+    if (sitiosAPI.length === 0) return;
+
+    const shuffled = [...sitiosAPI].sort(() => Math.random() - 0.5);
+    setRandomRecommendations(shuffled);
+  }, [isTourist, recommendations, sitiosAPI]);
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
+    }
+  };
+
+  const handleToggleFavorite = async (event, sitioId) => {
+    event.stopPropagation();
+    if (!user) {
+      onNavigateLogin?.();
+      return;
+    }
+    if (!isTourist) return;
+
+    const isFavorite = favoriteIds.has(sitioId);
+    try {
+      if (isFavorite) {
+        await api.delete(`/api/places/${sitioId}/favorite`);
+      } else {
+        await api.post(`/api/places/${sitioId}/favorite`);
+      }
+      setFavoriteIds((prev) => {
+        const next = new Set(prev);
+        if (isFavorite) {
+          next.delete(sitioId);
+        } else {
+          next.add(sitioId);
+        }
+        return next;
+      });
+    } catch (error) {
+      console.error('Error actualizando favorito:', error);
     }
   };
 
@@ -232,6 +312,13 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     }
   };
 
+  const baseFallback = recommendations.length === 0 ? randomRecommendations : sitiosAPI;
+  const fallbackRecommendations = baseFallback.filter((item) => item?.id && !recommendations.some((rec) => rec.id === item.id));
+  const recommendedList = isTourist
+    ? [...recommendations, ...fallbackRecommendations].slice(0, 8)
+    : recomendaciones;
+  const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
+
   return (
     <div className="min-h-screen coleccion-shell text-slate-900">
       {/* Scroll to Top Button */}
@@ -323,6 +410,23 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                       }
                     }}
                   >
+                    {isTourist && (
+                      <button
+                        type="button"
+                        onClick={(event) => handleToggleFavorite(event, sitio.id)}
+                        className={`absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 transition ${
+                          favoriteIds.has(sitio.id)
+                            ? 'bg-emerald-600 text-white ring-emerald-200'
+                            : 'bg-white/90 text-emerald-700 ring-emerald-100 hover:bg-emerald-50'
+                        }`}
+                        aria-label="Guardar en favoritos"
+                        title="Guardar en favoritos"
+                      >
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                        </svg>
+                      </button>
+                    )}
                     <div className="h-48 w-full overflow-hidden">
                       <img
                         src={`http://localhost:8000/api/files/${sitio.cover}`}
@@ -365,34 +469,49 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
           {/* Carril con scroll horizontal y snap */}
           <div className="overflow-x-auto scrollbar-none px-6 md:px-12">
             <div className="flex gap-6 md:gap-8 snap-x snap-mandatory">
-              {recomendaciones.map((rec) => (
-                <article
-                  key={rec.id}
-                  className="group relative shrink-0 snap-start w-[260px] sm:w-[300px] md:w-[340px] aspect-[9/16] rounded-[26px] overflow-hidden shadow-xl cursor-pointer"
-                >
-                  {/* Imagen */}
-                  <img
-                    src={rec.imagen}
-                    alt={rec.nombre}
-                    className="absolute inset-0 h-full w-full object-cover rounded-[26px] origin-center transform transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
+              {recommendationsLoading ? (
+                <div className="text-sm text-slate-600">Cargando recomendaciones...</div>
+              ) : recommendedList.length === 0 ? (
+                <div className="text-sm text-slate-600">No hay recomendaciones disponibles.</div>
+              ) : (
+                recommendedList.map((rec) => (
+                  <article
+                    key={rec.id}
+                    className="group relative shrink-0 snap-start w-[260px] sm:w-[300px] md:w-[340px] aspect-[9/16] rounded-[26px] overflow-hidden shadow-xl cursor-pointer"
+                    onClick={() => {
+                      if (user?.role === 'admin') {
+                        navigate(`/admin/sitio/${rec.id}`);
+                      } else if (user && user.role !== 'operator') {
+                        navigate(`/turista/sitio/${rec.id}`);
+                      } else {
+                        navigate(`/sitio/${rec.id}`);
+                      }
+                    }}
+                  >
+                    {/* Imagen */}
+                    <img
+                      src={rec.imagen || storageUrl(rec.cover)}
+                      alt={rec.nombre || rec.name}
+                      className="absolute inset-0 h-full w-full object-cover rounded-[26px] origin-center transform transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
 
-                  {/* Gradiente y contenido que aparecen en hover */}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-[26px]" />
+                    {/* Gradiente y contenido que aparecen en hover */}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-[26px]" />
 
-                  <div className="absolute inset-0 flex flex-col justify-between p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-[26px]">
-                    <div className="relative z-10 space-y-1 text-white">
-                      <p className="text-white/80 text-xs font-semibold">Recomendado</p>
-                      <h3 className="text-2xl font-bold leading-tight">{rec.nombre}</h3>
-                      <p className="text-sm">Explora este destino increíble</p>
+                    <div className="absolute inset-0 flex flex-col justify-between p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-[26px]">
+                      <div className="relative z-10 space-y-1 text-white">
+                        <p className="text-white/80 text-xs font-semibold">Recomendado</p>
+                        <h3 className="text-2xl font-bold leading-tight">{rec.nombre || rec.name}</h3>
+                        <p className="text-sm">{rec.slogan || 'Explora este destino increíble'}</p>
+                      </div>
+                      <div className="relative z-10 flex items-center justify-between">
+                        <div className="rounded-full bg-white/20 text-white text-xs px-3 py-1 backdrop-blur">Más destinos</div>
+                        <button className="grid place-items-center h-8 w-8 rounded-full bg-black/40 text-white backdrop-blur hover:bg-black/60 transition">+</button>
+                      </div>
                     </div>
-                    <div className="relative z-10 flex items-center justify-between">
-                      <div className="rounded-full bg-white/20 text-white text-xs px-3 py-1 backdrop-blur">Más destinos</div>
-                      <button className="grid place-items-center h-8 w-8 rounded-full bg-black/40 text-white backdrop-blur hover:bg-black/60 transition">+</button>
-                    </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                ))
+              )}
             </div>
           </div>
         </section>

@@ -88,7 +88,7 @@ export default function AdminCommentsPage() {
                 {reviews.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3 text-slate-800">{r.place?.name || '—'}</td>
-                    <td className="px-4 py-3 text-slate-800">{r.user?.name || '—'}</td>
+                    <td className="px-4 py-3 text-slate-800">{r.user ? (r.user?.name || 'Usuario') : '[usuario no encontrado]'}</td>
                     <td className="px-4 py-3 text-slate-800">{r.rating} / 5</td>
                     <td className="px-4 py-3 text-slate-700 max-w-xs break-words">{r.is_restricted ? '[ Contenido restringido ]' : r.comment}</td>
                     <td className="px-4 py-3 text-slate-600 text-xs">{r.created_at ? new Date(r.created_at).toLocaleString() : '—'}</td>

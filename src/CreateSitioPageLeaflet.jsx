@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createPlace, getPlaceById } from './services/placesApi';
-import { updatePlace } from './services/api';
+import { updatePlace, fetchPreferencesOptions } from './services/api';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -28,6 +28,17 @@ export default function CreateSitioPageLeaflet() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const isEdit = Boolean(id);
+  const [preferencesOptions, setPreferencesOptions] = useState([]);
+  const [selectedPreferences, setSelectedPreferences] = useState([]);
+  const daysOfWeek = [
+    { key: 'lunes', label: 'Lunes' },
+    { key: 'martes', label: 'Martes' },
+    { key: 'miercoles', label: 'Miercoles' },
+    { key: 'jueves', label: 'Jueves' },
+    { key: 'viernes', label: 'Viernes' },
+    { key: 'sabado', label: 'Sabado' },
+    { key: 'domingo', label: 'Domingo' },
+  ];
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -41,6 +52,17 @@ export default function CreateSitioPageLeaflet() {
     flora: '',
     infraestructura: '',
     recomendacion: '',
+    contacto: '',
+    estado_apertura: 'open',
+  });
+  const [openDays, setOpenDays] = useState({
+    lunes: true,
+    martes: true,
+    miercoles: true,
+    jueves: true,
+    viernes: true,
+    sabado: true,
+    domingo: true,
   });
 
   const [images, setImages] = useState({
@@ -66,6 +88,7 @@ export default function CreateSitioPageLeaflet() {
       try {
         const data = await getPlaceById(id);
         const p = data.place || data; // support both shapes
+        const labels = Array.isArray(p.label) ? p.label : (Array.isArray(p.labels) ? p.labels : []);
         setFormData({
           nombre: p.name || '',
           slogan: p.slogan || '',
@@ -78,7 +101,15 @@ export default function CreateSitioPageLeaflet() {
           flora: p.flora || '',
           infraestructura: p.estructure || '',
           recomendacion: p.tips || '',
+          contacto: p.contact_info || '',
+          estado_apertura: p.opening_status || 'open',
         });
+        const resolvedOpenDays = typeof p.open_days === 'object' && p.open_days !== null ? p.open_days : {};
+        setOpenDays((prev) => ({
+          ...prev,
+          ...resolvedOpenDays,
+        }));
+        setSelectedPreferences(labels.map((label) => label.id).filter(Boolean));
         // Existing image previews (constructed from storage paths)
         const base = 'http://localhost:8000/api/files/';
         setImagePreviews({
@@ -98,6 +129,18 @@ export default function CreateSitioPageLeaflet() {
     }
     loadExisting();
   }, [isEdit, id]);
+
+  useEffect(() => {
+    async function loadPreferences() {
+      try {
+        const data = await fetchPreferencesOptions();
+        setPreferencesOptions(Array.isArray(data) ? data : []);
+      } catch (e) {
+        setPreferencesOptions([]);
+      }
+    }
+    loadPreferences();
+  }, []);
 
   // Inicializar mapa de Leaflet
   useEffect(() => {
@@ -164,6 +207,22 @@ export default function CreateSitioPageLeaflet() {
     }
   };
 
+  const togglePreference = (prefId) => {
+    setSelectedPreferences((prev) => {
+      if (prev.includes(prefId)) {
+        return prev.filter((id) => id !== prefId);
+      }
+      return [...prev, prefId];
+    });
+  };
+
+  const toggleOpenDay = (dayKey) => {
+    setOpenDays((prev) => ({
+      ...prev,
+      [dayKey]: !prev[dayKey],
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -171,6 +230,11 @@ export default function CreateSitioPageLeaflet() {
     // Validaciones
     if (!formData.lat || !formData.lng) {
       setError('Por favor selecciona una ubicación en el mapa');
+      return;
+    }
+
+    if (selectedPreferences.length === 0) {
+      setError('Selecciona al menos una etiqueta');
       return;
     }
 
@@ -185,11 +249,23 @@ export default function CreateSitioPageLeaflet() {
       setLoading(true);
 
       if (isEdit) {
-        await updatePlace(id, { ...formData }, images.portada, images.clima_img, images.caracteristicas_img, images.flora_img, images.infraestructura_img);
+        await updatePlace(
+          id,
+          { ...formData, preferences: selectedPreferences, dias_abiertos: openDays },
+          images.portada,
+          images.clima_img,
+          images.caracteristicas_img,
+          images.flora_img,
+          images.infraestructura_img
+        );
       } else {
         const formDataToSend = new FormData();
         Object.keys(formData).forEach(key => {
           formDataToSend.append(key, formData[key]);
+        });
+        formDataToSend.append('dias_abiertos', JSON.stringify(openDays));
+        selectedPreferences.forEach((prefId) => {
+          formDataToSend.append('preferences[]', prefId);
         });
         Object.keys(images).forEach(key => {
           if (images[key]) {
@@ -341,6 +417,36 @@ export default function CreateSitioPageLeaflet() {
                     <p className="mt-2 text-xs text-slate-500">Se mantendrá la imagen actual si no seleccionas una nueva.</p>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Etiquetas */}
+            <div>
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">Etiquetas</h2>
+              <p className="text-sm text-slate-600 mb-4">Selecciona una o varias etiquetas para clasificar el sitio.</p>
+              <div className="flex flex-wrap gap-2">
+                {preferencesOptions.map((pref) => {
+                  const isSelected = selectedPreferences.includes(pref.id);
+                  const rawColor = pref.color || '#10b981';
+                  const color = rawColor.startsWith('#') ? rawColor : `#${rawColor}`;
+                  const style = isSelected
+                    ? { backgroundColor: color, borderColor: color, color: '#ffffff' }
+                    : { borderColor: color, color, backgroundColor: 'transparent' };
+                  return (
+                    <button
+                      key={pref.id}
+                      type="button"
+                      onClick={() => togglePreference(pref.id)}
+                      style={style}
+                      className="inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold transition hover:opacity-90"
+                    >
+                      {pref.name}
+                    </button>
+                  );
+                })}
+                {preferencesOptions.length === 0 && (
+                  <span className="text-sm text-slate-500">No hay etiquetas disponibles.</span>
+                )}
               </div>
             </div>
 
@@ -560,6 +666,57 @@ export default function CreateSitioPageLeaflet() {
                   className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="Ej: Llevar ropa impermeable, calzado adecuado..."
                 />
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">Contacto y disponibilidad</h2>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Contacto (telefonos o correo)
+                  </label>
+                  <textarea
+                    name="contacto"
+                    value={formData.contacto}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
+                    placeholder="Ej: +57 312 000 0000, contacto@ejemplo.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Dias abiertos</label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {daysOfWeek.map((day) => (
+                      <label key={day.key} className="flex items-center gap-2 rounded-lg border border-emerald-200 px-3 py-2 text-sm text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(openDays[day.key])}
+                          onChange={() => toggleOpenDay(day.key)}
+                          className="h-4 w-4 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-400"
+                        />
+                        {day.label}
+                      </label>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500">Si un dia no esta marcado, se considera cerrado.</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Estado del sitio</label>
+                  <select
+                    name="estado_apertura"
+                    value={formData.estado_apertura}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
+                  >
+                    <option value="open">Abierto</option>
+                    <option value="closed_temporarily">Cerrado temporalmente</option>
+                    <option value="open_with_restrictions">Abierto con restricciones</option>
+                  </select>
+                </div>
               </div>
             </div>
 

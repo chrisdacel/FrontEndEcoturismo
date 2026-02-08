@@ -23,8 +23,12 @@ import AdminOperatorsPage from './AdminOperatorsPage';
 import AdminProfilePage from './AdminProfilePage';
 import AdminSitesPage from './AdminSitesPage';
 import AdminCommentsPage from './AdminCommentsPage';
+import AdminLabelsPage from './AdminLabelsPage';
 import ProfilePageOperador from './ProfilePageOperador';
 import ProfilePageTurista from './ProfilePageTurista';
+import FavoritosPage from './FavoritosPage';
+import PreferencesPage from './PreferencesPage';
+import HistorialPage from './HistorialPage';
 import OperatorSitesPage from './OperatorSitesPage';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -156,6 +160,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/admin/etiquetas"
+        element={
+          <AdminRoute>
+            <AdminLabelsPage />
+          </AdminRoute>
+        }
+      />
+      <Route
         path="/crear-sitio"
         element={
           <AdminOperatorRoute>
@@ -184,6 +196,44 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <ProfilePageTurista />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/turista/favoritos"
+        element={
+          <ProtectedRoute>
+            <FavoritosPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/turista/preferencias"
+        element={
+          <ProtectedRoute>
+            <PreferencesPage
+              onNavigateHome={() => navigate('/turista/home')}
+              onNavigateLogin={() => navigate('/login')}
+            />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/turista/historial"
+        element={
+          <ProtectedRoute>
+            <HistorialPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/preferencias"
+        element={
+          <ProtectedRoute>
+            <PreferencesPage
+              onNavigateHome={() => navigate(user?.role === 'admin' ? '/admin/home' : user?.role === 'operator' ? '/operador/home' : '/turista/home')}
+              onNavigateLogin={() => navigate('/login')}
+            />
           </ProtectedRoute>
         }
       />

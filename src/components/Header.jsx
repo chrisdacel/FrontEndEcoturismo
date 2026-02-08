@@ -56,6 +56,21 @@ export default function Header() {
     navigate('/operador/mis-sitios');
   };
 
+  const goFavoritos = () => {
+    setMenuOpen(false);
+    navigate('/turista/favoritos');
+  };
+
+  const goPreferencias = () => {
+    setMenuOpen(false);
+    navigate('/turista/preferencias');
+  };
+
+  const goHistorial = () => {
+    setMenuOpen(false);
+    navigate('/turista/historial');
+  };
+
   const isScrolled = isAuthPage ? false : scrollY > 20;
   const textColor = isScrolled ? 'text-slate-900' : 'text-white';
   const secondaryTextColor = isScrolled ? 'text-slate-700' : 'text-emerald-100/80';
@@ -165,6 +180,30 @@ export default function Header() {
                     >
                       Perfil
                     </button>
+                    {isTourist && (
+                      <button
+                        onClick={goFavoritos}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                      >
+                        Favoritos
+                      </button>
+                    )}
+                    {isTourist && (
+                      <button
+                        onClick={goPreferencias}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                      >
+                        Preferencias
+                      </button>
+                    )}
+                    {isTourist && (
+                      <button
+                        onClick={goHistorial}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                      >
+                        Historial
+                      </button>
+                    )}
                     {user.role === 'admin' && (
                       <button
                         onClick={goAdminPanel}

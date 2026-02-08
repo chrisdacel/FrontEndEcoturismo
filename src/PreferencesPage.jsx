@@ -2,17 +2,6 @@ import { useEffect, useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { fetchPreferencesOptions, fetchUserPreferences, updateUserPreferences } from './services/api';
 
-// Mapeo de íconos para preferencias
-const preferenceIcons = {
-  'hiking': '🥾',
-  'birdwatching': '🦅',
-  'biking': '🚴',
-  'climbing': '🧗',
-  'wildlife': '🐢',
-  'reserves': '🏞️',
-  'kayaking': '🛶',
-  'forest_bathing': '🌲',
-};
 
 export default function PreferencesPage({ onNavigateHome, onNavigateLogin, isFirstTime = false }) {
   const { user, loading: authLoading } = useAuth();
@@ -70,85 +59,87 @@ export default function PreferencesPage({ onNavigateHome, onNavigateLogin, isFir
 
   if (authLoading) {
     return (
-      <div className="min-h-screen grid place-items-center bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white">
-        <p className="text-emerald-100">Cargando…</p>
+      <div className="min-h-screen grid place-items-center bg-white">
+        <p className="text-emerald-600">Cargando...</p>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen grid place-items-center bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white px-6">
-        <div className="rounded-2xl bg-white/10 ring-1 ring-white/10 p-8 text-center">
-          <p className="mb-4">Debes iniciar sesión para configurar tus preferencias.</p>
-          <button onClick={onNavigateLogin} className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold hover:bg-emerald-600">Iniciar sesión</button>
+      <div className="min-h-screen grid place-items-center bg-white px-6">
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-8 text-center">
+          <p className="mb-4 text-slate-700">Debes iniciar sesion para configurar tus preferencias.</p>
+          <button onClick={onNavigateLogin} className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600">Iniciar sesion</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white">
-      <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
-        <div className="mb-8">
-          <span className="text-emerald-300/80 text-xs tracking-[0.3em]">PREFERENCIAS</span>
-          <h1 className="mt-3 text-3xl md:text-4xl font-semibold">
-            {isFirstTime ? 'Tú decides el camino, elige una opción.' : 'Personaliza tu experiencia'}
-          </h1>
-          <p className="mt-2 text-emerald-100/80">
-            {isFirstTime ? 'Selecciona las actividades que más te interesan para recibir recomendaciones personalizadas.' : 'Elige los temas que más te interesan para recomendarte destinos.'}
-          </p>
-        </div>
-
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-100">{error}</div>
-        )}
-        {success && (
-          <div className="mb-4 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">{success}</div>
-        )}
-
-        {loading ? (
-          <div className="rounded-2xl bg-white/10 ring-1 ring-white/10 p-8">Cargando opciones…</div>
-        ) : (
-          <div className="rounded-2xl bg-white/10 ring-1 ring-white/10 p-6 md:p-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {options.map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => toggle(opt.id)}
-                  className={`flex flex-col items-center justify-center text-center rounded-xl p-4 ring-1 transition min-h-[140px] ${
-                    selected.includes(opt.id)
-                      ? 'bg-emerald-500/20 text-white ring-emerald-400/40'
-                      : 'bg-white/10 text-emerald-100 ring-white/10 hover:bg-white/20'
-                  }`}
-                >
-                  <span className="text-3xl mb-2">{preferenceIcons[opt.image] || '🌍'}</span>
-                  <span className="block text-xs font-medium leading-tight">{opt.name}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-8 flex gap-3 justify-end">
-              {!isFirstTime && (
-                <button
-                  onClick={onNavigateHome}
-                  className="rounded-lg bg-white/10 px-4 py-2.5 text-sm font-semibold text-emerald-100 ring-1 ring-white/10 hover:bg-white/20"
-                >
-                  Cancelar
-                </button>
-              )}
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-60"
-              >
-                {saving ? 'Guardando…' : 'Siguiente'}
-              </button>
-            </div>
+    <div className="min-h-screen bg-white text-slate-900">
+      <section className="relative pt-24 pb-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              Preferencias
+            </h1>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              {isFirstTime
+                ? 'Selecciona las actividades que mas te interesan para recibir recomendaciones personalizadas.'
+                : 'Elige los temas que mas te interesan para recomendarte destinos.'}
+            </p>
           </div>
-        )}
-      </div>
+
+          {error && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+          )}
+          {success && (
+            <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</div>
+          )}
+
+          {loading ? (
+            <div className="rounded-2xl border border-emerald-100 bg-white p-8">Cargando opciones...</div>
+          ) : (
+            <div className="rounded-2xl border border-emerald-100 bg-white p-6 md:p-8 shadow-sm">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {options.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => toggle(opt.id)}
+                    className={`flex items-center justify-center text-center rounded-xl px-4 py-5 ring-1 transition min-h-[120px] ${
+                      selected.includes(opt.id)
+                        ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+                        : 'bg-white text-slate-700 ring-slate-200 hover:bg-emerald-50'
+                    }`}
+                  >
+                    <span className="block text-sm font-semibold leading-tight">{opt.name}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-8 flex gap-3 justify-end">
+                {!isFirstTime && (
+                  <button
+                    onClick={onNavigateHome}
+                    className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    Cancelar
+                  </button>
+                )}
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="rounded-full bg-emerald-500 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 disabled:opacity-60"
+                >
+                  {saving ? 'Guardando...' : 'Guardar preferencias'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

@@ -155,3 +155,40 @@ export async function unrestrictReview(id) {
     throw error.response?.data || { message: 'Error desrestringiendo reseña' };
   }
 }
+
+// ============ PREFERENCES MANAGEMENT ============
+export async function getAdminPreferences() {
+  try {
+    const { data } = await api.get('/api/admin/preferences');
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo etiquetas' };
+  }
+}
+
+export async function createAdminPreference(payload) {
+  try {
+    const { data } = await api.post('/api/admin/preferences', payload);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error creando etiqueta' };
+  }
+}
+
+export async function updateAdminPreference(id, payload) {
+  try {
+    const { data } = await api.put(`/api/admin/preferences/${id}`, payload);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error actualizando etiqueta' };
+  }
+}
+
+export async function deleteAdminPreference(id) {
+  try {
+    const { data } = await api.delete(`/api/admin/preferences/${id}`);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error eliminando etiqueta' };
+  }
+}

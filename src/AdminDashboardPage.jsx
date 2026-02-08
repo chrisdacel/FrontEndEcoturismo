@@ -208,6 +208,25 @@ export default function AdminDashboardPage() {
               <h3 className="text-lg font-semibold text-slate-900 mb-2">Gestionar Comentarios</h3>
               <p className="text-sm text-slate-600">Ver y eliminar reseñas de los sitios</p>
             </button>
+
+            <button
+              onClick={() => navigate('/admin/etiquetas')}
+              className="group bg-white rounded-lg p-6 hover:ring-emerald-200 transition text-left"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="rounded-full bg-emerald-50 p-3 group-hover:bg-emerald-100 transition">
+                  <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h10l4 4-8 8-8-8V7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7v-2a2 2 0 012-2h6a2 2 0 012 2v2" />
+                  </svg>
+                </div>
+                <svg className="w-5 h-5 text-emerald-500 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">Gestionar Etiquetas</h3>
+              <p className="text-sm text-slate-600">Crear, editar y eliminar etiquetas</p>
+            </button>
           </div>
         </div>
       </section>

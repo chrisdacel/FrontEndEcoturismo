@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchProfile, updateProfile, changePassword, uploadAvatar, deleteAvatar } from './services/api';
+import { fetchProfile, updateProfile, changePassword, uploadAvatar, deleteAvatar, deleteAccount } from './services/api';
 import { useAuth } from './context/AuthContext';
 
 export default function ProfilePageOperador() {
@@ -13,7 +13,14 @@ export default function ProfilePageOperador() {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPass, setSavingPass] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [showDeleteForm, setShowDeleteForm] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const [passwords, setPasswords] = useState({ current_password: '', password: '', password_confirmation: '' });
 
@@ -91,6 +98,44 @@ export default function ProfilePageOperador() {
       setError(err.message || 'No se pudo eliminar la foto');
     } finally {
       setUploadingAvatar(false);
+    }
+  };
+
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    if (!confirm('¿Eliminar tu cuenta? Esta acción no se puede deshacer.')) return;
+    try {
+      setDeletingAccount(true);
+      setDeleteError('');
+      await deleteAccount(deletePassword);
+      setUser(null);
+      navigate('/login');
+    } catch (err) {
+      setDeleteError(err.message || 'No se pudo eliminar la cuenta');
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (passwords.password !== passwords.password_confirmation) {
+      setPasswordError('La nueva contraseña y la confirmación no coinciden');
+      setPasswordSuccess('');
+      return;
+    }
+
+    try {
+      setSavingPass(true);
+      setPasswordError('');
+      setPasswordSuccess('');
+      await changePassword(passwords.current_password, passwords.password, passwords.password_confirmation);
+      setPasswords({ current_password: '', password: '', password_confirmation: '' });
+      setPasswordSuccess('Contraseña actualizada correctamente');
+    } catch (err) {
+      setPasswordError(err.message || 'No se pudo actualizar la contraseña');
+    } finally {
+      setSavingPass(false);
     }
   };
 
@@ -203,6 +248,109 @@ export default function ProfilePageOperador() {
             </div>
           </form>
         </div>
+
+        <section className="mt-10">
+          <h2 className="text-lg font-semibold text-emerald-700">Cambiar contraseña</h2>
+          <p className="mt-1 text-sm text-slate-600">Usa tu contraseña actual para establecer una nueva.</p>
+          <button
+            type="button"
+            onClick={() => setShowPasswordForm((prev) => !prev)}
+            className="mt-4 inline-flex items-center justify-center rounded-full border border-emerald-300 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50"
+          >
+            {showPasswordForm ? 'Ocultar formulario' : 'Cambiar contraseña'}
+          </button>
+          {passwordError && (
+            <div className="mt-4 rounded-lg bg-rose-100 p-3 text-sm text-rose-700 ring-1 ring-rose-200">
+              {passwordError}
+            </div>
+          )}
+          {passwordSuccess && (
+            <div className="mt-4 rounded-lg bg-emerald-100 p-3 text-sm text-emerald-700 ring-1 ring-emerald-200">
+              {passwordSuccess}
+            </div>
+          )}
+          {showPasswordForm && (
+            <form onSubmit={handlePasswordChange} className="mt-4 grid gap-3 md:grid-cols-3">
+              <div>
+                <label className="block text-sm text-slate-700 mb-1">Contraseña actual</label>
+                <input
+                  type="password"
+                  value={passwords.current_password}
+                  onChange={(e) => setPasswords({ ...passwords, current_password: e.target.value })}
+                  required
+                  className="w-full rounded-lg bg-white px-4 py-2 text-slate-900 ring-1 ring-emerald-200 focus:ring-2 focus:ring-emerald-400 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-slate-700 mb-1">Nueva contraseña</label>
+                <input
+                  type="password"
+                  value={passwords.password}
+                  onChange={(e) => setPasswords({ ...passwords, password: e.target.value })}
+                  required
+                  className="w-full rounded-lg bg-white px-4 py-2 text-slate-900 ring-1 ring-emerald-200 focus:ring-2 focus:ring-emerald-400 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-slate-700 mb-1">Confirmar nueva contraseña</label>
+                <input
+                  type="password"
+                  value={passwords.password_confirmation}
+                  onChange={(e) => setPasswords({ ...passwords, password_confirmation: e.target.value })}
+                  required
+                  className="w-full rounded-lg bg-white px-4 py-2 text-slate-900 ring-1 ring-emerald-200 focus:ring-2 focus:ring-emerald-400 outline-none"
+                />
+              </div>
+              <div className="md:col-span-3 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={savingPass}
+                  className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-60"
+                >
+                  {savingPass ? 'Actualizando...' : 'Actualizar contraseña'}
+                </button>
+              </div>
+            </form>
+          )}
+        </section>
+
+        <section className="mt-10 border-t border-slate-200 pt-8">
+          <h2 className="text-lg font-semibold text-rose-700">Eliminar cuenta</h2>
+          <p className="mt-1 text-sm text-slate-600">Esta acción es permanente. Para continuar, confirma tu contraseña.</p>
+          <button
+            type="button"
+            onClick={() => setShowDeleteForm((prev) => !prev)}
+            className="mt-4 inline-flex items-center justify-center rounded-full border border-rose-300 bg-white px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-50"
+          >
+            {showDeleteForm ? 'Ocultar formulario' : 'Eliminar cuenta'}
+          </button>
+          {deleteError && (
+            <div className="mt-4 rounded-lg bg-rose-100 p-3 text-sm text-rose-700 ring-1 ring-rose-200">
+              {deleteError}
+            </div>
+          )}
+          {showDeleteForm && (
+            <form onSubmit={handleDeleteAccount} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div className="flex-1">
+                <label className="block text-sm text-slate-700 mb-1">Contraseña actual</label>
+                <input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  required
+                  className="w-full rounded-lg bg-white px-4 py-2 text-slate-900 ring-1 ring-rose-200 focus:ring-2 focus:ring-rose-400 outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={deletingAccount || !deletePassword}
+                className="inline-flex items-center justify-center rounded-full bg-rose-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-700 disabled:opacity-60"
+              >
+                {deletingAccount ? 'Eliminando...' : 'Eliminar cuenta'}
+              </button>
+            </form>
+          )}
+        </section>
       </div>
     </div>
   );
