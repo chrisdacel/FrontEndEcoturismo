@@ -7,13 +7,34 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Star Rating Component
-function StarRating({ rating, onRatingChange, size = 'medium' }) {
+function StarRating({ rating, onRatingChange, size = 'medium', interactive = true }) {
   const [hoverRating, setHoverRating] = useState(0);
   const sizeClasses = {
     small: 'w-4 h-4',
     medium: 'w-6 h-6',
     large: 'w-8 h-8'
   };
+
+  if (!interactive) {
+    // Versión estática sin interacción
+    return (
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <div key={star}>
+            <svg
+              className={`${sizeClasses[size]}`}
+              fill={rating >= star ? '#f59e0b' : 'none'}
+              stroke={rating >= star ? '#f59e0b' : '#cbd5e1'}
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="flex gap-1">
@@ -314,7 +335,7 @@ export default function SitioDetailPage({
         {/* Description Section */}
         <section className="py-16 px-6 bg-white">
           <div className="max-w-4xl mx-auto text-center">
-            <p className="text-lg text-slate-600 leading-relaxed">
+            <p className="text-lg text-slate-600 leading-relaxed break-words">
               {sitio.description}
             </p>
           </div>
@@ -326,15 +347,15 @@ export default function SitioDetailPage({
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-2 md:order-1">
                 <h2 className="text-3xl font-semibold text-emerald-700 mb-4">Localización</h2>
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-slate-600 leading-relaxed break-words">
                   {sitio.localization}
                 </p>
               </div>
-              <div className="order-1 md:order-2">
+              <div className="order-1 md:order-2 relative z-0">
                 {sitio.lat && sitio.lng ? (
                   <div 
                     ref={mapRef}
-                    className="w-full h-80 rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50 overflow-hidden"
+                    className="w-full h-80 rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50 overflow-hidden z-0"
                   ></div>
                 ) : (
                   <div className="w-full h-80 grid place-items-center rounded-lg border border-emerald-100 bg-emerald-50/50 text-slate-500">
@@ -359,7 +380,7 @@ export default function SitioDetailPage({
               </div>
               <div className="order-2">
                 <h2 className="text-3xl font-semibold text-emerald-700 mb-4">Clima</h2>
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-slate-600 leading-relaxed break-words">
                   {sitio.Weather}
                 </p>
               </div>
@@ -373,7 +394,7 @@ export default function SitioDetailPage({
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-2 md:order-1">
                 <h2 className="text-3xl font-semibold text-emerald-700 mb-4">Características</h2>
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-slate-600 leading-relaxed break-words">
                   {sitio.features}
                 </p>
               </div>
@@ -401,7 +422,7 @@ export default function SitioDetailPage({
               </div>
               <div className="order-2">
                 <h2 className="text-3xl font-semibold text-emerald-700 mb-4">Flora y Fauna</h2>
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-slate-600 leading-relaxed break-words">
                   {sitio.flora}
                 </p>
               </div>
@@ -415,7 +436,7 @@ export default function SitioDetailPage({
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-2 md:order-1">
                 <h2 className="text-3xl font-semibold text-emerald-700 mb-4">Infraestructura</h2>
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-slate-600 leading-relaxed break-words">
                   {sitio.estructure}
                 </p>
               </div>
@@ -470,7 +491,7 @@ export default function SitioDetailPage({
                   {averageRating !== null ? averageRating.toFixed(1) : '—'}
                 </div>
                 {averageRating !== null && (
-                  <StarRating rating={Math.round(averageRating)} onRatingChange={() => {}} size="small" />
+                  <StarRating rating={Math.round(averageRating)} onRatingChange={() => {}} size="small" interactive={false} />
                 )}
               </div>
               <div className="text-sm text-slate-600">
@@ -485,23 +506,30 @@ export default function SitioDetailPage({
                   <StarRating rating={rating} onRatingChange={setRating} size="medium" />
                   <span className="text-sm text-slate-600">({rating}/5)</span>
                 </div>
-                <textarea
-                  value={comment}
-                  onChange={handleCommentChange}
-                  required
-                  minLength={10}
-                  maxLength={1000}
-                  placeholder="Comparte tu experiencia..."
-                  className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
-                  rows={3}
-                />
+                <div className="space-y-1">
+                  <textarea
+                    value={comment}
+                    onChange={handleCommentChange}
+                    required
+                    minLength={10}
+                    maxLength={1000}
+                    placeholder="Comparte tu experiencia..."
+                    className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
+                    rows={3}
+                  />
+                  <div className={`text-xs font-medium ${
+                    comment.length > 1000 ? 'text-red-600' : comment.length > 900 ? 'text-amber-600' : 'text-slate-500'
+                  }`}>
+                    {comment.length}/1000 caracteres máximo (mínimo 10)
+                  </div>
+                </div>
                 {commentError && (
                   <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{commentError}</div>
                 )}
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    disabled={submitting}
+                    disabled={submitting || !rating || comment.length < 10 || comment.length > 1000}
                     className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2 text-white font-semibold hover:bg-emerald-700 disabled:opacity-60"
                   >
                     {submitting ? 'Enviando...' : 'Publicar comentario'}
@@ -512,15 +540,34 @@ export default function SitioDetailPage({
               <p className="mb-8 text-sm text-slate-600">Inicia sesión para comentar.</p>
             )}
 
-            <div className="space-y-4">
+            <div className="space-y-4 max-w-4xl mx-auto">
               {filteredReviews.map((rev) => {
                 const isOwner = user && rev.user && user.id === rev.user.id;
                 return (
-                  <div key={rev.id} className="bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
+                  <div key={rev.id} className="group bg-white rounded-lg border border-emerald-100 p-4 shadow-sm overflow-hidden">
                     <div className={editingId === rev.id ? "flex flex-col gap-3" : "flex items-start justify-between gap-3"}>
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-slate-900">{rev.user?.name || 'Usuario'}</p>
-                        <p className="text-xs text-slate-500">{rev.created_at ? new Date(rev.created_at).toLocaleString() : ''}</p>
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        {/* Avatar del usuario */}
+                        <div className="flex-shrink-0">
+                          {rev.user?.image ? (
+                            <img 
+                              src={`http://localhost:8000/api/files/${rev.user.image}`}
+                              alt={rev.user?.name}
+                              className="w-10 h-10 rounded-full object-cover border border-emerald-200"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-semibold text-sm">
+                              {rev.user?.name ? rev.user.name.charAt(0).toUpperCase() : 'U'}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Nombre y fecha */}
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-semibold truncate ${isOwner ? 'text-emerald-700' : 'text-slate-900'}`}>{rev.user?.name || 'Usuario'}</p>
+                          <p className="text-xs text-slate-500">{rev.created_at ? new Date(rev.created_at).toLocaleString() : ''}</p>
+                        
+                        {/* Contenido del comentario */}
                         {editingId === rev.id ? (
                           <div className="w-full mt-3 space-y-2">
                             <div className="flex gap-2 items-center">
@@ -528,19 +575,27 @@ export default function SitioDetailPage({
                               <StarRating rating={editRating} onRatingChange={setEditRating} size="small" />
                               <span className="text-xs text-slate-600">({editRating}/5)</span>
                             </div>
-                            <textarea
-                              value={editComment}
-                              onChange={(e) => setEditComment(e.target.value)}
-                              className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
-                              rows={3}
-                            />
+                            <div className="space-y-1">
+                              <textarea
+                                value={editComment}
+                                onChange={(e) => setEditComment(e.target.value)}
+                                maxLength={1000}
+                                className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
+                                rows={3}
+                              />
+                              <div className={`text-xs font-medium ${
+                                editComment.length > 1000 ? 'text-red-600' : editComment.length > 900 ? 'text-amber-600' : 'text-slate-500'
+                              }`}>
+                                {editComment.length}/1000 caracteres máximo (mínimo 10)
+                              </div>
+                            </div>
                             {editError && (
                               <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{editError}</div>
                             )}
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleUpdateReview(rev.id)}
-                                disabled={submitting}
+                                disabled={submitting || editComment.length === 0 || editComment.length > 1000}
                                 className="rounded-full bg-emerald-600 px-4 py-2 text-white text-sm hover:bg-emerald-700 disabled:opacity-60"
                               >
                                 Guardar
@@ -562,7 +617,7 @@ export default function SitioDetailPage({
                           </div>
                         ) : (
                           <>
-                            <p className="mt-3 text-slate-700 leading-relaxed">{rev.comment}</p>
+                            <p className="mt-3 text-slate-700 leading-relaxed break-words overflow-hidden w-full">{rev.comment}</p>
                             
                             {/* Botones de Like/Dislike */}
                             <div className="mt-3 flex items-center gap-4">
@@ -596,26 +651,33 @@ export default function SitioDetailPage({
                             </div>
                           </>
                         )}
+                        </div>
                       </div>
                       {!editingId || editingId !== rev.id ? (
                         <div className="text-right">
                         <div className="flex flex-col items-end gap-1">
-                          <StarRating rating={rev.rating} onRatingChange={() => {}} size="small" />
+                          <StarRating rating={rev.rating} onRatingChange={() => {}} size="small" interactive={false} />
                           <span className="text-xs text-slate-600">({rev.rating}/5)</span>
                         </div>
                         {isOwner && (
-                          <div className="mt-2 flex gap-2 justify-end">
+                          <div className="mt-2 flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
-                              className="text-xs rounded-full border border-emerald-200 px-3 py-1 text-emerald-700 hover:bg-emerald-50"
+                              className="p-1 rounded text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+                              title="Editar comentario"
                               onClick={() => startEdit(rev)}
                             >
-                              Editar
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
                             </button>
                             <button
-                              className="text-xs rounded-full bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                              className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                              title="Eliminar comentario"
                               onClick={() => handleDeleteReview(rev.id)}
                             >
-                              Eliminar
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
                             </button>
                           </div>
                         )}

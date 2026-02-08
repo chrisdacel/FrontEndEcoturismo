@@ -78,7 +78,7 @@ export default function AdminOperatorsPage() {
           </div>
         )}
 
-        <div className="overflow-x-auto bg-white rounded-lg">
+        <div className="overflow-x-auto bg-white border-b border-slate-200">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-white">
               <tr>

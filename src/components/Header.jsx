@@ -72,7 +72,7 @@ export default function Header() {
       className={
         isAuthPage
           ? 'absolute top-0 left-0 right-0 z-30 w-full bg-transparent'
-          : 'sticky top-0 z-40 w-full transition backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-white/5 ring-1 ring-white/10'
+          : 'sticky top-0 z-50 w-full transition backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-white/5 ring-1 ring-white/10'
       }
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:px-6">
@@ -136,11 +136,17 @@ export default function Header() {
                       : 'bg-white/10 text-emerald-100 ring-white/10 hover:bg-white/20'
                   }`}
                 >
-                  <img
-                    src={user?.avatar_url || '/images/Pagina_inicio/nature-svgrepo-com.svg'}
-                    alt="Avatar"
-                    className="h-6 w-6 rounded-full object-cover ring-1 ring-white/20"
-                  />
+                  {user?.avatar_url ? (
+                    <img
+                      src={user.avatar_url}
+                      alt="Avatar"
+                      className="h-6 w-6 rounded-full object-cover ring-1 ring-white/20"
+                    />
+                  ) : (
+                    <div className="h-6 w-6 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-bold text-white ring-1 ring-white/20">
+                      {user?.name?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                  )}
                   <span>{user.name || 'Usuario'}</span>
                   <svg
                     className="w-4 h-4"

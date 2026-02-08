@@ -72,9 +72,9 @@ export default function AdminCommentsPage() {
         {loading ? (
           <div className="text-sm text-slate-600">Cargando reseñas…</div>
         ) : (
-          <div className="overflow-x-auto bg-white border border-slate-200 rounded-lg shadow-sm">
+          <div className="overflow-x-auto bg-white border-b border-slate-200">
             <table className="min-w-full text-sm">
-              <thead className="bg-slate-50">
+              <thead className="bg-white">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Sitio</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Usuario</th>
