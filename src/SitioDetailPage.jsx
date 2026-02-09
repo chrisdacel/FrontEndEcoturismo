@@ -1,10 +1,34 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPlaceById } from './services/placesApi';
-import { api, createReview, updateReview, deleteReview, reactToReview, logPlaceVisit } from './services/api';
+import {
+  api,
+  createReview,
+  updateReview,
+  deleteReview,
+  reactToReview,
+  logPlaceVisit,
+  restrictReviewAsOperator,
+  unrestrictReviewAsOperator,
+} from './services/api';
 import { useAuth } from './context/AuthContext';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const greenMarkerSvg = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">'
+  + '<path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 9.4 12.5 28.5 12.5 28.5S25 21.9 25 12.5C25 5.6 19.4 0 12.5 0z" fill="#16a34a" stroke="#0f6b2a" stroke-width="1"/>'
+  + '<circle cx="12.5" cy="12.5" r="4.5" fill="#ffffff" fill-opacity="0.9"/>'
+  + '</svg>'
+)}`;
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: greenMarkerSvg,
+  iconRetinaUrl: greenMarkerSvg,
+  shadowUrl: markerShadow,
+});
 
 // Star Rating Component
 function StarRating({ rating, onRatingChange, size = 'medium', interactive = true }) {
@@ -89,9 +113,19 @@ export default function SitioDetailPage({
   const [editRating, setEditRating] = useState(5);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [eventData, setEventData] = useState(null);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const eventSectionRef = useRef(null);
   const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
+  const isOperator = user?.role === 'operator';
+  const isOperatorOwner = isOperator && sitio?.user_id === user?.id;
+  const isGuest = !user;
+  const shortText = (value, max = 220) => {
+    if (!value) return '';
+    const text = value.toString().trim();
+    return text.length > max ? `${text.slice(0, max - 3)}...` : text;
+  };
 
   const calcAverage = (list) => {
     if (!list || list.length === 0) return null;
@@ -131,6 +165,7 @@ export default function SitioDetailPage({
         const data = await getPlaceById(id);
         setSitio(data.place || data);
         setReviews(data.reviews || []);
+        setEventData(data.event || null);
         const avgFromApi = data.average_rating ?? null;
         setAverageRating(avgFromApi !== null ? Number(avgFromApi) : calcAverage(data.reviews || []));
       } catch (err) {
@@ -158,9 +193,22 @@ export default function SitioDetailPage({
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(mapInstanceRef.current);
 
+      const labelNames = Array.isArray(sitio.label)
+        ? sitio.label.map((label) => label?.name ?? label)
+        : Array.isArray(sitio.labels)
+          ? sitio.labels.map((label) => label?.name ?? label)
+          : [];
+      const labelsText = labelNames.filter(Boolean).slice(0, 3).join(' • ') || 'Sin etiqueta';
+      const popupHtml = `
+        <div style="display:flex;flex-direction:column;gap:6px;max-width:220px;">
+          <strong style="font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${sitio.name || 'Sitio'}</strong>
+          <span style="font-size:12px;color:#059669;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${labelsText}</span>
+        </div>
+      `;
+
       // Agregar marcador
       L.marker([sitio.lat, sitio.lng]).addTo(mapInstanceRef.current)
-        .bindPopup(`<b>${sitio.name}</b><br>${sitio.localization.substring(0, 50)}...`)
+        .bindPopup(popupHtml)
         .openPopup();
     }
 
@@ -256,6 +304,44 @@ export default function SitioDetailPage({
       // Silenciar para evitar ruidos en UI
     } finally {
       setFavoriteLoading(false);
+    }
+  };
+
+  const handleRestrictReview = async (reviewId) => {
+    if (!isOperatorOwner) return;
+    if (!confirm('¿Ocultar este comentario por incumplir las normas?')) return;
+
+    const reasonInput = window.prompt('Motivo para ocultar: insultos o spam', 'insultos');
+    if (!reasonInput) return;
+    const reason = reasonInput.trim().toLowerCase();
+    if (!['insultos', 'spam'].includes(reason)) {
+      alert('Motivo no valido. Usa: insultos o spam.');
+      return;
+    }
+
+    try {
+      await restrictReviewAsOperator(reviewId, reason);
+      setReviews((prev) => prev.map((r) => (r.id === reviewId
+        ? { ...r, is_restricted: true, restricted_by_role: 'operator', restriction_reason: reason }
+        : r
+      )));
+    } catch (err) {
+      alert(err?.message || 'Error restringiendo reseña');
+    }
+  };
+
+  const handleUnrestrictReview = async (reviewId) => {
+    if (!isOperatorOwner) return;
+    if (!confirm('¿Mostrar nuevamente este comentario?')) return;
+
+    try {
+      await unrestrictReviewAsOperator(reviewId);
+      setReviews((prev) => prev.map((r) => (r.id === reviewId
+        ? { ...r, is_restricted: false, restricted_by_role: null, restriction_reason: null }
+        : r
+      )));
+    } catch (err) {
+      alert(err?.message || 'Error desrestringiendo reseña');
     }
   };
 
@@ -368,6 +454,28 @@ export default function SitioDetailPage({
     }
   };
 
+  const formatEventDate = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    const day = date.toLocaleDateString('es-CO', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+    const time = date.toLocaleTimeString('es-CO', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    return `${day} ${time}`;
+  };
+
+  const scrollToEvent = () => {
+    if (!eventSectionRef.current) return;
+    eventSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white grid place-items-center">
@@ -401,6 +509,16 @@ export default function SitioDetailPage({
           style={{ backgroundImage: `url('${storageUrl(sitio.cover)}')` }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
+          {eventData && (
+            <button
+              type="button"
+              onClick={scrollToEvent}
+              className="absolute bottom-5 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-emerald-500/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-400"
+            >
+              Nuevo evento disponible
+              <span aria-hidden>↓</span>
+            </button>
+          )}
           {isTourist && (
             <button
               type="button"
@@ -462,36 +580,63 @@ export default function SitioDetailPage({
         <section className="py-16 px-6 bg-white">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-lg text-slate-600 leading-relaxed break-words">
-              {sitio.description}
+              {isGuest ? shortText(sitio.description || sitio.slogan) : sitio.description}
             </p>
           </div>
         </section>
 
-        {/* Localización Section */}
-        <section className="py-16 px-6 bg-emerald-50/30">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="order-2 md:order-1">
-                <h2 className="text-3xl font-semibold text-emerald-700 mb-4">Localización</h2>
-                <p className="text-slate-600 leading-relaxed break-words">
-                  {sitio.localization}
-                </p>
-              </div>
-              <div className="order-1 md:order-2 relative z-0">
-                {sitio.lat && sitio.lng ? (
-                  <div 
-                    ref={mapRef}
-                    className="w-full h-80 rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50 overflow-hidden z-0"
-                  ></div>
-                ) : (
-                  <div className="w-full h-80 grid place-items-center rounded-lg border border-emerald-100 bg-emerald-50/50 text-slate-500">
-                    Mapa no disponible
-                  </div>
-                )}
+        {isGuest && (
+          <section className="py-10 px-6 bg-emerald-50/40">
+            <div className="max-w-3xl mx-auto rounded-2xl border border-emerald-100 bg-white p-6 text-center shadow-sm shadow-emerald-100/40">
+              <h2 className="text-2xl font-semibold text-emerald-700 mb-2">Registrate para ver el sitio completo</h2>
+              <p className="text-sm text-slate-600 mb-4">
+                Desbloquea ubicacion, clima, caracteristicas, flora, recomendaciones y comentarios.
+              </p>
+              <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <button
+                  onClick={() => onNavigateRegister?.()}
+                  className="rounded-full bg-emerald-600 px-6 py-2 text-white font-semibold hover:bg-emerald-700"
+                >
+                  Crear cuenta
+                </button>
+                <button
+                  onClick={() => onNavigateLogin?.()}
+                  className="rounded-full border border-emerald-200 px-6 py-2 text-emerald-700 font-semibold hover:bg-emerald-50"
+                >
+                  Iniciar sesion
+                </button>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
+
+        {!isGuest && (
+          <>
+            {/* Localización Section */}
+            <section className="py-16 px-6 bg-emerald-50/30">
+              <div className="max-w-7xl mx-auto">
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div className="order-2 md:order-1">
+                    <h2 className="text-3xl font-semibold text-emerald-700 mb-4">Localización</h2>
+                    <p className="text-slate-600 leading-relaxed break-words">
+                      {sitio.localization}
+                    </p>
+                  </div>
+                  <div className="order-1 md:order-2 relative z-0">
+                    {sitio.lat && sitio.lng ? (
+                      <div 
+                        ref={mapRef}
+                        className="w-full h-80 rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50 overflow-hidden z-0"
+                      ></div>
+                    ) : (
+                      <div className="w-full h-80 grid place-items-center rounded-lg border border-emerald-100 bg-emerald-50/50 text-slate-500">
+                        Mapa no disponible
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </section>
 
         {/* Clima Section */}
         <section className="py-16 px-6 bg-white">
@@ -586,6 +731,32 @@ export default function SitioDetailPage({
             </p>
           </div>
         </section>
+
+        {eventData && (
+          <section ref={eventSectionRef} className="bg-white px-6 pb-16">
+            <div className="mx-auto max-w-5xl">
+              <div className="rounded-3xl border border-emerald-100 bg-emerald-50/40 p-8 shadow-sm">
+                <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-emerald-700">Evento disponible</p>
+                    <h2 className="mt-2 text-2xl font-bold text-slate-900">{eventData.title || 'Evento ecoturistico'}</h2>
+                    <p className="mt-2 text-sm text-slate-600">{formatEventDate(eventData.starts_at)}</p>
+                  </div>
+                  {eventData.image && (
+                    <img
+                      src={storageUrl(eventData.image)}
+                      alt={eventData.title || 'Evento'}
+                      className="h-40 w-full max-w-sm rounded-2xl object-cover shadow-md"
+                    />
+                  )}
+                </div>
+                {eventData.description && (
+                  <p className="mt-5 text-sm text-slate-700 leading-relaxed">{eventData.description}</p>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="py-16 px-6 bg-emerald-50/30">
           <div className="max-w-5xl mx-auto">
@@ -775,8 +946,15 @@ export default function SitioDetailPage({
                           <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                             <p className="text-sm text-yellow-800 flex items-start gap-2">
                               <span className="text-lg">⚠️</span>
-                              <span><strong>Contenido restringido:</strong> Este comentario ha sido restringido por violar nuestras políticas de bienestar comunitario.</span>
+                              {rev.restricted_by_role === 'operator' ? (
+                                <span><strong>Comentario oculto:</strong> Este comentario fue oculto por el operador ya que infringe las normas.</span>
+                              ) : (
+                                <span><strong>Contenido restringido:</strong> Este comentario ha sido restringido por violar nuestras politicas de bienestar comunitario.</span>
+                              )}
                             </p>
+                            {rev.restriction_reason && (
+                              <p className="mt-1 text-xs text-yellow-700">Motivo: {rev.restriction_reason}</p>
+                            )}
                           </div>
                         ) : (
                           <>
@@ -844,6 +1022,25 @@ export default function SitioDetailPage({
                             </button>
                           </div>
                         )}
+                        {isOperatorOwner && (
+                          <div className="mt-2 flex items-center justify-end gap-2">
+                            {rev.is_restricted ? (
+                              <button
+                                className="rounded-full border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
+                                onClick={() => handleUnrestrictReview(rev.id)}
+                              >
+                                Mostrar comentario
+                              </button>
+                            ) : (
+                              <button
+                                className="rounded-full border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
+                                onClick={() => handleRestrictReview(rev.id)}
+                              >
+                                Ocultar comentario
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                       ) : null}
                     </div>
@@ -857,6 +1054,8 @@ export default function SitioDetailPage({
             </div>
           </div>
         </section>
+          </>
+        )}
       </main>
 
       {/* Footer */}

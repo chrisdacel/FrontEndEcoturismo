@@ -363,6 +363,24 @@ export async function fetchRecommendations() {
   }
 }
 
+export async function fetchNextEvent() {
+  try {
+    const { data } = await api.get('/api/events/next');
+    return data?.event || null;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo evento' };
+  }
+}
+
+export async function fetchUpcomingEvents(limit = 5) {
+  try {
+    const { data } = await api.get('/api/events/upcoming', { params: { limit } });
+    return Array.isArray(data?.events) ? data.events : [];
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo eventos' };
+  }
+}
+
 // ============ HISTORIAL (TURISTA) ============
 export async function logPlaceVisit(placeId) {
   try {
@@ -433,6 +451,12 @@ export async function createPlace(placeData, coverImage, climateImage, featuresI
         formData.append('preferences[]', prefId);
       });
     }
+    const hasEventPayload = Boolean(placeData.event_title || placeData.event_description || placeData.event_datetime);
+    if (hasEventPayload) {
+      formData.append('event_title', placeData.event_title ?? '');
+      formData.append('event_description', placeData.event_description ?? '');
+      formData.append('event_datetime', placeData.event_datetime ?? '');
+    }
     
     // Imágenes
     formData.append('portada', coverImage);
@@ -468,7 +492,7 @@ export async function createPlace(placeData, coverImage, climateImage, featuresI
  * @param {File} floraImage - Imagen de flora (opcional)
  * @param {File} infrastructureImage - Imagen de infraestructura (opcional)
  */
-export async function updatePlace(id, placeData, coverImage = null, climateImage = null, featuresImage = null, floraImage = null, infrastructureImage = null) {
+export async function updatePlace(id, placeData, coverImage = null, climateImage = null, featuresImage = null, floraImage = null, infrastructureImage = null, eventImage = null) {
   try {
     const formData = new FormData();
     
@@ -500,6 +524,15 @@ export async function updatePlace(id, placeData, coverImage = null, climateImage
       placeData.preferences.forEach((prefId) => {
         formData.append('preferences[]', prefId);
       });
+    }
+    const hasEventPayload = Boolean(placeData.event_title || placeData.event_description || placeData.event_datetime);
+    if (hasEventPayload) {
+      formData.append('event_title', placeData.event_title ?? '');
+      formData.append('event_description', placeData.event_description ?? '');
+      formData.append('event_datetime', placeData.event_datetime ?? '');
+    }
+    if (eventImage) {
+      formData.append('event_image', eventImage);
     }
     // Sobrescribir método para compatibilidad con subida de archivos en Laravel
     formData.append('_method', 'PUT');
@@ -604,6 +637,24 @@ export async function reactToReview(reviewId, type) {
     return data;
   } catch (error) {
     throw error.response?.data || { message: 'Error agregando reacción' };
+  }
+}
+
+export async function restrictReviewAsOperator(reviewId, reason) {
+  try {
+    const { data } = await api.post(`/api/operator/reviews/${reviewId}/restrict`, { reason });
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error restringiendo reseña' };
+  }
+}
+
+export async function unrestrictReviewAsOperator(reviewId) {
+  try {
+    const { data } = await api.post(`/api/operator/reviews/${reviewId}/unrestrict`);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error desrestringiendo reseña' };
   }
 }
 

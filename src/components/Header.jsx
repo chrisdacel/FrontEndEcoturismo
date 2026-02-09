@@ -56,6 +56,11 @@ export default function Header() {
     navigate('/operador/mis-sitios');
   };
 
+  const goOperatorStats = () => {
+    setMenuOpen(false);
+    navigate('/operador/estadisticas');
+  };
+
   const goFavoritos = () => {
     setMenuOpen(false);
     navigate('/turista/favoritos');
@@ -75,19 +80,21 @@ export default function Header() {
   const textColor = isScrolled ? 'text-slate-900' : 'text-white';
   const secondaryTextColor = isScrolled ? 'text-slate-700' : 'text-emerald-100/80';
   const dotColor = isScrolled ? 'bg-emerald-500' : 'bg-emerald-400';
+  const isColeccionPage = location.pathname.includes('/coleccion');
 
   const baseLink = (isActive) =>
     `px-3 py-2 text-sm font-medium transition ${isActive ? 'text-emerald-500' : (isScrolled ? 'text-slate-700 hover:text-emerald-500' : 'text-emerald-100/80 hover:text-emerald-500')}`;
 
   const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
   const isOperator = user && user.role === 'operator';
+  const dropdownWidth = 'w-40';
 
   return (
     <header
       className={
         isAuthPage
           ? 'absolute top-0 left-0 right-0 z-30 w-full bg-transparent'
-          : 'sticky top-0 z-50 w-full transition backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-white/5 ring-1 ring-white/10'
+          : `sticky top-0 z-50 w-full transition backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-white/5 ${isColeccionPage ? '' : 'ring-1 ring-white/10'}`
       }
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:px-6">
@@ -164,7 +171,7 @@ export default function Header() {
                   )}
                   <span>{user.name || 'Usuario'}</span>
                   <svg
-                    className="w-4 h-4"
+                    className={`w-4 h-4 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -173,17 +180,17 @@ export default function Header() {
                   </svg>
                 </button>
                 {menuOpen && (
-                  <div className="absolute right-0 mt-2 w-40 rounded-xl bg-white/90 text-slate-800 shadow-lg ring-1 ring-slate-200/60 backdrop-blur">
+                  <div className={`absolute right-0 mt-2 ${dropdownWidth} rounded-xl overflow-hidden bg-white/90 text-slate-800 shadow-lg ring-1 ring-slate-200/60 backdrop-blur dropdown-open`}>
                     <button
                       onClick={goProfile}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100 rounded-t-xl"
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100 hover:text-emerald-500 transition-colors first:rounded-t-xl last:rounded-b-xl"
                     >
                       Perfil
                     </button>
                     {isTourist && (
                       <button
                         onClick={goFavoritos}
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100 hover:text-emerald-500 transition-colors first:rounded-t-xl last:rounded-b-xl"
                       >
                         Favoritos
                       </button>
@@ -191,7 +198,7 @@ export default function Header() {
                     {isTourist && (
                       <button
                         onClick={goPreferencias}
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100 hover:text-emerald-500 transition-colors first:rounded-t-xl last:rounded-b-xl"
                       >
                         Preferencias
                       </button>
@@ -199,7 +206,7 @@ export default function Header() {
                     {isTourist && (
                       <button
                         onClick={goHistorial}
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100 hover:text-emerald-500 transition-colors first:rounded-t-xl last:rounded-b-xl"
                       >
                         Historial
                       </button>
@@ -207,7 +214,7 @@ export default function Header() {
                     {user.role === 'admin' && (
                       <button
                         onClick={goAdminPanel}
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100 hover:text-emerald-500 transition-colors first:rounded-t-xl last:rounded-b-xl"
                       >
                         Panel de Administración
                       </button>
@@ -215,9 +222,17 @@ export default function Header() {
                     {user.role === 'operator' && (
                       <button
                         onClick={goOperatorSites}
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100 hover:text-emerald-500 transition-colors first:rounded-t-xl last:rounded-b-xl"
                       >
                         Gestionar mis sitios
+                      </button>
+                    )}
+                    {user.role === 'operator' && (
+                      <button
+                        onClick={goOperatorStats}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100 hover:text-emerald-500 transition-colors first:rounded-t-xl last:rounded-b-xl"
+                      >
+                        Estadisticas
                       </button>
                     )}
                   </div>

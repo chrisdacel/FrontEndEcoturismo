@@ -35,6 +35,9 @@ export default function CreateSitioPageSimple() {
     recomendacion: '',
     contacto: '',
     estado_apertura: 'open',
+    event_title: '',
+    event_description: '',
+    event_datetime: '',
   });
   const [openDays, setOpenDays] = useState({
     lunes: true,
@@ -45,6 +48,7 @@ export default function CreateSitioPageSimple() {
     sabado: true,
     domingo: true,
   });
+  const [showEventFields, setShowEventFields] = useState(false);
 
   const [images, setImages] = useState({
     portada: null,
@@ -61,6 +65,14 @@ export default function CreateSitioPageSimple() {
     flora_img: null,
     infraestructura_img: null,
   });
+  const [eventImage, setEventImage] = useState(null);
+  const [eventImagePreview, setEventImagePreview] = useState(null);
+
+  useEffect(() => {
+    if (formData.event_title || formData.event_description || formData.event_datetime) {
+      setShowEventFields(true);
+    }
+  }, [formData.event_title, formData.event_description, formData.event_datetime]);
 
   useEffect(() => {
     async function loadPreferences() {
@@ -97,6 +109,18 @@ export default function CreateSitioPageSimple() {
           ...imagePreviews,
           [fieldName]: reader.result,
         });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEventImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEventImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEventImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -159,6 +183,9 @@ export default function CreateSitioPageSimple() {
           formDataToSend.append(key, images[key]);
         }
       });
+      if (eventImage) {
+        formDataToSend.append('event_image', eventImage);
+      }
 
       await createPlace(formDataToSend);
 
@@ -596,6 +623,82 @@ export default function CreateSitioPageSimple() {
                   </select>
                 </div>
               </div>
+            </div>
+
+            {/* Evento (opcional) */}
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-2xl font-semibold text-slate-900">Evento (opcional)</h2>
+                  <p className="text-sm text-slate-600">Agrega un evento para este sitio sin que sea obligatorio.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowEventFields((prev) => !prev)}
+                  className="inline-flex items-center gap-2 rounded-full border border-emerald-200 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                >
+                  {showEventFields ? 'Ocultar evento' : 'Agregar evento'}
+                  <span className={`text-base transition ${showEventFields ? 'rotate-180' : ''}`} aria-hidden>
+                    ▼
+                  </span>
+                </button>
+              </div>
+              {showEventFields && (
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Nombre del evento
+                    </label>
+                    <input
+                      type="text"
+                      name="event_title"
+                      value={formData.event_title}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
+                      placeholder="Ej: Avistamiento en Ucumarí"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Descripción del evento
+                    </label>
+                    <textarea
+                      name="event_description"
+                      value={formData.event_description}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
+                      placeholder="Detalles breves del evento"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Fecha y hora
+                    </label>
+                    <input
+                      type="datetime-local"
+                      name="event_datetime"
+                      value={formData.event_datetime}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Imagen del evento (opcional)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleEventImageChange}
+                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
+                    />
+                    {eventImagePreview && (
+                      <img src={eventImagePreview} alt="Evento" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Botones */}

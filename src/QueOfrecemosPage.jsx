@@ -39,7 +39,7 @@ function QueOfrecemosPage({ onNavigateRegister }) {
           <section className="mb-20 grid gap-12 md:grid-cols-3">
             {features.map((feature) => (
               <div key={feature.id} className="flex flex-col gap-3">
-                <img src={feature.image} alt={feature.title} className="h-28 w-28" />
+                <img src={feature.image} alt={feature.title} className="h-28 w-28 brand-icon" />
                 <p className="text-lg font-semibold text-slate-900">{feature.title}</p>
                 <p className="text-sm text-gray-600 leading-relaxed">{feature.description}</p>
                 <a href={`#${feature.id}`} className="text-sm font-semibold text-slate-700 underline decoration-emerald-500 decoration-2 underline-offset-4 hover:text-emerald-600">Más información</a>

@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import { useAuth } from './context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { fetchUpcomingEvents } from './services/api';
 
 function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, onNavigateOferta, onNavigatePrivacidad, onNavigateSobreNosotros }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [scrollY, setScrollY] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
   const [heroVisible, setHeroVisible] = useState(false);
@@ -13,6 +16,10 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
   const [populareIndex, setPopularesIndex] = useState(0);
   const [eventosIndex, setEventosIndex] = useState(0);
   const [eventosTimer, setEventosTimer] = useState(null);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [eventCardIndex, setEventCardIndex] = useState(0);
+  const [eventCardVisible, setEventCardVisible] = useState(true);
+  const [loadingNextEvent, setLoadingNextEvent] = useState(false);
 
   // Datos
   const sitios = [
@@ -26,14 +33,6 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
     { id: 8, title: 'Parque Regional Natural Ucumari', subtitle: '', location: 'Via Pereira- La virginia', image: '/images/Pagina_inicio/Santuario-Fauna-Flora-Otun-Quimbaya-Ucumari-13.jpg' },
     { id: 9, title: 'Parque Regional Natural Ucumari', subtitle: '', location: 'Via Pereira- La virginia', image: '/images/Pagina_inicio/Santuario-Fauna-Flora-Otun-Quimbaya-Ucumari-13.jpg' },
     { id: 10, title: 'Parque Regional Natural Ucumari', subtitle: '', location: 'Via Pereira- La virginia', image: '/images/Pagina_inicio/Santuario-Fauna-Flora-Otun-Quimbaya-Ucumari-13.jpg' },
-  ];
-
-  const eventos = [
-    { id: 1, title: 'Santa Rosa De Cabal', image: 'url(/images/Pagina_inicio/Pasadia-termales-de-santa-rosa-de-cabal-y-filandia.webp)' },
-    { id: 2, title: 'Via Pereira La Virginia', image: 'url(/images/Pagina_inicio/Nevado-del-Tolima-WalterV-1024x683.jpeg)' },
-    { id: 3, title: 'Santa Rosa De Cabal', image: 'url(/images/Pagina_inicio/Pasadia-termales-de-santa-rosa-de-cabal-y-filandia.webp)' },
-    { id: 4, title: 'Via Pereira La Virginia', image: 'url(/images/Pagina_inicio/Nevado-del-Tolima-WalterV-1024x683.jpeg)' },
-    { id: 5, title: 'Santa Rosa De Cabal', image: 'url(/images/Pagina_inicio/Pasadia-termales-de-santa-rosa-de-cabal-y-filandia.webp)' },
   ];
 
   const beneficios = [
@@ -77,6 +76,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
 
   // Carousel eventos
   const handleEventosChange = (index) => {
+    if (upcomingEvents.length === 0) return;
     setFadeIn(false);
     setTimeout(() => {
       setEventosIndex(index);
@@ -86,7 +86,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
     const timer = setInterval(() => {
       setFadeIn(false);
       setTimeout(() => {
-        setEventosIndex((prev) => (prev + 1) % eventos.length);
+        setEventosIndex((prev) => (prev + 1) % upcomingEvents.length);
         setFadeIn(true);
       }, 300);
     }, 5000);
@@ -94,16 +94,124 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
   };
 
   useEffect(() => {
+    if (upcomingEvents.length === 0) return undefined;
     const timer = setInterval(() => {
       setFadeIn(false);
       setTimeout(() => {
-        setEventosIndex((prev) => (prev + 1) % eventos.length);
+        setEventosIndex((prev) => (prev + 1) % upcomingEvents.length);
         setFadeIn(true);
       }, 300);
     }, 5000);
     setEventosTimer(timer);
     return () => clearInterval(timer);
-  }, [eventos.length]);
+  }, [upcomingEvents.length]);
+
+  useEffect(() => {
+    let active = true;
+    if (!user) {
+      setUpcomingEvents([]);
+      setEventCardIndex(0);
+      return undefined;
+    }
+
+    const loadNextEvent = async () => {
+      try {
+        setLoadingNextEvent(true);
+        const data = await fetchUpcomingEvents(6);
+        if (active) {
+          setUpcomingEvents(Array.isArray(data) ? data : []);
+          setEventCardIndex(0);
+          setEventCardVisible(true);
+        }
+      } catch (_) {
+        if (active) setUpcomingEvents([]);
+      } finally {
+        if (active) setLoadingNextEvent(false);
+      }
+    };
+
+    loadNextEvent();
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user || upcomingEvents.length <= 1) return undefined;
+    let mounted = true;
+    const interval = setInterval(() => {
+      if (!mounted) return;
+      setEventCardVisible(false);
+      setTimeout(() => {
+        if (!mounted) return;
+        setEventCardIndex((prev) => (prev + 1) % upcomingEvents.length);
+        setEventCardVisible(true);
+      }, 250);
+    }, 5000);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [user, upcomingEvents.length]);
+
+  const formatEventDate = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    const day = date.toLocaleDateString('es-CO', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+    const time = date.toLocaleTimeString('es-CO', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    return `${day} ${time}`;
+  };
+
+  const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
+
+  const activeEvent = upcomingEvents[eventCardIndex] || null;
+  const activeEventPlaceId = activeEvent?.place?.id || activeEvent?.place_id || null;
+  const handleEventClick = () => {
+    if (!activeEventPlaceId) return;
+    if (user?.role === 'admin') {
+      navigate(`/admin/sitio/${activeEventPlaceId}`);
+      return;
+    }
+    if (user?.role === 'operator') {
+      navigate(`/operador/sitio/${activeEventPlaceId}`);
+      return;
+    }
+    if (user?.role) {
+      navigate(`/turista/sitio/${activeEventPlaceId}`);
+      return;
+    }
+    navigate(`/sitio/${activeEventPlaceId}`);
+  };
+
+  const activeCarouselEvent = upcomingEvents[eventosIndex] || null;
+  const activeCarouselPlaceId = activeCarouselEvent?.place?.id || activeCarouselEvent?.place_id || null;
+  const handleCarouselEventClick = () => {
+    if (!activeCarouselPlaceId) return;
+    if (user?.role === 'admin') {
+      navigate(`/admin/sitio/${activeCarouselPlaceId}`);
+      return;
+    }
+    if (user?.role === 'operator') {
+      navigate(`/operador/sitio/${activeCarouselPlaceId}`);
+      return;
+    }
+    if (user?.role) {
+      navigate(`/turista/sitio/${activeCarouselPlaceId}`);
+      return;
+    }
+    navigate(`/sitio/${activeCarouselPlaceId}`);
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white text-slate-900">
@@ -121,7 +229,6 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
       )}
 
       <main className="relative z-10">
-        {/* HERO */}
         <section className="relative overflow-hidden bg-cover bg-center min-h-[80vh]" style={{ backgroundImage: "url(/images/Pagina_inicio/ecoturismo.jpg)" }}>
           <div className={`absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent md:from-white md:via-white/60 md:to-black/20 transition-opacity duration-500 ${heroVisible ? 'opacity-100' : 'opacity-0'}`} />
           <div className={`absolute left-6 md:left-12 top-[25%] z-10 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
@@ -149,11 +256,27 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
           
           {/* Cards flotantes a la derecha */}
           <div className="absolute bottom-8 right-8 z-50 flex gap-3">
-            <div className="rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 shadow-2xl">
-              <p className="text-xs uppercase tracking-wide text-white font-bold">PRÓXIMO EVENTO</p>
-              <p className="mt-2 text-lg font-bold text-white">Avistamiento en Ucumarí</p>
-              <p className="text-sm text-white">Sábado 9:00 AM</p>
-            </div>
+            {user && (
+              <button
+                type="button"
+                onClick={handleEventClick}
+                disabled={!activeEventPlaceId}
+                className={`rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 text-left shadow-2xl transition-all duration-500 ${activeEventPlaceId ? 'cursor-pointer hover:-translate-y-0.5 hover:bg-white/20' : 'cursor-default'} ${eventCardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+              >
+                <p className="text-xs uppercase tracking-wide text-white font-bold">PRÓXIMO EVENTO</p>
+                {loadingNextEvent ? (
+                  <p className="mt-2 text-sm text-white/90">Cargando evento...</p>
+                ) : activeEvent ? (
+                  <>
+                    <p className="mt-2 text-lg font-bold text-white">{activeEvent.title || 'Evento ecoturistico'}</p>
+                    <p className="text-sm text-white/90">{activeEvent.place?.name || 'Sitio ecoturistico'}</p>
+                    <p className="text-sm text-white">{formatEventDate(activeEvent.starts_at)}</p>
+                  </>
+                ) : (
+                  <p className="mt-2 text-sm text-white/90">No hay eventos proximos, mantente atento.</p>
+                )}
+              </button>
+            )}
             {user && user.role !== 'admin' && (
               <div className="rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 shadow-2xl">
                 <p className="text-xs uppercase tracking-wide text-white font-bold">FAVORITOS</p>
@@ -193,71 +316,76 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
           </div>
         </section>
 
-        {/* POPULARES + EVENTOS */}
+        {/* EVENTOS */}
         <section className="w-full py-20">
           <div className="mx-auto max-w-7xl px-6">
             <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="text-sm uppercase tracking-[0.25em] text-emerald-700">Agenda viva</p>
-                <h2 className="text-3xl font-semibold text-slate-900">Sitios populares y eventos en tiempo real</h2>
-                <p className="mt-2 text-slate-600">Desliza para ver los destinos más guardados y los eventos que se vienen.</p>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={onNavigateColeccion}
-                  className="rounded-full border border-emerald-200 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:border-emerald-400 hover:bg-emerald-50"
-                >
-                  Ver colección completa
-                </button>
+                <h2 className="text-3xl font-semibold text-slate-900">Nuevos eventos</h2>
+                <p className="mt-2 text-slate-600">Explora los eventos disponibles del momento.</p>
               </div>
             </div>
 
-            {/* Carousel eventos */}
-            <div className="relative overflow-hidden rounded-lg border border-emerald-100 shadow-lg shadow-emerald-100/50 min-h-96 bg-slate-900">
-                {/* Background image con crossfade */}
-                <div 
-                  className={`absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-in-out ${fadeIn ? 'opacity-100' : 'opacity-0'}`}
-                  style={{ backgroundImage: eventos[eventosIndex]?.image || 'none' }}
-                />
-                
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
-
-                <div className={`relative flex h-full flex-col justify-end gap-2 p-8 transition-all duration-500 transform ${fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                  <p className="text-xs uppercase tracking-[0.2em] text-white/80">Próximo evento</p>
-                  <h3 className="text-3xl font-bold text-white">{eventos[eventosIndex]?.title}</h3>
-                  <p className="text-white/90">Recibe alertas y guarda en tu agenda.</p>
-                </div>
-
-                {/* Flechas navegación */}
+            {upcomingEvents.length > 0 ? (
+              <>
+                {/* Carousel eventos */}
                 <button
-                  onClick={() => handleEventosChange((eventosIndex - 1 + eventos.length) % eventos.length)}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-3 py-2 text-2xl font-bold text-white transition hover:bg-black/60"
-                  aria-label="Evento anterior"
+                  type="button"
+                  onClick={handleCarouselEventClick}
+                  disabled={!activeCarouselPlaceId}
+                  className={`relative w-full overflow-hidden rounded-lg border border-emerald-100 shadow-lg shadow-emerald-100/50 min-h-96 bg-slate-900 text-left transition ${activeCarouselPlaceId ? 'cursor-pointer hover:-translate-y-0.5' : 'cursor-default'}`}
                 >
-                  &lt;
-                </button>
-                <button
-                  onClick={() => handleEventosChange((eventosIndex + 1) % eventos.length)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-3 py-2 text-2xl font-bold text-white transition hover:bg-black/60"
-                  aria-label="Siguiente evento"
-                >
-                  &gt;
-                </button>
-
-                {/* Dots */}
-              </div>
-
-              {/* Dots fuera de la card */}
-              <div className="mt-4 flex justify-center gap-3">
-                {eventos.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleEventosChange(idx)}
-                    className={`h-2.5 w-2.5 rounded-full transition ${idx === eventosIndex ? 'bg-emerald-600' : 'bg-emerald-200'}`}
-                    aria-label={`Ir al evento ${idx + 1}`}
+                  {/* Background image con crossfade */}
+                  <div
+                    className={`absolute inset-0 bg-cover bg-center transition-opacity duration-700 ease-in-out ${fadeIn ? 'opacity-100' : 'opacity-0'}`}
+                    style={{ backgroundImage: upcomingEvents[eventosIndex]?.image ? `url(${storageUrl(upcomingEvents[eventosIndex]?.image)})` : 'none' }}
                   />
-                ))}
-            </div>
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
+
+                  <div className={`relative flex h-full flex-col items-start justify-start gap-2 px-8 pb-8 pt-4 transition-all duration-500 transform ${fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                    <p className="text-xs uppercase tracking-[0.2em] text-white/80">Próximo evento</p>
+                    <h3 className="text-3xl font-bold text-white">
+                      {upcomingEvents[eventosIndex]?.title || 'Evento ecoturistico'}
+                    </h3>
+                    <p className="text-white/90">Recibe alertas y guarda en tu agenda.</p>
+                  </div>
+
+                  {/* Flechas navegación */}
+                  <button
+                    onClick={() => handleEventosChange((eventosIndex - 1 + upcomingEvents.length) % upcomingEvents.length)}
+                    className="absolute -left-6 top-1/2 -translate-y-1/2 rounded-full bg-black/25 px-2 py-1.5 text-xl font-semibold text-white/90 shadow-sm transition hover:bg-black/40"
+                    aria-label="Evento anterior"
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    onClick={() => handleEventosChange((eventosIndex + 1) % upcomingEvents.length)}
+                    className="absolute -right-6 top-1/2 -translate-y-1/2 rounded-full bg-black/25 px-2 py-1.5 text-xl font-semibold text-white/90 shadow-sm transition hover:bg-black/40"
+                    aria-label="Siguiente evento"
+                  >
+                    &gt;
+                  </button>
+                </button>
+
+                {/* Dots fuera de la card */}
+                <div className="mt-4 flex justify-center gap-3">
+                  {upcomingEvents.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleEventosChange(idx)}
+                      className={`h-2.5 w-2.5 rounded-full transition ${idx === eventosIndex ? 'bg-emerald-600' : 'bg-emerald-200'}`}
+                      aria-label={`Ir al evento ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50/40 p-6 text-center text-sm text-slate-600">
+                No hay eventos disponibles en este momento.
+              </div>
+            )}
           </div>
         </section>
 

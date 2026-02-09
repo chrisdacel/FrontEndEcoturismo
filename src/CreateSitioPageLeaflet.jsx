@@ -6,14 +6,19 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix para los iconos de Leaflet en Vite/React
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const greenMarkerSvg = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">'
+  + '<path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 9.4 12.5 28.5 12.5 28.5S25 21.9 25 12.5C25 5.6 19.4 0 12.5 0z" fill="#16a34a" stroke="#0f6b2a" stroke-width="1"/>'
+  + '<circle cx="12.5" cy="12.5" r="4.5" fill="#ffffff" fill-opacity="0.9"/>'
+  + '</svg>'
+)}`;
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconUrl: markerIcon,
-  iconRetinaUrl: markerIcon2x,
+  iconUrl: greenMarkerSvg,
+  iconRetinaUrl: greenMarkerSvg,
   shadowUrl: markerShadow,
 });
 
@@ -54,6 +59,9 @@ export default function CreateSitioPageLeaflet() {
     recomendacion: '',
     contacto: '',
     estado_apertura: 'open',
+    event_title: '',
+    event_description: '',
+    event_datetime: '',
   });
   const [openDays, setOpenDays] = useState({
     lunes: true,
@@ -64,6 +72,7 @@ export default function CreateSitioPageLeaflet() {
     sabado: true,
     domingo: true,
   });
+  const [showEventFields, setShowEventFields] = useState(false);
 
   const [images, setImages] = useState({
     portada: null,
@@ -80,6 +89,8 @@ export default function CreateSitioPageLeaflet() {
     flora_img: null,
     infraestructura_img: null,
   });
+  const [eventImage, setEventImage] = useState(null);
+  const [eventImagePreview, setEventImagePreview] = useState(null);
 
   // Load existing place data in edit mode
   useEffect(() => {
@@ -88,6 +99,8 @@ export default function CreateSitioPageLeaflet() {
       try {
         const data = await getPlaceById(id);
         const p = data.place || data; // support both shapes
+        const eventData = data.event || null;
+        const eventDatetime = eventData?.starts_at ? new Date(eventData.starts_at).toISOString().slice(0, 16) : '';
         const labels = Array.isArray(p.label) ? p.label : (Array.isArray(p.labels) ? p.labels : []);
         setFormData({
           nombre: p.name || '',
@@ -103,7 +116,13 @@ export default function CreateSitioPageLeaflet() {
           recomendacion: p.tips || '',
           contacto: p.contact_info || '',
           estado_apertura: p.opening_status || 'open',
+          event_title: eventData?.title || '',
+          event_description: eventData?.description || '',
+          event_datetime: eventDatetime,
         });
+        if (eventData?.title || eventData?.description || eventDatetime) {
+          setShowEventFields(true);
+        }
         const resolvedOpenDays = typeof p.open_days === 'object' && p.open_days !== null ? p.open_days : {};
         setOpenDays((prev) => ({
           ...prev,
@@ -119,6 +138,9 @@ export default function CreateSitioPageLeaflet() {
           flora_img: p.flora_img ? base + p.flora_img : null,
           infraestructura_img: p.estructure_img ? base + p.estructure_img : null,
         });
+        if (eventData?.image) {
+          setEventImagePreview(base + eventData.image);
+        }
         if (mapRef.current && markerRef.current && p.lat && p.lng) {
           markerRef.current.setLatLng([parseFloat(p.lat), parseFloat(p.lng)]);
           mapRef.current.setView([parseFloat(p.lat), parseFloat(p.lng)], 13);
@@ -207,6 +229,18 @@ export default function CreateSitioPageLeaflet() {
     }
   };
 
+  const handleEventImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEventImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEventImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const togglePreference = (prefId) => {
     setSelectedPreferences((prev) => {
       if (prev.includes(prefId)) {
@@ -256,7 +290,8 @@ export default function CreateSitioPageLeaflet() {
           images.clima_img,
           images.caracteristicas_img,
           images.flora_img,
-          images.infraestructura_img
+          images.infraestructura_img,
+          eventImage
         );
       } else {
         const formDataToSend = new FormData();
@@ -272,6 +307,9 @@ export default function CreateSitioPageLeaflet() {
             formDataToSend.append(key, images[key]);
           }
         });
+        if (eventImage) {
+          formDataToSend.append('event_image', eventImage);
+        }
         
         // Debug: Mostrar datos que se envían
         console.log('=== Datos del formulario ===');
@@ -718,6 +756,82 @@ export default function CreateSitioPageLeaflet() {
                   </select>
                 </div>
               </div>
+            </div>
+
+            {/* Evento (opcional) */}
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-2xl font-semibold text-slate-900">Evento (opcional)</h2>
+                  <p className="text-sm text-slate-600">Agrega un evento para este sitio sin que sea obligatorio.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowEventFields((prev) => !prev)}
+                  className="inline-flex items-center gap-2 rounded-full border border-emerald-200 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                >
+                  {showEventFields ? 'Ocultar evento' : 'Agregar evento'}
+                  <span className={`text-base transition ${showEventFields ? 'rotate-180' : ''}`} aria-hidden>
+                    ▼
+                  </span>
+                </button>
+              </div>
+              {showEventFields && (
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Nombre del evento
+                    </label>
+                    <input
+                      type="text"
+                      name="event_title"
+                      value={formData.event_title}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
+                      placeholder="Ej: Avistamiento en Ucumarí"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Descripción del evento
+                    </label>
+                    <textarea
+                      name="event_description"
+                      value={formData.event_description}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
+                      placeholder="Detalles breves del evento"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Fecha y hora
+                    </label>
+                    <input
+                      type="datetime-local"
+                      name="event_datetime"
+                      value={formData.event_datetime}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Imagen del evento (opcional)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleEventImageChange}
+                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
+                    />
+                    {eventImagePreview && (
+                      <img src={eventImagePreview} alt="Evento" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Botones */}

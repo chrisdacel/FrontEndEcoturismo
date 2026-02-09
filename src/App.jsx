@@ -1,5 +1,6 @@
-﻿import { AuthProvider, useAuth } from './context/AuthContext';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+﻿import { useEffect } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import HomePage from './HomePage';
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
@@ -30,6 +31,7 @@ import FavoritosPage from './FavoritosPage';
 import PreferencesPage from './PreferencesPage';
 import HistorialPage from './HistorialPage';
 import OperatorSitesPage from './OperatorSitesPage';
+import OperatorStatsPage from './OperatorStatsPage';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -561,6 +563,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/operador/estadisticas"
+        element={
+          <AdminOperatorRoute>
+            <OperatorStatsPage />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
         path="/operador/sitio/:id/editar"
         element={
           <AdminOperatorRoute>
@@ -573,12 +583,69 @@ function AppRoutes() {
   );
 }
 
+function ScrollToTop() {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [location.pathname]);
+
+  return null;
+}
+
+function PageTransition({ children }) {
+  const location = useLocation();
+
+  return (
+    <div key={location.pathname} className="page-enter">
+      {children}
+    </div>
+  );
+}
+
+function ScrollReveal() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const targets = Array.from(document.querySelectorAll('main section, main article'));
+    if (targets.length === 0) return undefined;
+
+    targets.forEach((el) => {
+      if (!el.classList.contains('scroll-reveal')) {
+        el.classList.add('scroll-reveal');
+      }
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -10% 0px' }
+    );
+
+    targets.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [location.pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
       <div className="min-h-screen bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white">
+        <ScrollToTop />
+        <ScrollReveal />
         <Header />
-        <AppRoutes />
+        <PageTransition>
+          <AppRoutes />
+        </PageTransition>
       </div>
     </AuthProvider>
   );

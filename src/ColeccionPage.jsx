@@ -9,14 +9,19 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix para los iconos de Leaflet en Vite/React
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const greenMarkerSvg = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">'
+  + '<path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 9.4 12.5 28.5 12.5 28.5S25 21.9 25 12.5C25 5.6 19.4 0 12.5 0z" fill="#16a34a" stroke="#0f6b2a" stroke-width="1"/>'
+  + '<circle cx="12.5" cy="12.5" r="4.5" fill="#ffffff" fill-opacity="0.9"/>'
+  + '</svg>'
+)}`;
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconUrl: markerIcon,
-  iconRetinaUrl: markerIcon2x,
+  iconUrl: greenMarkerSvg,
+  iconRetinaUrl: greenMarkerSvg,
   shadowUrl: markerShadow,
 });
 
@@ -53,20 +58,18 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     loadSites();
   }, [loadSites]);
 
-  // Refrescar sitios periódicamente para mantener el mapa actualizado
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      loadSites();
-    }, 30000);
-    return () => clearInterval(intervalId);
-  }, [loadSites]);
-
   const handleSearch = async () => {
     setLoading(true);
     await loadSites(searchText);
   };
 
   const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
+  const isGuest = !user;
+  const shortText = (value, max = 110) => {
+    if (!value) return '';
+    const text = value.toString().trim();
+    return text.length > max ? `${text.slice(0, max - 3)}...` : text;
+  };
 
   const loadFavorites = useCallback(async () => {
     if (!isTourist) return;
@@ -223,6 +226,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
 
   // Inicializar mapa
   useEffect(() => {
+    if (isGuest) return;
     if (!mapContainerRef.current || mapRef.current) return;
 
     const map = L.map(mapContainerRef.current).setView([4.8087, -75.6906], 9);
@@ -239,10 +243,11 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
       mapRef.current = null;
       markersLayerRef.current = null;
     };
-  }, []);
+  }, [isGuest]);
 
   // Pintar pines en el mapa cuando cambian los sitios
   useEffect(() => {
+    if (isGuest) return;
     if (!mapRef.current || !markersLayerRef.current) return;
 
     const layer = markersLayerRef.current;
@@ -254,15 +259,16 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
       const lng = parseFloat(sitio.lng);
       if (Number.isFinite(lat) && Number.isFinite(lng)) {
         const marker = L.marker([lat, lng]);
-        const imageUrl = sitio.cover ? `http://localhost:8000/api/files/${sitio.cover}` : '';
+        const labelNames = Array.isArray(sitio.label)
+          ? sitio.label.map((label) => label?.name ?? label)
+          : Array.isArray(sitio.labels)
+            ? sitio.labels.map((label) => label?.name ?? label)
+            : [];
+        const labelsText = labelNames.filter(Boolean).slice(0, 3).join(' • ') || 'Sin etiqueta';
         const popupHtml = `
-          <div class="popup-card" style="display:flex;gap:10px;align-items:center;cursor:pointer;max-width:260px;">
-            ${imageUrl ? `<img src="${imageUrl}" alt="${sitio.name || 'Sitio'}" style="width:72px;height:60px;object-fit:cover;border-radius:8px;flex:0 0 auto;" />` : ''}
-            <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-              <strong style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">${sitio.name || 'Sitio'}</strong>
-              <span style="font-size:12px;color:#64748b;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:160px;">${(sitio.localization || '').toString()}</span>
-              <span style="font-size:12px;color:#059669;">Ver detalles</span>
-            </div>
+          <div class="popup-card" style="display:flex;flex-direction:column;gap:6px;cursor:pointer;max-width:220px;">
+            <strong style="font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${sitio.name || 'Sitio'}</strong>
+            <span style="font-size:12px;color:#059669;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${labelsText}</span>
           </div>
         `;
         marker.bindPopup(popupHtml);
@@ -290,7 +296,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     if (bounds.length > 0) {
       mapRef.current.fitBounds(bounds, { padding: [30, 30] });
     }
-  }, [sitiosAPI]);
+  }, [sitiosAPI, isGuest]);
 
   const scrollToTopHandler = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -332,7 +338,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
         </button>
       )}
 
-      <main className="pt-6">
+      <main className="pt-0">
         {/* Sección 1: Hero con trío de imágenes y buscador */}
         <section className="relative w-full py-16 md:py-20 coleccion-hero">
           <div className="relative z-10 flex flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-between md:gap-10 md:px-12">
@@ -344,7 +350,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                     <img
                       src={shot.imagen}
                       alt={shot.nombre}
-                      className={`object-cover rounded-[22px] shadow-lg w-[120px] h-[280px] md:w-[150px] md:h-[340px] lg:w-[170px] lg:h-[400px] ${idx === 1 ? 'h-[300px] md:h-[360px] lg:h-[430px]' : ''}`}
+                      className={`object-cover rounded-[22px] shadow-lg w-[140px] h-[320px] md:w-[170px] md:h-[380px] lg:w-[200px] lg:h-[440px] ${idx === 1 ? 'h-[340px] md:h-[410px] lg:h-[470px]' : ''}`}
                     />
                   </div>
                 ))}
@@ -436,8 +442,17 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                     </div>
                     <div className="p-4">
                       <h3 className="text-lg font-semibold text-slate-900 mb-2">{sitio.name}</h3>
-                      <p className="text-sm text-slate-600 mb-2">{sitio.slogan}</p>
-                      <p className="text-xs text-emerald-600">📍 {sitio.localization.substring(0, 60)}...</p>
+                      {isGuest ? (
+                        <>
+                          <p className="text-sm text-slate-600 mb-2">{shortText(sitio.description || sitio.slogan, 120)}</p>
+                          <p className="text-xs text-emerald-600">Registrate para ver mas detalles.</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm text-slate-600 mb-2">{sitio.slogan}</p>
+                          <p className="text-xs text-emerald-600">📍 {sitio.localization.substring(0, 60)}...</p>
+                        </>
+                      )}
                     </div>
                   </article>
                 ))}
@@ -463,7 +478,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
         )}
 
         {/* Sección 3: Recomendaciones (scroll lateral) */}
-        <section className="w-full bg-white py-16 px-0 md:px-0 mb-20">
+        <section className="w-full bg-white py-16 pb-20 px-0 md:px-0">
           <h2 className="mb-8 px-6 md:px-12 text-3xl font-bold">Recomendaciones</h2>
 
           {/* Carril con scroll horizontal y snap */}
@@ -517,15 +532,26 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
         </section>
 
         {/* Sección 4: Mapa de sitios turísticos */}
-        <section className="w-full bg-white pb-20">
-          <div className="px-6 md:px-12 mb-6">
-            <h2 className="text-3xl font-bold">Mapa de sitios turísticos</h2>
-            <p className="text-slate-600 mt-2">Explora los sitios agregados en tiempo real.</p>
-          </div>
-          <div className="px-6 md:px-12">
-            <div ref={mapContainerRef} className="w-full h-[520px] rounded-2xl ring-1 ring-emerald-100 shadow-lg" />
-          </div>
-        </section>
+        {!isGuest ? (
+          <section className="w-full bg-white pb-20">
+            <div className="px-6 md:px-12 mb-6">
+              <h2 className="text-3xl font-bold">Mapa de sitios turísticos</h2>
+              <p className="text-slate-600 mt-2">Explora los sitios agregados en tiempo real.</p>
+            </div>
+            <div className="px-6 md:px-12">
+              <div ref={mapContainerRef} className="w-full h-[520px] rounded-2xl ring-1 ring-emerald-100 shadow-lg" />
+            </div>
+          </section>
+        ) : (
+          <section className="w-full bg-white pb-20">
+            <div className="px-6 md:px-12">
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-6 text-center">
+                <h3 className="text-xl font-semibold text-emerald-700 mb-2">Registrate para ver el mapa completo</h3>
+                <p className="text-sm text-slate-600">Accede a ubicaciones exactas y rutas sugeridas.</p>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
 
       {/* Footer (estilo Home) */}
