@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { register as apiRegister } from './services/api';
+import Alert from './components/Alert';
 
 export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNavigatePreferences, onNavigateConfirm }) {
   const { setUser } = useAuth();
@@ -36,8 +37,8 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
       return false;
     }
     
-    if (pwd.length < 8 || pwd.length > 15) {
-      setPasswordError('La contraseña debe tener entre 8 y 15 caracteres');
+    if (pwd.length < 8 || pwd.length > 64) {
+      setPasswordError('La contraseña debe tener entre 8 y 64 caracteres');
       return false;
     }
     
@@ -53,6 +54,11 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
     
     if (!/[0-9]/.test(pwd)) {
       setPasswordError('La contraseña debe incluir al menos un dígito');
+      return false;
+    }
+
+    if (!/^[A-Za-z0-9@?#$%()_=*\\:;'.\/\+<>¿,\[\]]+$/.test(pwd)) {
+      setPasswordError('La contraseña contiene caracteres no permitidos');
       return false;
     }
     
@@ -117,7 +123,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white">
+    <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white overflow-x-hidden">
       <div className="mx-auto flex min-h-screen max-w-7xl items-center px-6 py-12 md:px-10">
         {/* Intro izquierda */}
         <div className="hidden flex-1 md:flex md:flex-col md:pr-10">
@@ -146,14 +152,14 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
             </div>
 
             {error && (
-              <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-100">
-                {error}
-              </div>
+                <Alert type="error" className="mb-4">
+                  {error}
+                </Alert>
             )}
             {success && (
-              <div className="mb-4 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">
-                {success}
-              </div>
+                <Alert type="success" className="mb-4">
+                  {success}
+                </Alert>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -240,9 +246,9 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                     }}
                     required
                     minLength={8}
-                    maxLength={15}
+                    maxLength={64}
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
-                    placeholder="8-15 caracteres"
+                    placeholder="8-64 caracteres"
                   />
                   {passwordError && (
                     <p className="mt-1 text-xs text-red-300">{passwordError}</p>
@@ -256,7 +262,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                     onChange={(e) => setPassword2(e.target.value)}
                     required
                     minLength={8}
-                    maxLength={15}
+                    maxLength={64}
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
                     placeholder="Repite tu contraseña"
                   />

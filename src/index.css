@@ -21,6 +21,18 @@ a {
 
 body {
   margin: 0;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+@layer components {
+  .page-container {
+    @apply mx-auto w-full max-w-7xl px-4 md:px-6;
+  }
 }
 
 @keyframes pageFadeIn {
@@ -208,4 +220,53 @@ body {
 
 .brand-icon {
   filter: brightness(0) saturate(100%) invert(26%) sepia(82%) saturate(1216%) hue-rotate(86deg) brightness(88%) contrast(91%);
+}
+
+.site-filter-select {
+  border-radius: 999px;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.site-filter-select:focus {
+  outline: none;
+  border-color: rgba(16, 185, 129, 0.7);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+}
+
+.site-filter-select option {
+  color: #0f172a;
+  background: #ffffff;
+}
+
+.site-filter-select option:hover,
+.site-filter-select option:focus {
+  color: #10b981;
+}
+
+.color-circle {
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  display: inline-block;
+  aspect-ratio: 1 / 1;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.color-circle::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.color-circle::-webkit-color-swatch {
+  border: none;
+  border-radius: 9999px;
+}
+
+.color-circle::-moz-color-swatch {
+  border: none;
+  border-radius: 9999px;
 }

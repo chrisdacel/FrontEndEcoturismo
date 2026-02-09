@@ -175,6 +175,55 @@ export async function fetchProfile() {
   }
 }
 
+// Notificaciones del turista
+export async function fetchNotifications(limit = 8) {
+  try {
+    const { data } = await api.get('/api/user/notifications', {
+      params: { limit },
+    });
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'No se pudieron cargar las notificaciones' };
+  }
+}
+
+export async function markNotificationRead(notificationId) {
+  try {
+    const { data } = await api.post(`/api/user/notifications/${notificationId}/read`);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'No se pudo marcar la notificacion' };
+  }
+}
+
+export async function archiveNotification(notificationId) {
+  try {
+    const { data } = await api.post(`/api/user/notifications/${notificationId}/archive`);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'No se pudo archivar la notificacion' };
+  }
+}
+
+export async function archiveAllNotifications() {
+  try {
+    const { data } = await api.post('/api/user/notifications/archive-all');
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'No se pudieron archivar las notificaciones' };
+  }
+}
+
+// Evento publico (turista)
+export async function fetchPublicEvent(eventId) {
+  try {
+    const { data } = await api.get(`/api/events/${eventId}/public`);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'No se pudo cargar el evento' };
+  }
+}
+
 // Perfil: actualizar nombre/email
 export async function updateProfile(payload) {
   try {
@@ -258,6 +307,15 @@ export async function getCurrentUser() {
     return data;
   } catch (error) {
     return null; // No autenticado
+  }
+}
+
+export async function fetchOperatorStats() {
+  try {
+    const { data } = await api.get('/api/operator/stats');
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error cargando estadisticas' };
   }
 }
 
@@ -640,9 +698,19 @@ export async function reactToReview(reviewId, type) {
   }
 }
 
-export async function restrictReviewAsOperator(reviewId, reason) {
+export async function getOperatorReviews() {
   try {
-    const { data } = await api.post(`/api/operator/reviews/${reviewId}/restrict`, { reason });
+    const { data } = await api.get('/api/operator/reviews');
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo reseñas' };
+  }
+}
+
+export async function restrictReviewAsOperator(reviewId, reason = null) {
+  try {
+    const payload = reason ? { reason } : {};
+    const { data } = await api.post(`/api/operator/reviews/${reviewId}/restrict`, payload);
     return data;
   } catch (error) {
     throw error.response?.data || { message: 'Error restringiendo reseña' };

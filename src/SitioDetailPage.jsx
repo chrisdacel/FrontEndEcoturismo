@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getPlaceById } from './services/placesApi';
 import {
   api,
@@ -10,11 +10,14 @@ import {
   logPlaceVisit,
   restrictReviewAsOperator,
   unrestrictReviewAsOperator,
+  markNotificationRead,
 } from './services/api';
 import { useAuth } from './context/AuthContext';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import Alert from './components/Alert';
+import ConfirmDialog from './components/ConfirmDialog';
 
 const greenMarkerSvg = `data:image/svg+xml,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">'
@@ -95,15 +98,18 @@ export default function SitioDetailPage({
 }) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [sitio, setSitio] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [commentError, setCommentError] = useState(null);
   const [editError, setEditError] = useState(null);
+  const [actionError, setActionError] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [filteredReviews, setFilteredReviews] = useState([]);
   const [filterType, setFilterType] = useState('recent');
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
   const [averageRating, setAverageRating] = useState(null);
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState(5);
@@ -114,12 +120,16 @@ export default function SitioDetailPage({
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [eventData, setEventData] = useState(null);
+  const [confirmState, setConfirmState] = useState({ open: false });
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const eventSectionRef = useRef(null);
+  const filterMenuRef = useRef(null);
   const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
   const isOperator = user?.role === 'operator';
+  const isAdmin = user?.role === 'admin';
   const isOperatorOwner = isOperator && sitio?.user_id === user?.id;
+  const eventEditBasePath = isAdmin ? '/admin' : '/operador';
   const isGuest = !user;
   const shortText = (value, max = 220) => {
     if (!value) return '';
@@ -160,6 +170,16 @@ export default function SitioDetailPage({
   }, [reviews, filterType]);
 
   useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterMenuRef.current && !filterMenuRef.current.contains(event.target)) {
+        setFilterMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
     const load = async () => {
       try {
         const data = await getPlaceById(id);
@@ -178,9 +198,16 @@ export default function SitioDetailPage({
   }, [id]);
 
   useEffect(() => {
-    if (!isTourist || !user || !id) return;
+    if (!user || !id) return;
     logPlaceVisit(id).catch(() => {});
-  }, [id, isTourist, user]);
+  }, [id, user]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const notificationId = params.get('notification');
+    if (!notificationId) return;
+    markNotificationRead(notificationId).catch(() => {});
+  }, [location.search]);
 
   // Inicializar mapa cuando sitio esté cargado
   useEffect(() => {
@@ -248,6 +275,26 @@ export default function SitioDetailPage({
     closed_temporarily: 'bg-rose-50 text-rose-700 border-rose-200',
     open_with_restrictions: 'bg-amber-50 text-amber-700 border-amber-200',
   };
+  const approvalStatusLabels = {
+    approved: 'Aprobado',
+    pending: 'Pendiente',
+    rejected: 'Rechazado',
+  };
+  const approvalStatusStyles = {
+    approved: 'bg-emerald-500/90 text-white shadow-emerald-500/30 hover:bg-emerald-400',
+    pending: 'bg-amber-400/90 text-white shadow-amber-400/30 hover:bg-amber-300',
+    rejected: 'bg-rose-500/90 text-white shadow-rose-500/30 hover:bg-rose-400',
+  };
+  const filterLabels = {
+    recent: 'Mas recientes',
+    highest: 'Mejor calificacion',
+    lowest: 'Peor calificacion',
+  };
+  const filterOptions = [
+    { value: 'recent', label: 'Mas recientes' },
+    { value: 'highest', label: 'Mejor calificacion' },
+    { value: 'lowest', label: 'Peor calificacion' },
+  ];
   const daysOfWeek = [
     { key: 'lunes', label: 'Lunes' },
     { key: 'martes', label: 'Martes' },
@@ -309,40 +356,52 @@ export default function SitioDetailPage({
 
   const handleRestrictReview = async (reviewId) => {
     if (!isOperatorOwner) return;
-    if (!confirm('¿Ocultar este comentario por incumplir las normas?')) return;
-
-    const reasonInput = window.prompt('Motivo para ocultar: insultos o spam', 'insultos');
-    if (!reasonInput) return;
-    const reason = reasonInput.trim().toLowerCase();
-    if (!['insultos', 'spam'].includes(reason)) {
-      alert('Motivo no valido. Usa: insultos o spam.');
-      return;
-    }
-
-    try {
-      await restrictReviewAsOperator(reviewId, reason);
-      setReviews((prev) => prev.map((r) => (r.id === reviewId
-        ? { ...r, is_restricted: true, restricted_by_role: 'operator', restriction_reason: reason }
-        : r
-      )));
-    } catch (err) {
-      alert(err?.message || 'Error restringiendo reseña');
-    }
+    setConfirmState({
+      open: true,
+      title: 'Restringir comentario',
+      message: '¿Ocultar este comentario por incumplir las normas?',
+      confirmLabel: 'Restringir',
+      tone: 'warning',
+      onConfirm: async () => {
+        try {
+          setActionError(null);
+          await restrictReviewAsOperator(reviewId);
+          setReviews((prev) => prev.map((r) => (r.id === reviewId
+            ? { ...r, is_restricted: true, restricted_by_role: 'operator', restriction_reason: null }
+            : r
+          )));
+        } catch (err) {
+          setActionError(err?.message || 'Error restringiendo reseña');
+        } finally {
+          setConfirmState({ open: false });
+        }
+      },
+    });
   };
 
   const handleUnrestrictReview = async (reviewId) => {
     if (!isOperatorOwner) return;
-    if (!confirm('¿Mostrar nuevamente este comentario?')) return;
-
-    try {
-      await unrestrictReviewAsOperator(reviewId);
-      setReviews((prev) => prev.map((r) => (r.id === reviewId
-        ? { ...r, is_restricted: false, restricted_by_role: null, restriction_reason: null }
-        : r
-      )));
-    } catch (err) {
-      alert(err?.message || 'Error desrestringiendo reseña');
-    }
+    setConfirmState({
+      open: true,
+      title: 'Restaurar comentario',
+      message: '¿Mostrar nuevamente este comentario?',
+      confirmLabel: 'Restaurar',
+      tone: 'info',
+      onConfirm: async () => {
+        try {
+          setActionError(null);
+          await unrestrictReviewAsOperator(reviewId);
+          setReviews((prev) => prev.map((r) => (r.id === reviewId
+            ? { ...r, is_restricted: false, restricted_by_role: null, restriction_reason: null }
+            : r
+          )));
+        } catch (err) {
+          setActionError(err?.message || 'Error desrestringiendo reseña');
+        } finally {
+          setConfirmState({ open: false });
+        }
+      },
+    });
   };
 
   const handleCreateReview = async (e) => {
@@ -395,30 +454,40 @@ export default function SitioDetailPage({
   };
 
   const handleDeleteReview = async (reviewId) => {
-    if (!confirm('¿Eliminar este comentario?')) return;
-    setSubmitting(true);
-    setCommentError(null);
-    try {
-      await deleteReview(reviewId);
-      setReviews((prev) => {
-        const next = prev.filter((r) => r.id !== reviewId);
-        setAverageRating(calcAverage(next));
-        return next;
-      });
-    } catch (err) {
-      setCommentError(err.message || 'Error eliminando reseña');
-    } finally {
-      setSubmitting(false);
-    }
+    setConfirmState({
+      open: true,
+      title: 'Eliminar comentario',
+      message: '¿Eliminar este comentario?',
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+      onConfirm: async () => {
+        setSubmitting(true);
+        setCommentError(null);
+        try {
+          await deleteReview(reviewId);
+          setReviews((prev) => {
+            const next = prev.filter((r) => r.id !== reviewId);
+            setAverageRating(calcAverage(next));
+            return next;
+          });
+        } catch (err) {
+          setCommentError(err.message || 'Error eliminando reseña');
+        } finally {
+          setSubmitting(false);
+          setConfirmState({ open: false });
+        }
+      },
+    });
   };
 
   const handleReaction = async (reviewId, type) => {
     if (!user) {
-      alert('Debes iniciar sesión para reaccionar');
+      setActionError('Debes iniciar sesion para reaccionar');
       return;
     }
     
     try {
+      setActionError(null);
       await reactToReview(reviewId, type);
       
       // Actualizar el estado local
@@ -450,7 +519,7 @@ export default function SitioDetailPage({
         return r;
       }));
     } catch (err) {
-      alert(err.message || 'Error al reaccionar');
+      setActionError(err.message || 'Error al reaccionar');
     }
   };
 
@@ -487,8 +556,9 @@ export default function SitioDetailPage({
     return (
       <div className="min-h-screen bg-white grid place-items-center p-6">
         <div className="max-w-md text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-2">No se pudo cargar el sitio</h2>
-          <p className="text-slate-600 mb-4">{error}</p>
+          <Alert type="error" title="No se pudo cargar el sitio" className="mb-4 text-left">
+            {error}
+          </Alert>
           <button onClick={() => navigate('/coleccion')} className="rounded-full bg-emerald-600 px-6 py-3 text-white">Volver a Colección</button>
         </div>
       </div>
@@ -499,7 +569,7 @@ export default function SitioDetailPage({
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white text-slate-900">
+    <div className="relative min-h-screen overflow-x-hidden bg-white text-slate-900">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(76,175,80,0.08),transparent_35%)]" />
 
       <main>
@@ -509,15 +579,50 @@ export default function SitioDetailPage({
           style={{ backgroundImage: `url('${storageUrl(sitio.cover)}')` }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
-          {eventData && (
+          {isOperatorOwner && (
             <button
               type="button"
-              onClick={scrollToEvent}
-              className="absolute bottom-5 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-emerald-500/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-400"
+              onClick={() => navigate(`/operador/sitio/${id}/editar`)}
+              className="absolute top-5 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-emerald-700 shadow-lg shadow-emerald-500/10 transition hover:bg-white"
             >
-              Nuevo evento disponible
-              <span aria-hidden>↓</span>
+              Editar
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z" />
+              </svg>
             </button>
+          )}
+          {(isOperatorOwner || isAdmin) && !eventData && (
+            <span
+              className={`absolute bottom-5 right-5 z-20 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide shadow-lg transition ${
+                approvalStatusStyles[sitio.approval_status || 'pending']
+                || 'bg-slate-500/90 text-white shadow-slate-500/30 hover:bg-slate-400'
+              }`}
+            >
+              {approvalStatusLabels[sitio.approval_status || 'pending'] || 'Pendiente'}
+            </span>
+          )}
+          {eventData && (
+            <div className="absolute bottom-5 right-5 z-20 flex flex-col items-end gap-2">
+              {(isOperatorOwner || isAdmin) && (
+                <span
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide shadow-lg transition ${
+                    approvalStatusStyles[sitio.approval_status || 'pending']
+                    || 'bg-slate-500/90 text-white shadow-slate-500/30 hover:bg-slate-400'
+                  }`}
+                >
+                  {approvalStatusLabels[sitio.approval_status || 'pending'] || 'Pendiente'}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={scrollToEvent}
+                className="inline-flex items-center gap-2 rounded-full bg-emerald-500/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-400"
+              >
+                Nuevo evento disponible
+                <span aria-hidden>↓</span>
+              </button>
+            </div>
           )}
           {isTourist && (
             <button
@@ -540,7 +645,7 @@ export default function SitioDetailPage({
           <div className="relative z-10 w-full">
             <div className="mx-auto max-w-7xl px-6 py-16">
               <div className="max-w-2xl">
-                <h1 className="mt-4 text-4xl md:text-5xl font-bold leading-tight text-white">{sitio.name}</h1>
+                <h1 className="mt-4 text-[clamp(2rem,4vw,3.5rem)] font-bold leading-tight text-white break-words">{sitio.name}</h1>
                 <p className="mt-3 text-lg md:text-xl text-emerald-100/90 max-w-xl">
                   {sitio.slogan}
                 </p>
@@ -732,6 +837,29 @@ export default function SitioDetailPage({
           </div>
         </section>
 
+        {!eventData && (
+          <section className="bg-white px-6 pb-16">
+            <div className="mx-auto max-w-4xl text-center">
+              <div className="rounded-3xl border border-emerald-100 bg-emerald-50/40 p-8 shadow-sm">
+                <p className="text-sm text-slate-700">
+                  Actualmente no hay eventos disponibles, mantente al tanto.
+                </p>
+                {(isOperatorOwner || isAdmin) && (
+                  <div className="mt-6 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => navigate(`${eventEditBasePath}/sitio/${id}/evento/crear`)}
+                      className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-700"
+                    >
+                      Crear evento
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
         {eventData && (
           <section ref={eventSectionRef} className="bg-white px-6 pb-16">
             <div className="mx-auto max-w-5xl">
@@ -739,6 +867,25 @@ export default function SitioDetailPage({
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="text-xs uppercase tracking-[0.3em] text-emerald-700">Evento disponible</p>
+                    {(isOperatorOwner || isAdmin) && (
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span
+                          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide shadow-lg transition ${
+                            approvalStatusStyles[eventData.approval_status || 'pending']
+                            || 'bg-slate-500/90 text-white shadow-slate-500/30 hover:bg-slate-400'
+                          }`}
+                        >
+                          {approvalStatusLabels[eventData.approval_status || 'pending'] || 'Pendiente'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => navigate(`${eventEditBasePath}/evento/${eventData.id}/editar`)}
+                          className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-emerald-700 transition hover:bg-emerald-50"
+                        >
+                          Editar evento
+                        </button>
+                      </div>
+                    )}
                     <h2 className="mt-2 text-2xl font-bold text-slate-900">{eventData.title || 'Evento ecoturistico'}</h2>
                     <p className="mt-2 text-sm text-slate-600">{formatEventDate(eventData.starts_at)}</p>
                   </div>
@@ -804,15 +951,40 @@ export default function SitioDetailPage({
               {/* Filtro de comentarios */}
               <div className="flex items-center gap-2">
                 <label className="text-sm font-semibold text-slate-700">Ordenar por:</label>
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  className="rounded-lg border border-emerald-200 px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-emerald-300"
-                >
-                  <option value="recent">Más recientes</option>
-                  <option value="highest">Mejor calificación</option>
-                  <option value="lowest">Peor calificación</option>
-                </select>
+                <div className="relative" ref={filterMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setFilterMenuOpen((prev) => !prev)}
+                    className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
+                  >
+                    <span>{filterLabels[filterType] || 'Mas recientes'}</span>
+                    <svg
+                      className={`h-4 w-4 transition-transform duration-200 ${filterMenuOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {filterMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-56 max-h-none rounded-xl overflow-visible bg-white/90 text-slate-800 shadow-lg ring-1 ring-slate-200/60 backdrop-blur dropdown-open z-20">
+                      {filterOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => {
+                            setFilterType(option.value);
+                            setFilterMenuOpen(false);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -855,7 +1027,9 @@ export default function SitioDetailPage({
                   </div>
                 </div>
                 {commentError && (
-                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{commentError}</div>
+                  <Alert type="error" className="mb-2">
+                    {commentError}
+                  </Alert>
                 )}
                 <div className="flex justify-end">
                   <button
@@ -871,6 +1045,12 @@ export default function SitioDetailPage({
               <p className="mb-8 text-sm text-slate-600">Inicia sesión para comentar.</p>
             )}
 
+            {actionError && (
+              <Alert type="error" className="mb-4">
+                {actionError}
+              </Alert>
+            )}
+
             <div className="space-y-4 max-w-4xl mx-auto">
               {filteredReviews.map((rev) => {
                 const hasUser = Boolean(rev.user && rev.user.id);
@@ -882,7 +1062,7 @@ export default function SitioDetailPage({
                     <div className={editingId === rev.id ? "flex flex-col gap-3" : "flex items-start justify-between gap-3"}>
                       <div className="flex items-start gap-3 flex-1 min-w-0">
                         {/* Avatar del usuario */}
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 relative">
                           {hasUser && rev.user?.image ? (
                             <img 
                               src={`http://localhost:8000/api/files/${rev.user.image}`}
@@ -893,6 +1073,13 @@ export default function SitioDetailPage({
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm ${hasUser ? 'bg-emerald-600 text-white' : 'bg-slate-300 text-slate-700'}`}>
                               {avatarInitial}
                             </div>
+                          )}
+                          {isOwner && (
+                            <span className="absolute -top-1 -right-1 grid h-4 w-4 place-items-center rounded-full bg-emerald-500 text-white shadow">
+                              <svg className="h-2.5 w-2.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M12 2l2.9 6.3 6.9.6-5.2 4.5 1.6 6.6L12 16.6 5.8 20l1.6-6.6-5.2-4.5 6.9-.6L12 2z" />
+                              </svg>
+                            </span>
                           )}
                         </div>
                         
@@ -924,7 +1111,9 @@ export default function SitioDetailPage({
                               </div>
                             </div>
                             {editError && (
-                              <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{editError}</div>
+                              <Alert type="error" className="mb-2">
+                                {editError}
+                              </Alert>
                             )}
                             <div className="flex gap-2">
                               <button
@@ -943,18 +1132,20 @@ export default function SitioDetailPage({
                             </div>
                           </div>
                         ) : rev.is_restricted ? (
-                          <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                            <p className="text-sm text-yellow-800 flex items-start gap-2">
-                              <span className="text-lg">⚠️</span>
-                              {rev.restricted_by_role === 'operator' ? (
-                                <span><strong>Comentario oculto:</strong> Este comentario fue oculto por el operador ya que infringe las normas.</span>
-                              ) : (
-                                <span><strong>Contenido restringido:</strong> Este comentario ha sido restringido por violar nuestras politicas de bienestar comunitario.</span>
-                              )}
-                            </p>
-                            {rev.restriction_reason && (
-                              <p className="mt-1 text-xs text-yellow-700">Motivo: {rev.restriction_reason}</p>
-                            )}
+                          <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 shadow-sm ring-1 ring-amber-100">
+                            <div className="flex items-start gap-3">
+                              <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 3h.01M10.29 3.86l-7.4 12.82A1.5 1.5 0 004.2 19h15.6a1.5 1.5 0 001.31-2.32l-7.4-12.82a1.5 1.5 0 00-2.6 0z" />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-600">Contenido restringido</p>
+                                <p className="text-sm text-amber-900/90">
+                                  Este comentario ha sido restringido por violar nuestras politicas de bienestar comunitario.
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         ) : (
                           <>
@@ -1020,25 +1211,6 @@ export default function SitioDetailPage({
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                               </svg>
                             </button>
-                          </div>
-                        )}
-                        {isOperatorOwner && (
-                          <div className="mt-2 flex items-center justify-end gap-2">
-                            {rev.is_restricted ? (
-                              <button
-                                className="rounded-full border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
-                                onClick={() => handleUnrestrictReview(rev.id)}
-                              >
-                                Mostrar comentario
-                              </button>
-                            ) : (
-                              <button
-                                className="rounded-full border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
-                                onClick={() => handleRestrictReview(rev.id)}
-                              >
-                                Ocultar comentario
-                              </button>
-                            )}
                           </div>
                         )}
                       </div>
@@ -1125,6 +1297,16 @@ export default function SitioDetailPage({
           <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
         </div>
       </footer>
+
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        tone={confirmState.tone}
+        onClose={() => setConfirmState({ open: false })}
+        onConfirm={confirmState.onConfirm}
+      />
     </div>
   );
 }

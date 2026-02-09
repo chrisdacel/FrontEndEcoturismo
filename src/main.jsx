@@ -5,13 +5,13 @@ import App from './App.jsx';
 import './index.css';
 import { initializeCsrfToken } from './services/api';
 
-// Inicializar CSRF token antes de renderizar la app
-initializeCsrfToken().then(() => {
-  ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </React.StrictMode>
-  );
-});
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+);
+
+// Inicializar CSRF token en segundo plano para no bloquear el render
+initializeCsrfToken();

@@ -9,7 +9,7 @@ export default function SitioPage({
 }) {
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white text-slate-900">
+    <div className="relative min-h-screen overflow-x-hidden bg-white text-slate-900">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(76,175,80,0.08),transparent_35%)]" />
 
 

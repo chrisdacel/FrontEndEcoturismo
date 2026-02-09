@@ -1,12 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchUserPlaces, api } from './services/api';
+import Alert from './components/Alert';
+import ConfirmDialog from './components/ConfirmDialog';
 
 export default function AdminSitesPage() {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const [approvalFilter, setApprovalFilter] = useState('all');
+  const [approvalMenuOpen, setApprovalMenuOpen] = useState(false);
+  const statusMenuRef = useRef(null);
+  const approvalMenuRef = useRef(null);
   const navigate = useNavigate();
+  const [confirmState, setConfirmState] = useState({ open: false });
 
   const loadPlaces = async () => {
     setLoading(true);
@@ -25,22 +35,86 @@ export default function AdminSitesPage() {
     loadPlaces();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (statusMenuRef.current && !statusMenuRef.current.contains(event.target)) {
+        setStatusMenuOpen(false);
+      }
+      if (approvalMenuRef.current && !approvalMenuRef.current.contains(event.target)) {
+        setApprovalMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const goEdit = (id) => navigate(`/admin/sitio/${id}/editar`);
 
   const deletePlaceById = async (id) => {
-    if (!confirm('¿Eliminar este sitio?')) return;
-    try {
-      await api.delete(`/api/places/${id}`);
-      loadPlaces();
-    } catch (err) {
-      alert(err?.message || 'Error eliminando sitio');
-    }
+    setConfirmState({
+      open: true,
+      title: 'Eliminar sitio',
+      message: '¿Eliminar este sitio? Esta accion no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/api/places/${id}`);
+          await loadPlaces();
+          setError('');
+        } catch (err) {
+          setError(err?.message || 'Error eliminando sitio');
+        } finally {
+          setConfirmState({ open: false });
+        }
+      },
+    });
   };
+
 
   const goDetail = (id) => navigate(`/admin/sitio/${id}`);
 
+  const statusLabels = {
+    all: 'Todos los estados',
+    open: 'Abierto',
+    closed_temporarily: 'Cerrado temporalmente',
+    open_with_restrictions: 'Abierto con restricciones',
+  };
+
+  const approvalLabels = {
+    all: 'Todas las aprobaciones',
+    pending: 'Pendiente',
+    approved: 'Aprobado',
+    rejected: 'Rechazado',
+  };
+
+
+  const statusOptions = [
+    { value: 'all', label: 'Todos los estados' },
+    { value: 'open', label: 'Abierto' },
+    { value: 'closed_temporarily', label: 'Cerrado temporalmente' },
+    { value: 'open_with_restrictions', label: 'Abierto con restricciones' },
+  ];
+
+  const approvalOptions = [
+    { value: 'all', label: 'Todas las aprobaciones' },
+    { value: 'pending', label: 'Pendiente' },
+    { value: 'approved', label: 'Aprobado' },
+    { value: 'rejected', label: 'Rechazado' },
+  ];
+
+  const filteredPlaces = places.filter((place) => {
+    const name = place?.name || place?.nombre || '';
+    const email = place?.user?.email || place?.creator_email || '';
+    const searchValue = `${name} ${email}`.toLowerCase();
+    const matchesSearch = searchValue.includes(searchTerm.trim().toLowerCase());
+    const matchesStatus = statusFilter === 'all' || (place?.opening_status || place?.estado_apertura) === statusFilter;
+    const matchesApproval = approvalFilter === 'all' || (place?.approval_status || 'pending') === approvalFilter;
+    return matchesSearch && matchesStatus && matchesApproval;
+  });
+
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       <div className="mx-auto max-w-7xl px-4 md:px-6 py-10">
         <div className="mb-6">
           <button
@@ -52,7 +126,7 @@ export default function AdminSitesPage() {
             </svg>
             Volver
           </button>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">Gestión de Sitios</h1>
               <p className="text-sm text-slate-600">Administra, edita y elimina sitios turísticos</p>
@@ -61,23 +135,162 @@ export default function AdminSitesPage() {
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+          <Alert type="error" className="mb-4">
+            {error}
+          </Alert>
         )}
 
         {loading ? (
           <div className="text-sm text-slate-600">Cargando sitios…</div>
         ) : (
-          <div className="overflow-x-auto bg-white border-b border-slate-200">
-            <table className="min-w-full text-sm">
+          <>
+            <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-1 items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2">
+                <svg className="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Buscar por nombre o email"
+                  className="w-full bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
+                />
+              </div>
+              <div className="relative" ref={statusMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setStatusMenuOpen((prev) => !prev)}
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
+                >
+                  <span>{statusLabels[statusFilter] || 'Todos los estados'}</span>
+                  <svg
+                    className={`h-4 w-4 transition-transform duration-200 ${statusMenuOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {statusMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 max-h-none rounded-xl overflow-visible bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
+                    {statusOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setStatusFilter(option.value);
+                          setStatusMenuOpen(false);
+                        }}
+                        className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="relative" ref={approvalMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setApprovalMenuOpen((prev) => !prev)}
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
+                >
+                  <span>{approvalLabels[approvalFilter] || 'Todas las aprobaciones'}</span>
+                  <svg
+                    className={`h-4 w-4 transition-transform duration-200 ${approvalMenuOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {approvalMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 max-h-none rounded-xl overflow-visible bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
+                    {approvalOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setApprovalFilter(option.value);
+                          setApprovalMenuOpen(false);
+                        }}
+                        className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="md:hidden space-y-3 mb-4">
+              {filteredPlaces.map((p) => (
+                <div key={p.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                  <div className="flex items-start gap-3">
+                    {p.cover ? (
+                      <img
+                        src={`http://localhost:8000/api/files/${p.cover}`}
+                        alt={p.nombre || p.name}
+                        className="h-16 w-24 rounded-md object-cover border border-slate-200"
+                      />
+                    ) : (
+                      <div className="h-16 w-24 rounded-md bg-slate-100 border border-slate-200 grid place-items-center text-xs text-slate-400">
+                        Sin imagen
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <button
+                        className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                        onClick={() => goDetail(p.id)}
+                      >
+                        {p.nombre || p.name || '—'}
+                      </button>
+                      <p className="mt-1 text-xs text-slate-600">{p.user?.email || p.creator_email || '—'}</p>
+                      <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-600">
+                        <span>Estado: {statusLabels[p.opening_status || p.estado_apertura] || '—'}</span>
+                        <span>Aprobacion: {approvalLabels[p.approval_status] || 'Pendiente'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <button
+                      className="rounded-full border border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
+                      onClick={() => goEdit(p.id)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="rounded-full border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-50"
+                      onClick={() => deletePlaceById(p.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {filteredPlaces.length === 0 && (
+                <div className="rounded-xl border border-slate-200 bg-white p-4 text-center text-sm text-slate-600">
+                  No hay sitios que coincidan con el filtro.
+                </div>
+              )}
+            </div>
+
+            <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200">
+              <table className="min-w-full text-sm">
               <thead className="bg-white">
                 <tr>
                   <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Nombre</th>
                   <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Email</th>
+                  <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Estado</th>
+                  <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Aprobacion</th>
                   <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {places.map((p) => (
+                {filteredPlaces.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4">
                       <div className="flex flex-col items-start gap-2">
@@ -106,6 +319,16 @@ export default function AdminSitesPage() {
                       <span className="text-slate-700">{p.user?.email || p.creator_email || '—'}</span>
                     </td>
                     <td className="px-6 py-4">
+                      <span className="text-slate-700">
+                        {statusLabels[p.opening_status || p.estado_apertura] || '—'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-slate-700">
+                        {approvalLabels[p.approval_status] || 'Pendiente'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
                       <div className="flex items-center gap-1">
                         <button
                           className="p-1.5 rounded text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
@@ -131,9 +354,22 @@ export default function AdminSitesPage() {
                 ))}
               </tbody>
             </table>
+            {filteredPlaces.length === 0 && (
+              <div className="px-6 py-6 text-center text-slate-600">No hay sitios que coincidan con el filtro.</div>
+            )}
           </div>
+          </>
         )}
       </div>
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        tone={confirmState.tone}
+        onClose={() => setConfirmState({ open: false })}
+        onConfirm={confirmState.onConfirm}
+      />
     </div>
   );
 }

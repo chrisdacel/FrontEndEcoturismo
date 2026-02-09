@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProfile, updateProfile, changePassword, uploadAvatar, deleteAvatar, deleteAccount } from './services/api';
 import { useAuth } from './context/AuthContext';
+import Alert from './components/Alert';
+import ConfirmDialog from './components/ConfirmDialog';
 
 export default function ProfilePageTurista() {
   const navigate = useNavigate();
@@ -18,9 +20,11 @@ export default function ProfilePageTurista() {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [showDeleteForm, setShowDeleteForm] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [confirmState, setConfirmState] = useState({ open: false });
   const [deletePassword, setDeletePassword] = useState('');
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [inlinePasswordError, setInlinePasswordError] = useState('');
 
   const [passwords, setPasswords] = useState({ current_password: '', password: '', password_confirmation: '' });
 
@@ -103,22 +107,57 @@ export default function ProfilePageTurista() {
 
   const handleDeleteAccount = async (e) => {
     e.preventDefault();
-    if (!confirm('¿Eliminar tu cuenta? Esta acción no se puede deshacer.')) return;
-    try {
-      setDeletingAccount(true);
-      setDeleteError('');
-      await deleteAccount(deletePassword);
-      setUser(null);
-      navigate('/login');
-    } catch (err) {
-      setDeleteError(err.message || 'No se pudo eliminar la cuenta');
-    } finally {
-      setDeletingAccount(false);
-    }
+    setConfirmState({
+      open: true,
+      title: 'Eliminar cuenta',
+      message: '¿Eliminar tu cuenta? Esta accion no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+      onConfirm: async () => {
+        try {
+          setDeletingAccount(true);
+          setDeleteError('');
+          await deleteAccount(deletePassword);
+          setUser(null);
+          navigate('/login');
+        } catch (err) {
+          setDeleteError(err.message || 'No se pudo eliminar la cuenta');
+        } finally {
+          setDeletingAccount(false);
+          setConfirmState({ open: false });
+        }
+      },
+    });
   };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
+    const pwd = passwords.password;
+    if (pwd.length < 8 || pwd.length > 64) {
+      setPasswordError('La contraseña debe tener entre 8 y 64 caracteres');
+      setPasswordSuccess('');
+      return;
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      setPasswordError('La contraseña debe incluir al menos una letra mayúscula');
+      setPasswordSuccess('');
+      return;
+    }
+    if (!/[a-z]/.test(pwd)) {
+      setPasswordError('La contraseña debe incluir al menos una letra minúscula');
+      setPasswordSuccess('');
+      return;
+    }
+    if (!/[0-9]/.test(pwd)) {
+      setPasswordError('La contraseña debe incluir al menos un dígito');
+      setPasswordSuccess('');
+      return;
+    }
+    if (!/^[A-Za-z0-9@?#$%()_=*\\:;'.\/\+<>¿,\[\]]+$/.test(pwd)) {
+      setPasswordError('La contraseña contiene caracteres no permitidos');
+      setPasswordSuccess('');
+      return;
+    }
     if (passwords.password !== passwords.password_confirmation) {
       setPasswordError('La nueva contraseña y la confirmación no coinciden');
       setPasswordSuccess('');
@@ -151,7 +190,7 @@ export default function ProfilePageTurista() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 px-4">
+    <div className="min-h-screen bg-white text-slate-900 px-4 overflow-x-hidden">
       <div className="max-w-4xl mx-auto pt-24 pb-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Perfil</h1>
@@ -159,15 +198,15 @@ export default function ProfilePageTurista() {
         </div>
 
         {error && (
-          <div className="mb-4 rounded-xl bg-red-100 p-4 ring-1 ring-red-300 text-red-700">
+          <Alert type="error" className="mb-4">
             {error}
-          </div>
+          </Alert>
         )}
 
         {success && (
-          <div className="mb-4 rounded-lg bg-emerald-100 p-4 ring-1 ring-emerald-300 text-emerald-700">
+          <Alert type="success" className="mb-4">
             {success}
-          </div>
+          </Alert>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -286,10 +325,53 @@ export default function ProfilePageTurista() {
                 <input
                   type="password"
                   value={passwords.password}
-                  onChange={(e) => setPasswords({ ...passwords, password: e.target.value })}
+                  onChange={(e) => {
+                    const nextValue = e.target.value;
+                    setPasswords({ ...passwords, password: nextValue });
+                    if (!nextValue) {
+                      setInlinePasswordError('');
+                      return;
+                    }
+                    if (nextValue.length < 8 || nextValue.length > 64) {
+                      setInlinePasswordError('La contraseña debe tener entre 8 y 64 caracteres');
+                      return;
+                    }
+                    if (!/[A-Z]/.test(nextValue)) {
+                      setInlinePasswordError('La contraseña debe incluir al menos una letra mayúscula');
+                      return;
+                    }
+                    if (!/[a-z]/.test(nextValue)) {
+                      setInlinePasswordError('La contraseña debe incluir al menos una letra minúscula');
+                      return;
+                    }
+                    if (!/[0-9]/.test(nextValue)) {
+                      setInlinePasswordError('La contraseña debe incluir al menos un dígito');
+                      return;
+                    }
+                    if (!/^[A-Za-z0-9@?#$%()_=*\\:;'.\/\+<>¿,\[\]]+$/.test(nextValue)) {
+                      setInlinePasswordError('La contraseña contiene caracteres no permitidos');
+                      return;
+                    }
+                    setInlinePasswordError('');
+                  }}
                   required
+                  minLength={8}
+                  maxLength={64}
                   className="w-full rounded-lg bg-white px-4 py-2 text-slate-900 ring-1 ring-emerald-200 focus:ring-2 focus:ring-emerald-400 outline-none"
                 />
+                {inlinePasswordError && (
+                  <p className="mt-1 text-xs text-rose-600">{inlinePasswordError}</p>
+                )}
+                <div className="mt-2 text-xs text-slate-600">
+                  <p className="mb-1">Tu contraseña debe incluir:</p>
+                  <ul className="list-inside list-disc space-y-1">
+                    <li>Entre 8 y 64 caracteres</li>
+                    <li>Al menos una letra mayúscula</li>
+                    <li>Al menos una letra minúscula</li>
+                    <li>Al menos un dígito</li>
+                    <li>Solo símbolos permitidos: @ ? # $ % ( ) _ = * \ : ; ' . / + &lt; &gt; &amp; ¿ , [ ]</li>
+                  </ul>
+                </div>
               </div>
               <div>
                 <label className="block text-sm text-slate-700 mb-1">Confirmar nueva contraseña</label>
@@ -298,6 +380,8 @@ export default function ProfilePageTurista() {
                   value={passwords.password_confirmation}
                   onChange={(e) => setPasswords({ ...passwords, password_confirmation: e.target.value })}
                   required
+                  minLength={8}
+                  maxLength={64}
                   className="w-full rounded-lg bg-white px-4 py-2 text-slate-900 ring-1 ring-emerald-200 focus:ring-2 focus:ring-emerald-400 outline-none"
                 />
               </div>
@@ -352,6 +436,15 @@ export default function ProfilePageTurista() {
           )}
         </section>
       </div>
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        tone={confirmState.tone}
+        onClose={() => setConfirmState({ open: false })}
+        onConfirm={confirmState.onConfirm}
+      />
     </div>
   );
 }

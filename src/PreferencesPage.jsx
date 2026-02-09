@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { fetchPreferencesOptions, fetchUserPreferences, updateUserPreferences } from './services/api';
+import Alert from './components/Alert';
 
 
 export default function PreferencesPage({ onNavigateHome, onNavigateLogin, isFirstTime = false }) {
@@ -77,7 +78,7 @@ export default function PreferencesPage({ onNavigateHome, onNavigateLogin, isFir
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       <section className="relative pt-24 pb-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
@@ -92,10 +93,14 @@ export default function PreferencesPage({ onNavigateHome, onNavigateLogin, isFir
           </div>
 
           {error && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+            <Alert type="error" className="mb-4">
+              {error}
+            </Alert>
           )}
           {success && (
-            <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</div>
+            <Alert type="success" className="mb-4">
+              {success}
+            </Alert>
           )}
 
           {loading ? (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { login } from './services/api';
+import Alert from './components/Alert';
 
 function LoginPage({ onNavigateHome, onNavigateRegister, onNavigateForgot, onNavigatePreferences }) {
   const { setUser } = useAuth();
@@ -30,7 +31,7 @@ function LoginPage({ onNavigateHome, onNavigateRegister, onNavigateForgot, onNav
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white">
+    <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white overflow-x-hidden">
       <div className="mx-auto flex min-h-screen max-w-7xl items-center px-6 py-12 md:px-10">
         {/* Lado izquierdo: mensaje/branding */}
         <div className="hidden flex-1 md:flex md:flex-col md:pr-10">
@@ -52,9 +53,9 @@ function LoginPage({ onNavigateHome, onNavigateRegister, onNavigateForgot, onNav
             </div>
 
             {error && (
-              <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-100">
+              <Alert type="error" className="mb-4">
                 {error}
-              </div>
+              </Alert>
             )}
 
             <form onSubmit={handleLogin} className="space-y-4">

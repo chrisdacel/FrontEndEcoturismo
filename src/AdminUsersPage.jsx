@@ -1,20 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllUsers, deleteUser, updateUser } from './services/adminApi';
+import Alert from './components/Alert';
+import ConfirmDialog from './components/ConfirmDialog';
 
 export default function AdminUsersPage() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [busyId, setBusyId] = useState(null);
   const [roleChanges, setRoleChanges] = useState({});
+  const [roleMenuOpen, setRoleMenuOpen] = useState(false);
+  const [roleRowMenuOpen, setRoleRowMenuOpen] = useState(null);
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const roleMenuRef = useRef(null);
+  const statusMenuRef = useRef(null);
+  const [confirmState, setConfirmState] = useState({ open: false });
 
   useEffect(() => {
     loadUsers();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (roleMenuRef.current && !roleMenuRef.current.contains(event.target)) {
+        setRoleMenuOpen(false);
+      }
+      if (statusMenuRef.current && !statusMenuRef.current.contains(event.target)) {
+        setStatusMenuOpen(false);
+      }
+      if (roleRowMenuOpen !== null) {
+        const rowMenu = document.querySelector(`[data-role-menu-id="${roleRowMenuOpen}"]`);
+        if (rowMenu && !rowMenu.contains(event.target)) {
+          setRoleRowMenuOpen(null);
+        }
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [roleRowMenuOpen]);
 
   const loadUsers = async (filters = {}) => {
     try {
@@ -37,17 +65,26 @@ export default function AdminUsersPage() {
   };
 
   const handleDelete = async (id) => {
-    const confirm = window.confirm('¿Eliminar este usuario?');
-    if (!confirm) return;
-    try {
-      setBusyId(id);
-      await deleteUser(id);
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-    } catch (err) {
-      alert(err.message || 'No se pudo eliminar');
-    } finally {
-      setBusyId(null);
-    }
+    setConfirmState({
+      open: true,
+      title: 'Eliminar usuario',
+      message: '¿Eliminar este usuario? Esta accion no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+      onConfirm: async () => {
+        try {
+          setBusyId(id);
+          await deleteUser(id);
+          setUsers((prev) => prev.filter((u) => u.id !== id));
+          setError('');
+        } catch (err) {
+          setError(err.message || 'No se pudo eliminar');
+        } finally {
+          setBusyId(null);
+          setConfirmState({ open: false });
+        }
+      },
+    });
   };
 
   const handleRoleChange = (id, role) => {
@@ -61,12 +98,51 @@ export default function AdminUsersPage() {
       setBusyId(id);
       const { user } = await updateUser(id, { role: newRole });
       setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role: user?.role || newRole } : u)));
+      setError('');
     } catch (err) {
-      alert(err.message || 'No se pudo actualizar el rol');
+      setError(err.message || 'No se pudo actualizar el rol');
     } finally {
       setBusyId(null);
     }
   };
+
+  const roleLabels = {
+    '': 'Todos los roles',
+    admin: 'Admin',
+    operator: 'Operador',
+    user: 'Turista',
+  };
+
+  const statusLabels = {
+    '': 'Todos los estados',
+    active: 'Activo',
+    pending: 'Pendiente',
+    approved: 'Aprobado',
+    rejected: 'Rechazado',
+  };
+
+  const roleOptions = [
+    { value: '', label: 'Todos los roles' },
+    { value: 'admin', label: 'Admin' },
+    { value: 'operator', label: 'Operador' },
+    { value: 'user', label: 'Turista' },
+  ];
+
+  const statusOptions = [
+    { value: '', label: 'Todos los estados' },
+    { value: 'active', label: 'Activo' },
+    { value: 'pending', label: 'Pendiente' },
+    { value: 'approved', label: 'Aprobado' },
+    { value: 'rejected', label: 'Rechazado' },
+  ];
+
+  const filteredUsers = users.filter((u) => {
+    const name = `${u.name || ''} ${u.last_name || ''}`.trim();
+    const email = u.email || '';
+    const searchValue = `${name} ${email}`.toLowerCase();
+    const matchesSearch = searchValue.includes(searchTerm.trim().toLowerCase());
+    return matchesSearch;
+  });
 
   if (loading) {
     return (
@@ -80,9 +156,9 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 px-4 pb-16">
+    <div className="min-h-screen bg-white text-slate-900 px-4 pb-16 overflow-x-hidden">
       <div className="max-w-6xl mx-auto pt-24">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <button
               onClick={() => navigate('/admin/dashboard')}
@@ -93,51 +169,100 @@ export default function AdminUsersPage() {
               </svg>
               Volver
             </button>
-            <h1 className="text-3xl font-bold text-slate-900">Usuarios</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Gestion de usuarios</h1>
             <p className="text-slate-600">Gestiona todos los usuarios del sistema</p>
           </div>
-          <button
-            onClick={() => navigate('/admin/create-operator')}
-            className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 font-semibold text-white shadow-sm hover:bg-emerald-600"
-          >
-            Crear usuario
-          </button>
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 p-4 ring-1 ring-red-200 text-red-700">
+          <Alert type="error" className="mb-4">
             {error}
-          </div>
+          </Alert>
         )}
 
         <div className="bg-white rounded-lg p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-xs text-slate-600 mb-1">Rol</label>
-              <select
-                value={filterRole}
-                onChange={(e) => setFilterRole(e.target.value)}
-                className="w-full rounded-lg bg-white px-3 py-2 text-slate-900 ring-1 ring-slate-300 focus:ring-2 focus:ring-emerald-400 outline-none [&>option]:text-slate-900 [&>option]:bg-white"
-              >
-                <option value="">Todos</option>
-                <option value="admin">Admin</option>
-                <option value="operator">Operador</option>
-                <option value="user">Turista</option>
-              </select>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2">
+                <svg className="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Buscar por nombre o email"
+                  className="w-full bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-xs text-slate-600 mb-1">Estado</label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full rounded-lg bg-white px-3 py-2 text-slate-900 ring-1 ring-slate-300 focus:ring-2 focus:ring-emerald-400 outline-none [&>option]:text-slate-900 [&>option]:bg-white"
+            <div ref={roleMenuRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setRoleMenuOpen((prev) => !prev)}
+                className="inline-flex w-full items-center justify-between gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
               >
-                <option value="">Todos</option>
-                <option value="active">Activo</option>
-                <option value="pending">Pendiente</option>
-                <option value="approved">Aprobado</option>
-                <option value="rejected">Rechazado</option>
-              </select>
+                <span>{roleLabels[filterRole] || 'Todos los roles'}</span>
+                <svg
+                  className={`h-4 w-4 transition-transform duration-200 ${roleMenuOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {roleMenuOpen && (
+                <div className="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
+                  {roleOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        setFilterRole(option.value);
+                        setRoleMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div ref={statusMenuRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setStatusMenuOpen((prev) => !prev)}
+                className="inline-flex w-full items-center justify-between gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
+              >
+                <span>{statusLabels[filterStatus] || 'Todos los estados'}</span>
+                <svg
+                  className={`h-4 w-4 transition-transform duration-200 ${statusMenuOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {statusMenuOpen && (
+                <div className="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
+                  {statusOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        setFilterStatus(option.value);
+                        setStatusMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex items-end">
               <button
@@ -147,47 +272,139 @@ export default function AdminUsersPage() {
                 Filtrar
               </button>
             </div>
-            <div className="flex items-end">
-              <button
-                onClick={() => { setFilterRole(''); setFilterStatus(''); loadUsers(); }}
-                className="inline-flex items-center rounded-full border border-emerald-200 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:border-emerald-400 hover:bg-emerald-50"
-              >
-                Limpiar
-              </button>
-            </div>
           </div>
         </div>
 
-        <div className="overflow-x-auto bg-white border-b border-slate-200">
+        <div className="md:hidden space-y-3 mb-4">
+          {filteredUsers.map((u) => (
+            <div key={u.id} className="rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-sm font-semibold text-slate-900">{u.name} {u.last_name || ''}</p>
+              <p className="mt-1 text-xs text-slate-600">{u.email}</p>
+              <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-600">
+                <span>Estado: {statusLabels[u.status] || 'Activo'}</span>
+                <span>Rol: {roleLabels[roleChanges[u.id] ?? u.role ?? 'user'] || 'Turista'}</span>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <div className="relative" data-role-menu-id={u.id}>
+                  <button
+                    type="button"
+                    onClick={() => setRoleRowMenuOpen((prev) => (prev === u.id ? null : u.id))}
+                    className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
+                  >
+                    <span>{roleLabels[roleChanges[u.id] ?? u.role ?? 'user'] || 'Turista'}</span>
+                    <svg
+                      className={`h-3.5 w-3.5 transition-transform duration-200 ${roleRowMenuOpen === u.id ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {roleRowMenuOpen === u.id && (
+                    <div className="absolute left-0 mt-2 w-40 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
+                      {roleOptions
+                        .filter((option) => option.value)
+                        .map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => {
+                              handleRoleChange(u.id, option.value);
+                              setRoleRowMenuOpen(null);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => saveRole(u.id)}
+                  disabled={!roleChanges[u.id] || busyId === u.id}
+                  className="rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
+                >
+                  Guardar
+                </button>
+                <button
+                  onClick={() => handleDelete(u.id)}
+                  className="rounded-full bg-rose-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-600"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          ))}
+          {filteredUsers.length === 0 && (
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-center text-sm text-slate-600">
+              No hay usuarios para mostrar
+            </div>
+          )}
+        </div>
+
+        <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-white">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">Nombre</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">Email</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">Rol</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">Estado</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-700">Rol</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-700">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {users.map((u) => (
+              {filteredUsers.map((u) => (
                 <tr key={u.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 text-sm text-slate-900">{u.name} {u.last_name || ''}</td>
                   <td className="px-4 py-3 text-sm text-slate-600">{u.email}</td>
+                  <td className="px-4 py-3 text-sm text-slate-700">
+                    {statusLabels[u.status] || 'Activo'}
+                  </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs capitalize text-slate-700 ring-1 ring-slate-300">
-                        {u.role || 'user'}
-                      </span>
-                      <select
-                        value={roleChanges[u.id] ?? u.role ?? 'user'}
-                        onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                        className="rounded-full bg-white px-2 py-1 text-xs text-slate-900 ring-1 ring-slate-300 focus:ring-2 focus:ring-emerald-400 outline-none"
-                      >
-                        <option value="user">User</option>
-                        <option value="operator">Operator</option>
-                        <option value="admin">Admin</option>
-                      </select>
+                      <div className="relative" data-role-menu-id={u.id}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setRoleRowMenuOpen((prev) => (prev === u.id ? null : u.id))
+                          }
+                          className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
+                        >
+                          <span>{roleLabels[roleChanges[u.id] ?? u.role ?? 'user'] || 'Turista'}</span>
+                          <svg
+                            className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                              roleRowMenuOpen === u.id ? 'rotate-180' : ''
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                        {roleRowMenuOpen === u.id && (
+                          <div className="absolute left-0 mt-2 w-40 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
+                            {roleOptions
+                              .filter((option) => option.value)
+                              .map((option) => (
+                                <button
+                                  key={option.value}
+                                  type="button"
+                                  onClick={() => {
+                                    handleRoleChange(u.id, option.value);
+                                    setRoleRowMenuOpen(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                                >
+                                  {option.label}
+                                </button>
+                              ))}
+                          </div>
+                        )}
+                      </div>
                       <button
                         onClick={() => saveRole(u.id)}
                         disabled={busyId === u.id || (roleChanges[u.id] ?? u.role) === u.role}
@@ -196,11 +413,6 @@ export default function AdminUsersPage() {
                         Guardar
                       </button>
                     </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className="inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs capitalize text-slate-700 ring-1 ring-slate-300">
-                      {u.status || 'active'}
-                    </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-right">
                     <button
@@ -213,7 +425,7 @@ export default function AdminUsersPage() {
                   </td>
                 </tr>
               ))}
-              {users.length === 0 && (
+              {filteredUsers.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-4 py-6 text-center text-slate-600">Sin resultados</td>
                 </tr>
@@ -222,6 +434,15 @@ export default function AdminUsersPage() {
           </table>
         </div>
       </div>
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        tone={confirmState.tone}
+        onClose={() => setConfirmState({ open: false })}
+        onConfirm={confirmState.onConfirm}
+      />
     </div>
   );
 }

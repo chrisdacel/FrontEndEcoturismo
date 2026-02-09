@@ -17,7 +17,7 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   return (
-    <div className="flex min-h-screen flex-col bg-white text-slate-900">
+    <div className="flex min-h-screen flex-col bg-white text-slate-900 overflow-x-hidden">
       {/* Hero: más alto, texto inferior izquierda, overlay con crossfade */}
       <section className="relative min-h-[70vh] w-full overflow-hidden bg-cover bg-center" style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.jpg')" }}>
         <div className={`absolute inset-0 bg-gradient-to-r from-white via-white/70 to-transparent md:from-white md:via-white/50 md:to-black/10 transition-opacity duration-500 ${heroVisible ? 'opacity-100' : 'opacity-0'}`} />

@@ -30,8 +30,14 @@ import ProfilePageTurista from './ProfilePageTurista';
 import FavoritosPage from './FavoritosPage';
 import PreferencesPage from './PreferencesPage';
 import HistorialPage from './HistorialPage';
+import NotificationsPage from './NotificationsPage';
 import OperatorSitesPage from './OperatorSitesPage';
 import OperatorStatsPage from './OperatorStatsPage';
+import OperatorEventsPage from './OperatorEventsPage';
+import OperatorCommentsPage from './OperatorCommentsPage';
+import EditEventPage from './EditEventPage';
+import CreateEventPage from './CreateEventPage';
+import EventDetailPage from './EventDetailPage';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -229,6 +235,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/turista/notificaciones"
+        element={
+          <ProtectedRoute>
+            <NotificationsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/preferencias"
         element={
           <ProtectedRoute>
@@ -374,6 +388,14 @@ function AppRoutes() {
           />
         }
       />
+      <Route
+        path="/turista/evento/:id"
+        element={
+          <ProtectedRoute>
+            <EventDetailPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Rutas admin para ver las vistas públicas con prefijo admin */}
       <Route
@@ -475,6 +497,22 @@ function AppRoutes() {
           </AdminRoute>
         }
       />
+      <Route
+        path="/admin/evento/:id/editar"
+        element={
+          <AdminRoute>
+            <EditEventPage />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/sitio/:id/evento/crear"
+        element={
+          <AdminRoute>
+            <CreateEventPage />
+          </AdminRoute>
+        }
+      />
 
       {/* Rutas operador (usuarios con rol operator) */}
       <Route
@@ -563,6 +601,22 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/operador/comentarios"
+        element={
+          <AdminOperatorRoute>
+            <OperatorCommentsPage />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
+        path="/operador/mis-eventos"
+        element={
+          <AdminOperatorRoute>
+            <OperatorEventsPage />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
         path="/operador/estadisticas"
         element={
           <AdminOperatorRoute>
@@ -575,6 +629,22 @@ function AppRoutes() {
         element={
           <AdminOperatorRoute>
             <CreateSitioPage />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
+        path="/operador/evento/:id/editar"
+        element={
+          <AdminOperatorRoute>
+            <EditEventPage />
+          </AdminOperatorRoute>
+        }
+      />
+      <Route
+        path="/operador/sitio/:id/evento/crear"
+        element={
+          <AdminOperatorRoute>
+            <CreateEventPage />
           </AdminOperatorRoute>
         }
       />

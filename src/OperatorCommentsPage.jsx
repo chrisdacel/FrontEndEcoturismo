@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getAdminReviews, restrictReview, unrestrictReview } from './services/adminApi';
+import { getOperatorReviews, restrictReviewAsOperator, unrestrictReviewAsOperator } from './services/api';
 import { useNavigate } from 'react-router-dom';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
 
-export default function AdminCommentsPage() {
+export default function OperatorCommentsPage() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -20,7 +20,7 @@ export default function AdminCommentsPage() {
     setLoading(true);
     setError('');
     try {
-      const data = await getAdminReviews();
+      const data = await getOperatorReviews();
       setReviews(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err?.message || 'Error cargando reseñas');
@@ -52,8 +52,11 @@ export default function AdminCommentsPage() {
       tone: 'warning',
       onConfirm: async () => {
         try {
-          await restrictReview(id);
-          setReviews((prev) => prev.map((r) => r.id === id ? { ...r, is_restricted: true } : r));
+          await restrictReviewAsOperator(id);
+          setReviews((prev) => prev.map((r) => r.id === id
+            ? { ...r, is_restricted: true, restricted_by_role: 'operator', restriction_reason: null }
+            : r
+          ));
           setError('');
         } catch (err) {
           setError(err?.message || 'Error restringiendo reseña');
@@ -73,8 +76,11 @@ export default function AdminCommentsPage() {
       tone: 'info',
       onConfirm: async () => {
         try {
-          await unrestrictReview(id);
-          setReviews((prev) => prev.map((r) => r.id === id ? { ...r, is_restricted: false } : r));
+          await unrestrictReviewAsOperator(id);
+          setReviews((prev) => prev.map((r) => r.id === id
+            ? { ...r, is_restricted: false, restricted_by_role: null, restriction_reason: null }
+            : r
+          ));
           setError('');
         } catch (err) {
           setError(err?.message || 'Error desrestringiendo reseña');
@@ -174,7 +180,7 @@ export default function AdminCommentsPage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">Gestionar Comentarios</h1>
-            <p className="text-sm text-slate-600">Revisa y restringe reseñas de todos los sitios</p>
+            <p className="text-sm text-slate-600">Revisa y restringe reseñas de tus sitios</p>
           </div>
         </div>
 
@@ -299,7 +305,7 @@ export default function AdminCommentsPage() {
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Sitio</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Usuario</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Calificación</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Calificacion</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Comentario</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Fecha</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Acciones</th>

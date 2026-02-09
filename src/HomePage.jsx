@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import { useAuth } from './context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { fetchUpcomingEvents } from './services/api';
+import { api, fetchRecommendations, fetchUpcomingEvents } from './services/api';
 
 function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, onNavigateOferta, onNavigatePrivacidad, onNavigateSobreNosotros }) {
   const { user } = useAuth();
@@ -20,6 +20,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
   const [eventCardIndex, setEventCardIndex] = useState(0);
   const [eventCardVisible, setEventCardVisible] = useState(true);
   const [loadingNextEvent, setLoadingNextEvent] = useState(false);
+  const [recommendedCount, setRecommendedCount] = useState(0);
 
   // Datos
   const sitios = [
@@ -111,6 +112,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
     if (!user) {
       setUpcomingEvents([]);
       setEventCardIndex(0);
+      setRecommendedCount(0);
       return undefined;
     }
 
@@ -131,6 +133,37 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
     };
 
     loadNextEvent();
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    let active = true;
+    if (!user || user.role !== 'user') {
+      setRecommendedCount(0);
+      return undefined;
+    }
+
+    const loadRecommendationCount = async () => {
+      try {
+        const [recommendations, favoritesResponse] = await Promise.all([
+          fetchRecommendations(),
+          api.get('/api/favorites'),
+        ]);
+        if (!active) return;
+        const favorites = Array.isArray(favoritesResponse?.data) ? favoritesResponse.data : [];
+        const favoriteIds = new Set(favorites.map((fav) => Number(fav.id)));
+        const recs = Array.isArray(recommendations) ? recommendations : [];
+        const newCount = recs.filter((rec) => !favoriteIds.has(Number(rec.id))).length;
+        setRecommendedCount(newCount);
+      } catch (_) {
+        if (active) setRecommendedCount(0);
+      }
+    };
+
+    loadRecommendationCount();
 
     return () => {
       active = false;
@@ -214,7 +247,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white text-slate-900">
+    <div className="relative min-h-screen overflow-x-hidden bg-white text-slate-900">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(76,175,80,0.08),transparent_35%)]" />
 
       {/* Back to top button */}
@@ -234,15 +267,29 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
           <div className={`absolute left-6 md:left-12 top-[25%] z-10 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
             <div className="inline-flex items-center gap-3 rounded-full bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              Ecoturismo
+              {user ? 'Bienvenido' : 'Ecoturismo'}
             </div>
             <div className="mt-4 max-w-2xl space-y-4">
-              <h1 className="text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
-                Explora, guarda y personaliza tus rutas ecoturísticas en Risaralda
-              </h1>
-              <p className="text-lg text-slate-700">
-                Conecta con la naturaleza, recibe eventos cercanos y guarda tus sitios favoritos. Todo sincronizado con tu perfil y preferencias.
-              </p>
+              {user ? (
+                <>
+                  <h1 className="text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
+                    {`Hola, ${user.name || 'usuario'}`}
+                  </h1>
+                  <p className="text-lg text-slate-700">
+                    Nos alegra tenerte de regreso. Inspírate con nuevos destinos, guarda tus rutas preferidas
+                    y descubre eventos cercanos para vivir la naturaleza con propósito.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
+                    Explora, guarda y personaliza tus rutas ecoturísticas en Risaralda
+                  </h1>
+                  <p className="text-lg text-slate-700">
+                    Conecta con la naturaleza, recibe eventos cercanos y guarda tus sitios favoritos. Todo sincronizado con tu perfil y preferencias.
+                  </p>
+                </>
+              )}
             </div>
             <div className="mt-6 flex flex-wrap gap-4">
               <button
@@ -255,13 +302,13 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
           </div>
           
           {/* Cards flotantes a la derecha */}
-          <div className="absolute bottom-8 right-8 z-50 flex gap-3">
+          <div className="absolute bottom-6 left-4 right-4 z-40 flex flex-col gap-3 md:bottom-8 md:left-auto md:right-8 md:flex-row">
             {user && (
               <button
                 type="button"
                 onClick={handleEventClick}
                 disabled={!activeEventPlaceId}
-                className={`rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 text-left shadow-2xl transition-all duration-500 ${activeEventPlaceId ? 'cursor-pointer hover:-translate-y-0.5 hover:bg-white/20' : 'cursor-default'} ${eventCardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+                className={`w-full rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 text-left shadow-2xl transition-all duration-500 md:w-auto ${activeEventPlaceId ? 'cursor-pointer hover:-translate-y-0.5 hover:bg-white/20' : 'cursor-default'} ${eventCardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
               >
                 <p className="text-xs uppercase tracking-wide text-white font-bold">PRÓXIMO EVENTO</p>
                 {loadingNextEvent ? (
@@ -277,12 +324,18 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
                 )}
               </button>
             )}
-            {user && user.role !== 'admin' && (
-              <div className="rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 shadow-2xl">
+            {user?.role === 'user' && (
+              <button
+                type="button"
+                onClick={() => navigate('/turista/coleccion#recomendaciones')}
+                className="w-full rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 text-left shadow-2xl transition hover:-translate-y-0.5 hover:bg-white/20 md:w-auto"
+              >
                 <p className="text-xs uppercase tracking-wide text-white font-bold">FAVORITOS</p>
-                <p className="mt-2 text-lg font-bold text-white">3 nuevos sitios</p>
+                <p className="mt-2 text-lg font-bold text-white">
+                  {recommendedCount} {recommendedCount === 1 ? 'nuevo sitio' : 'nuevos sitios'}
+                </p>
                 <p className="text-sm text-white">Listos para explorar</p>
-              </div>
+              </button>
             )}
           </div>
         </section>
@@ -355,14 +408,14 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
                   {/* Flechas navegación */}
                   <button
                     onClick={() => handleEventosChange((eventosIndex - 1 + upcomingEvents.length) % upcomingEvents.length)}
-                    className="absolute -left-6 top-1/2 -translate-y-1/2 rounded-full bg-black/25 px-2 py-1.5 text-xl font-semibold text-white/90 shadow-sm transition hover:bg-black/40"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/25 px-2 py-1.5 text-xl font-semibold text-white/90 shadow-sm transition hover:bg-black/40 md:-left-6"
                     aria-label="Evento anterior"
                   >
                     &lt;
                   </button>
                   <button
                     onClick={() => handleEventosChange((eventosIndex + 1) % upcomingEvents.length)}
-                    className="absolute -right-6 top-1/2 -translate-y-1/2 rounded-full bg-black/25 px-2 py-1.5 text-xl font-semibold text-white/90 shadow-sm transition hover:bg-black/40"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/25 px-2 py-1.5 text-xl font-semibold text-white/90 shadow-sm transition hover:bg-black/40 md:-right-6"
                     aria-label="Siguiente evento"
                   >
                     &gt;

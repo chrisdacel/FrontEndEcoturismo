@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { getAllPlaces } from './services/placesApi';
 import { api, fetchRecommendations } from './services/api';
@@ -27,6 +27,7 @@ L.Icon.Default.mergeOptions({
 
 export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavigatePrivacidad, onNavigateSobreNosotros }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [scrollToTop, setScrollToTop] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState([0, 0, 0]);
@@ -58,12 +59,21 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     loadSites();
   }, [loadSites]);
 
+  useEffect(() => {
+    if (location.hash !== '#recomendaciones') return;
+    const target = document.getElementById('recomendaciones');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [location.hash]);
+
   const handleSearch = async () => {
     setLoading(true);
     await loadSites(searchText);
   };
 
   const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
+  const isAdminOrOperator = user && (user.role === 'admin' || user.role === 'operator');
   const isGuest = !user;
   const shortText = (value, max = 110) => {
     if (!value) return '';
@@ -103,18 +113,28 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   }, [isTourist]);
 
   useEffect(() => {
-    if (!isTourist) return;
+    if (isTourist) {
+      if (recommendations.length > 0) {
+        setRandomRecommendations([]);
+        return;
+      }
 
-    if (recommendations.length > 0) {
+      if (sitiosAPI.length === 0) return;
+
+      const shuffled = [...sitiosAPI].sort(() => Math.random() - 0.5);
+      setRandomRecommendations(shuffled);
+      return;
+    }
+
+    if (!isAdminOrOperator && !isGuest) return;
+    if (sitiosAPI.length === 0) {
       setRandomRecommendations([]);
       return;
     }
 
-    if (sitiosAPI.length === 0) return;
-
     const shuffled = [...sitiosAPI].sort(() => Math.random() - 0.5);
     setRandomRecommendations(shuffled);
-  }, [isTourist, recommendations, sitiosAPI]);
+  }, [isTourist, isAdminOrOperator, isGuest, recommendations, sitiosAPI]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -322,11 +342,11 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const fallbackRecommendations = baseFallback.filter((item) => item?.id && !recommendations.some((rec) => rec.id === item.id));
   const recommendedList = isTourist
     ? [...recommendations, ...fallbackRecommendations].slice(0, 8)
-    : recomendaciones;
+    : ((isAdminOrOperator || isGuest) ? randomRecommendations.slice(0, 8) : recomendaciones);
   const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
 
   return (
-    <div className="min-h-screen coleccion-shell text-slate-900">
+    <div className="min-h-screen coleccion-shell text-slate-900 overflow-x-hidden">
       {/* Scroll to Top Button */}
       {scrollToTop && (
         <button
@@ -416,6 +436,14 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                       }
                     }}
                   >
+                    {user?.role === 'operator' && sitio.user_id === user.id && (
+                      <span className="absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow-sm">
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.6-4.9-2.6-4.9 2.6.9-5.6-4-3.9 5.5-.8L12 3z" />
+                        </svg>
+                        Tu sitio
+                      </span>
+                    )}
                     {isTourist && (
                       <button
                         type="button"
@@ -441,7 +469,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                       />
                     </div>
                     <div className="p-4">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">{sitio.name}</h3>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-2">{shortText(sitio.name, 44)}</h3>
                       {isGuest ? (
                         <>
                           <p className="text-sm text-slate-600 mb-2">{shortText(sitio.description || sitio.slogan, 120)}</p>
@@ -449,8 +477,8 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                         </>
                       ) : (
                         <>
-                          <p className="text-sm text-slate-600 mb-2">{sitio.slogan}</p>
-                          <p className="text-xs text-emerald-600">📍 {sitio.localization.substring(0, 60)}...</p>
+                          <p className="text-sm text-slate-600 mb-2">{shortText(sitio.slogan, 90)}</p>
+                          <p className="text-xs text-emerald-600">📍 {shortText(sitio.localization, 70)}</p>
                         </>
                       )}
                     </div>
@@ -478,7 +506,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
         )}
 
         {/* Sección 3: Recomendaciones (scroll lateral) */}
-        <section className="w-full bg-white py-16 pb-20 px-0 md:px-0">
+        <section id="recomendaciones" className="w-full bg-white py-16 pb-20 px-0 md:px-0">
           <h2 className="mb-8 px-6 md:px-12 text-3xl font-bold">Recomendaciones</h2>
 
           {/* Carril con scroll horizontal y snap */}
@@ -516,11 +544,22 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                     <div className="absolute inset-0 flex flex-col justify-between p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-[26px]">
                       <div className="relative z-10 space-y-1 text-white">
                         <p className="text-white/80 text-xs font-semibold">Recomendado</p>
-                        <h3 className="text-2xl font-bold leading-tight">{rec.nombre || rec.name}</h3>
-                        <p className="text-sm">{rec.slogan || 'Explora este destino increíble'}</p>
+                        <h3 className="text-2xl font-bold leading-tight">{shortText(rec.nombre || rec.name, 38)}</h3>
+                        <p className="text-sm">{shortText(rec.slogan || 'Explora este destino increíble', 84)}</p>
                       </div>
                       <div className="relative z-10 flex items-center justify-between">
-                        <div className="rounded-full bg-white/20 text-white text-xs px-3 py-1 backdrop-blur">Más destinos</div>
+                        <div className="flex flex-wrap gap-2">
+                          {(Array.isArray(rec.label) && rec.label.length > 0 ? rec.label : [{ id: 'none', name: 'Sin etiquetas' }])
+                            .slice(0, 3)
+                            .map((label, idx) => (
+                              <span
+                                key={label.id ?? `${rec.id}-label-${idx}`}
+                                className="rounded-full bg-white/20 text-white text-xs px-3 py-1 backdrop-blur"
+                              >
+                                {label.name || 'Etiqueta'}
+                              </span>
+                            ))}
+                        </div>
                         <button className="grid place-items-center h-8 w-8 rounded-full bg-black/40 text-white backdrop-blur hover:bg-black/60 transition">+</button>
                       </div>
                     </div>

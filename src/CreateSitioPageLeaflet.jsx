@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createPlace, getPlaceById } from './services/placesApi';
 import { updatePlace, fetchPreferencesOptions } from './services/api';
+import { useAuth } from './context/AuthContext';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -25,6 +26,7 @@ L.Icon.Default.mergeOptions({
 export default function CreateSitioPageLeaflet() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user } = useAuth();
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const mapContainerRef = useRef(null);
@@ -35,6 +37,8 @@ export default function CreateSitioPageLeaflet() {
   const isEdit = Boolean(id);
   const [preferencesOptions, setPreferencesOptions] = useState([]);
   const [selectedPreferences, setSelectedPreferences] = useState([]);
+  const isOperatorOrAdmin = user?.role === 'operator' || user?.role === 'admin';
+  const eventBasePath = user?.role === 'admin' ? '/admin' : '/operador';
   const daysOfWeek = [
     { key: 'lunes', label: 'Lunes' },
     { key: 'martes', label: 'Martes' },
@@ -44,6 +48,45 @@ export default function CreateSitioPageLeaflet() {
     { key: 'sabado', label: 'Sabado' },
     { key: 'domingo', label: 'Domingo' },
   ];
+  const defaultOpenDays = {
+    lunes: true,
+    martes: true,
+    miercoles: true,
+    jueves: true,
+    viernes: true,
+    sabado: true,
+    domingo: true,
+  };
+  const fieldLimits = {
+    nombre: { min: 5, max: 80 },
+    slogan: { min: 5, max: 120 },
+    descripcion: { min: 30, max: 1000 },
+    localizacion: { min: 10, max: 500 },
+    clima: { min: 20, max: 600 },
+    caracteristicas: { min: 20, max: 600 },
+    flora: { min: 20, max: 600 },
+    infraestructura: { min: 20, max: 600 },
+    recomendacion: { min: 20, max: 600 },
+    contacto: { min: 0, max: 200, optional: true },
+  };
+
+  const getCounterClass = (length, min, max, optional = false) => {
+    if (optional && length === 0) return 'text-slate-500';
+    if (length > max) return 'text-red-600';
+    if (length < min) return 'text-amber-600';
+    return 'text-slate-500';
+  };
+
+  const renderCounter = (value, limits) => {
+    const length = value ? value.length : 0;
+    const { min, max, optional } = limits;
+    const helper = optional ? 'opcional' : `minimo ${min}`;
+    return (
+      <div className={`text-xs font-medium ${getCounterClass(length, min, max, optional)}`}>
+        {length}/{max} caracteres ({helper})
+      </div>
+    );
+  };
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -59,20 +102,8 @@ export default function CreateSitioPageLeaflet() {
     recomendacion: '',
     contacto: '',
     estado_apertura: 'open',
-    event_title: '',
-    event_description: '',
-    event_datetime: '',
   });
-  const [openDays, setOpenDays] = useState({
-    lunes: true,
-    martes: true,
-    miercoles: true,
-    jueves: true,
-    viernes: true,
-    sabado: true,
-    domingo: true,
-  });
-  const [showEventFields, setShowEventFields] = useState(false);
+  const [openDays, setOpenDays] = useState(defaultOpenDays);
 
   const [images, setImages] = useState({
     portada: null,
@@ -89,68 +120,8 @@ export default function CreateSitioPageLeaflet() {
     flora_img: null,
     infraestructura_img: null,
   });
-  const [eventImage, setEventImage] = useState(null);
-  const [eventImagePreview, setEventImagePreview] = useState(null);
 
-  // Load existing place data in edit mode
-  useEffect(() => {
-    async function loadExisting() {
-      if (!isEdit) return;
-      try {
-        const data = await getPlaceById(id);
-        const p = data.place || data; // support both shapes
-        const eventData = data.event || null;
-        const eventDatetime = eventData?.starts_at ? new Date(eventData.starts_at).toISOString().slice(0, 16) : '';
-        const labels = Array.isArray(p.label) ? p.label : (Array.isArray(p.labels) ? p.labels : []);
-        setFormData({
-          nombre: p.name || '',
-          slogan: p.slogan || '',
-          descripcion: p.description || '',
-          localizacion: p.localization || '',
-          lat: p.lat ? String(p.lat) : '',
-          lng: p.lng ? String(p.lng) : '',
-          clima: p.Weather || '',
-          caracteristicas: p.features || '',
-          flora: p.flora || '',
-          infraestructura: p.estructure || '',
-          recomendacion: p.tips || '',
-          contacto: p.contact_info || '',
-          estado_apertura: p.opening_status || 'open',
-          event_title: eventData?.title || '',
-          event_description: eventData?.description || '',
-          event_datetime: eventDatetime,
-        });
-        if (eventData?.title || eventData?.description || eventDatetime) {
-          setShowEventFields(true);
-        }
-        const resolvedOpenDays = typeof p.open_days === 'object' && p.open_days !== null ? p.open_days : {};
-        setOpenDays((prev) => ({
-          ...prev,
-          ...resolvedOpenDays,
-        }));
-        setSelectedPreferences(labels.map((label) => label.id).filter(Boolean));
-        // Existing image previews (constructed from storage paths)
-        const base = 'http://localhost:8000/api/files/';
-        setImagePreviews({
-          portada: p.cover ? base + p.cover : null,
-          clima_img: p.Weather_img ? base + p.Weather_img : null,
-          caracteristicas_img: p.features_img ? base + p.features_img : null,
-          flora_img: p.flora_img ? base + p.flora_img : null,
-          infraestructura_img: p.estructure_img ? base + p.estructure_img : null,
-        });
-        if (eventData?.image) {
-          setEventImagePreview(base + eventData.image);
-        }
-        if (mapRef.current && markerRef.current && p.lat && p.lng) {
-          markerRef.current.setLatLng([parseFloat(p.lat), parseFloat(p.lng)]);
-          mapRef.current.setView([parseFloat(p.lat), parseFloat(p.lng)], 13);
-        }
-      } catch (e) {
-        setError(e.message || 'No se pudo cargar el sitio');
-      }
-    }
-    loadExisting();
-  }, [isEdit, id]);
+  const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
 
   useEffect(() => {
     async function loadPreferences() {
@@ -163,6 +134,73 @@ export default function CreateSitioPageLeaflet() {
     }
     loadPreferences();
   }, []);
+
+  useEffect(() => {
+    if (!isEdit) return;
+
+    let isMounted = true;
+    const loadPlace = async () => {
+      try {
+        const data = await getPlaceById(id);
+        const place = data?.place || data;
+        if (!isMounted || !place) return;
+
+        setFormData({
+          nombre: place.name ?? '',
+          slogan: place.slogan ?? '',
+          descripcion: place.description ?? '',
+          localizacion: place.localization ?? '',
+          lat: place.lat?.toString() ?? '',
+          lng: place.lng?.toString() ?? '',
+          clima: place.Weather ?? '',
+          caracteristicas: place.features ?? '',
+          flora: place.flora ?? '',
+          infraestructura: place.estructure ?? '',
+          recomendacion: place.tips ?? '',
+          contacto: place.contact_info ?? '',
+          estado_apertura: place.opening_status ?? 'open',
+        });
+
+        const labels = Array.isArray(place.label)
+          ? place.label
+          : Array.isArray(place.labels)
+            ? place.labels
+            : [];
+        const labelIds = labels
+          .map((label) => (typeof label === 'number' ? label : label?.id))
+          .filter(Boolean);
+        setSelectedPreferences(labelIds);
+
+        const placeOpenDays = (place.open_days && typeof place.open_days === 'object') ? place.open_days : {};
+        setOpenDays({ ...defaultOpenDays, ...placeOpenDays });
+
+        setImagePreviews({
+          portada: storageUrl(place.cover),
+          clima_img: storageUrl(place.Weather_img),
+          caracteristicas_img: storageUrl(place.features_img),
+          flora_img: storageUrl(place.flora_img),
+          infraestructura_img: storageUrl(place.estructure_img),
+        });
+      } catch (err) {
+        setError(err.message || 'Error cargando sitio');
+      }
+    };
+
+    loadPlace();
+    return () => {
+      isMounted = false;
+    };
+  }, [id, isEdit]);
+
+  useEffect(() => {
+    const lat = parseFloat(formData.lat);
+    const lng = parseFloat(formData.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    if (mapRef.current && markerRef.current) {
+      markerRef.current.setLatLng([lat, lng]);
+      mapRef.current.setView([lat, lng], 13);
+    }
+  }, [formData.lat, formData.lng]);
 
   // Inicializar mapa de Leaflet
   useEffect(() => {
@@ -229,18 +267,6 @@ export default function CreateSitioPageLeaflet() {
     }
   };
 
-  const handleEventImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setEventImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setEventImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const togglePreference = (prefId) => {
     setSelectedPreferences((prev) => {
       if (prev.includes(prefId)) {
@@ -290,8 +316,7 @@ export default function CreateSitioPageLeaflet() {
           images.clima_img,
           images.caracteristicas_img,
           images.flora_img,
-          images.infraestructura_img,
-          eventImage
+          images.infraestructura_img
         );
       } else {
         const formDataToSend = new FormData();
@@ -307,10 +332,6 @@ export default function CreateSitioPageLeaflet() {
             formDataToSend.append(key, images[key]);
           }
         });
-        if (eventImage) {
-          formDataToSend.append('event_image', eventImage);
-        }
-        
         // Debug: Mostrar datos que se envían
         console.log('=== Datos del formulario ===');
         for (let [key, value] of formDataToSend.entries()) {
@@ -321,13 +342,21 @@ export default function CreateSitioPageLeaflet() {
           }
         }
         
-        await createPlace(formDataToSend);
+        const response = await createPlace(formDataToSend);
+        const createdId = response?.place?.id || response?.id;
+        if (createdId) {
+          setTimeout(() => {
+            navigate(`${eventBasePath}/sitio/${createdId}`);
+          }, 1200);
+        }
       }
 
       setSuccess(true);
-      setTimeout(() => {
-        navigate(isEdit ? `/admin/sitio/${id}` : '/coleccion');
-      }, 1500);
+      if (isEdit) {
+        setTimeout(() => {
+          navigate(`${eventBasePath}/sitio/${id}`);
+        }, 1200);
+      }
     } catch (err) {
       console.error('Error completo:', err);
       setError(err.message || 'Error creando sitio');
@@ -338,7 +367,7 @@ export default function CreateSitioPageLeaflet() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       <section className="relative pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -402,9 +431,12 @@ export default function CreateSitioPageLeaflet() {
                     value={formData.nombre}
                     onChange={handleChange}
                     required
+                    minLength={fieldLimits.nombre.min}
+                    maxLength={fieldLimits.nombre.max}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     placeholder="Ej: Reserva natural parque la Nona"
                   />
+                  {renderCounter(formData.nombre, fieldLimits.nombre)}
                 </div>
 
                 <div className="md:col-span-2">
@@ -417,9 +449,12 @@ export default function CreateSitioPageLeaflet() {
                     value={formData.slogan}
                     onChange={handleChange}
                     required
+                    minLength={fieldLimits.slogan.min}
+                    maxLength={fieldLimits.slogan.max}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     placeholder="Ej: ¡Conéctate con la naturaleza!"
                   />
+                  {renderCounter(formData.slogan, fieldLimits.slogan)}
                 </div>
 
                 <div className="md:col-span-2">
@@ -432,9 +467,12 @@ export default function CreateSitioPageLeaflet() {
                     onChange={handleChange}
                     required
                     rows={4}
+                    minLength={fieldLimits.descripcion.min}
+                    maxLength={fieldLimits.descripcion.max}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     placeholder="Describe el sitio turístico..."
                   />
+                  {renderCounter(formData.descripcion, fieldLimits.descripcion)}
                 </div>
 
                 <div className="md:col-span-2">
@@ -502,9 +540,12 @@ export default function CreateSitioPageLeaflet() {
                     onChange={handleChange}
                     required
                     rows={3}
+                    minLength={fieldLimits.localizacion.min}
+                    maxLength={fieldLimits.localizacion.max}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     placeholder="Ej: Se encuentra en el municipio de Marsella, a 7 km del casco urbano..."
                   />
+                  {renderCounter(formData.localizacion, fieldLimits.localizacion)}
                 </div>
 
                 <div>
@@ -542,9 +583,12 @@ export default function CreateSitioPageLeaflet() {
                     onChange={handleChange}
                     required
                     rows={3}
+                    minLength={fieldLimits.clima.min}
+                    maxLength={fieldLimits.clima.max}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     placeholder="Ej: Clima templado y húmedo, con temperaturas entre 17°C y 26°C..."
                   />
+                  {renderCounter(formData.clima, fieldLimits.clima)}
                 </div>
 
                 <div>
@@ -582,9 +626,12 @@ export default function CreateSitioPageLeaflet() {
                     onChange={handleChange}
                     required
                     rows={3}
+                    minLength={fieldLimits.caracteristicas.min}
+                    maxLength={fieldLimits.caracteristicas.max}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     placeholder="Ej: Senderos ecológicos, zonas de descanso, miradores..."
                   />
+                  {renderCounter(formData.caracteristicas, fieldLimits.caracteristicas)}
                 </div>
 
                 <div>
@@ -622,9 +669,12 @@ export default function CreateSitioPageLeaflet() {
                     onChange={handleChange}
                     required
                     rows={3}
+                    minLength={fieldLimits.flora.min}
+                    maxLength={fieldLimits.flora.max}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     placeholder="Ej: Diversidad de especies nativas, aves endémicas..."
                   />
+                  {renderCounter(formData.flora, fieldLimits.flora)}
                 </div>
 
                 <div>
@@ -662,9 +712,12 @@ export default function CreateSitioPageLeaflet() {
                     onChange={handleChange}
                     required
                     rows={3}
+                    minLength={fieldLimits.infraestructura.min}
+                    maxLength={fieldLimits.infraestructura.max}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     placeholder="Ej: Cabañas, zonas de camping, restaurante..."
                   />
+                  {renderCounter(formData.infraestructura, fieldLimits.infraestructura)}
                 </div>
 
                 <div>
@@ -701,9 +754,12 @@ export default function CreateSitioPageLeaflet() {
                   onChange={handleChange}
                   required
                   rows={3}
+                  minLength={fieldLimits.recomendacion.min}
+                  maxLength={fieldLimits.recomendacion.max}
                   className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="Ej: Llevar ropa impermeable, calzado adecuado..."
                 />
+                {renderCounter(formData.recomendacion, fieldLimits.recomendacion)}
               </div>
             </div>
 
@@ -719,9 +775,11 @@ export default function CreateSitioPageLeaflet() {
                     value={formData.contacto}
                     onChange={handleChange}
                     rows={3}
+                    maxLength={fieldLimits.contacto.max}
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     placeholder="Ej: +57 312 000 0000, contacto@ejemplo.com"
                   />
+                  {renderCounter(formData.contacto, fieldLimits.contacto)}
                 </div>
 
                 <div>
@@ -756,82 +814,6 @@ export default function CreateSitioPageLeaflet() {
                   </select>
                 </div>
               </div>
-            </div>
-
-            {/* Evento (opcional) */}
-            <div>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-2xl font-semibold text-slate-900">Evento (opcional)</h2>
-                  <p className="text-sm text-slate-600">Agrega un evento para este sitio sin que sea obligatorio.</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowEventFields((prev) => !prev)}
-                  className="inline-flex items-center gap-2 rounded-full border border-emerald-200 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
-                >
-                  {showEventFields ? 'Ocultar evento' : 'Agregar evento'}
-                  <span className={`text-base transition ${showEventFields ? 'rotate-180' : ''}`} aria-hidden>
-                    ▼
-                  </span>
-                </button>
-              </div>
-              {showEventFields && (
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Nombre del evento
-                    </label>
-                    <input
-                      type="text"
-                      name="event_title"
-                      value={formData.event_title}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
-                      placeholder="Ej: Avistamiento en Ucumarí"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Descripción del evento
-                    </label>
-                    <textarea
-                      name="event_description"
-                      value={formData.event_description}
-                      onChange={handleChange}
-                      rows={3}
-                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
-                      placeholder="Detalles breves del evento"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Fecha y hora
-                    </label>
-                    <input
-                      type="datetime-local"
-                      name="event_datetime"
-                      value={formData.event_datetime}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Imagen del evento (opcional)
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleEventImageChange}
-                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
-                    />
-                    {eventImagePreview && (
-                      <img src={eventImagePreview} alt="Evento" className="mt-2 h-32 w-auto rounded-lg object-cover" />
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Botones */}

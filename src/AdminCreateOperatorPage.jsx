@@ -37,8 +37,28 @@ export default function AdminCreateOperatorPage() {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres');
+    if (formData.password.length < 8 || formData.password.length > 64) {
+      setError('La contraseña debe tener entre 8 y 64 caracteres');
+      return;
+    }
+
+    if (!/[A-Z]/.test(formData.password)) {
+      setError('La contraseña debe incluir al menos una letra mayúscula');
+      return;
+    }
+
+    if (!/[a-z]/.test(formData.password)) {
+      setError('La contraseña debe incluir al menos una letra minúscula');
+      return;
+    }
+
+    if (!/[0-9]/.test(formData.password)) {
+      setError('La contraseña debe incluir al menos un dígito');
+      return;
+    }
+
+    if (!/^[A-Za-z0-9@?#$%()_=*\\:;'.\/\+<>¿,\[\]]+$/.test(formData.password)) {
+      setError('La contraseña contiene caracteres no permitidos');
       return;
     }
 
@@ -66,7 +86,7 @@ export default function AdminCreateOperatorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       <section className="relative pt-24 pb-16 px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
@@ -185,8 +205,9 @@ export default function AdminCreateOperatorPage() {
                   onChange={handleChange}
                   required
                   minLength={8}
+                  maxLength={64}
                   className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
-                  placeholder="Mínimo 8 caracteres"
+                  placeholder="8-64 caracteres"
                 />
               </div>
 
@@ -201,6 +222,8 @@ export default function AdminCreateOperatorPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
+                  minLength={8}
+                  maxLength={64}
                   className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="Repite la contraseña"
                 />

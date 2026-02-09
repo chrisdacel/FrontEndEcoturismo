@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { initializeCsrfToken, resetPassword } from './services/api';
+import Alert from './components/Alert';
 
 export default function ResetPasswordPage({ onNavigateLogin }) {
   const [searchParams] = useSearchParams();
@@ -13,10 +14,33 @@ export default function ResetPasswordPage({ onNavigateLogin }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   useEffect(() => {
     initializeCsrfToken();
   }, []);
+
+  const getPasswordError = (pwd) => {
+    if (!pwd) {
+      return '';
+    }
+    if (pwd.length < 8 || pwd.length > 64) {
+      return 'La contraseña debe tener entre 8 y 64 caracteres';
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      return 'La contraseña debe incluir al menos una letra mayúscula';
+    }
+    if (!/[a-z]/.test(pwd)) {
+      return 'La contraseña debe incluir al menos una letra minúscula';
+    }
+    if (!/[0-9]/.test(pwd)) {
+      return 'La contraseña debe incluir al menos un dígito';
+    }
+    if (!/^[A-Za-z0-9@?#$%()_=*\\:;'.\/\+<>¿,\[\]]+$/.test(pwd)) {
+      return 'La contraseña contiene caracteres no permitidos';
+    }
+    return '';
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,8 +51,9 @@ export default function ResetPasswordPage({ onNavigateLogin }) {
       setError('Falta el token de recuperación. Usa el enlace del correo.');
       return;
     }
-    if (password.length < 8) {
-      setError('La contraseña debe tener mínimo 8 caracteres');
+    const pwdError = getPasswordError(password);
+    if (pwdError) {
+      setError(pwdError);
       return;
     }
     if (password !== password2) {
@@ -51,7 +76,7 @@ export default function ResetPasswordPage({ onNavigateLogin }) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white">
+    <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white overflow-x-hidden">
       <div className="mx-auto flex min-h-screen max-w-7xl items-center px-6 py-12 md:px-10">
         <div className="hidden flex-1 md:flex md:flex-col md:pr-10">
           <span className="text-emerald-300/80 text-xs tracking-[0.4em]">ECOTURISMO</span>
@@ -69,14 +94,14 @@ export default function ResetPasswordPage({ onNavigateLogin }) {
             </div>
 
             {error && (
-              <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-100">
+              <Alert type="error" className="mb-4">
                 {error}
-              </div>
+              </Alert>
             )}
             {success && (
-              <div className="mb-4 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">
+              <Alert type="success" className="mb-4">
                 {success}
-              </div>
+              </Alert>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -97,12 +122,30 @@ export default function ResetPasswordPage({ onNavigateLogin }) {
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    const nextValue = e.target.value;
+                    setPassword(nextValue);
+                    setPasswordError(getPasswordError(nextValue));
+                  }}
                   required
                   minLength={8}
+                  maxLength={64}
                   className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
-                  placeholder="Mínimo 8 caracteres"
+                  placeholder="8-64 caracteres"
                 />
+                {passwordError && (
+                  <p className="mt-1 text-xs text-red-300">{passwordError}</p>
+                )}
+                <div className="mt-2 text-xs text-emerald-100/80">
+                  <p className="mb-1">Tu contraseña debe incluir:</p>
+                  <ul className="list-inside list-disc space-y-1">
+                    <li>Entre 8 y 64 caracteres</li>
+                    <li>Al menos una letra mayúscula</li>
+                    <li>Al menos una letra minúscula</li>
+                    <li>Al menos un dígito</li>
+                    <li>Solo símbolos permitidos: @ ? # $ % ( ) _ = * \ : ; ' . / + &lt; &gt; &amp; ¿ , [ ]</li>
+                  </ul>
+                </div>
               </div>
 
               <div>
@@ -113,6 +156,7 @@ export default function ResetPasswordPage({ onNavigateLogin }) {
                   onChange={(e) => setPassword2(e.target.value)}
                   required
                   minLength={8}
+                  maxLength={64}
                   className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
                   placeholder="Repite tu contraseña"
                 />

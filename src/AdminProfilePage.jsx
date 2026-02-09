@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProfile, updateProfile, uploadAvatar, deleteAvatar, deleteAccount, changePassword } from './services/api';
 import { useAuth } from './context/AuthContext';
+import Alert from './components/Alert';
+import ConfirmDialog from './components/ConfirmDialog';
 
 export default function AdminProfilePage() {
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ export default function AdminProfilePage() {
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [deleteError, setDeleteError] = useState('');
   const [passwords, setPasswords] = useState({ current_password: '', password: '', password_confirmation: '' });
+  const [confirmState, setConfirmState] = useState({ open: false });
 
   useEffect(() => {
     load();
@@ -102,18 +105,27 @@ export default function AdminProfilePage() {
 
   const handleDeleteAccount = async (e) => {
     e.preventDefault();
-    if (!confirm('¿Eliminar tu cuenta? Esta acción no se puede deshacer.')) return;
-    try {
-      setDeletingAccount(true);
-      setDeleteError('');
-      await deleteAccount(deletePassword);
-      setUser(null);
-      navigate('/login');
-    } catch (err) {
-      setDeleteError(err.message || 'No se pudo eliminar la cuenta');
-    } finally {
-      setDeletingAccount(false);
-    }
+    setConfirmState({
+      open: true,
+      title: 'Eliminar cuenta',
+      message: '¿Eliminar tu cuenta? Esta accion no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+      onConfirm: async () => {
+        try {
+          setDeletingAccount(true);
+          setDeleteError('');
+          await deleteAccount(deletePassword);
+          setUser(null);
+          navigate('/login');
+        } catch (err) {
+          setDeleteError(err.message || 'No se pudo eliminar la cuenta');
+        } finally {
+          setDeletingAccount(false);
+          setConfirmState({ open: false });
+        }
+      },
+    });
   };
 
   const handlePasswordChange = async (e) => {
@@ -150,7 +162,7 @@ export default function AdminProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 px-4">
+    <div className="min-h-screen bg-white text-slate-900 px-4 overflow-x-hidden">
       <div className="max-w-4xl mx-auto pt-24 pb-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Perfil</h1>
@@ -158,15 +170,15 @@ export default function AdminProfilePage() {
         </div>
 
         {error && (
-          <div className="mb-4 rounded-xl bg-red-100 p-4 ring-1 ring-red-300 text-red-700">
+          <Alert type="error" className="mb-4">
             {error}
-          </div>
+          </Alert>
         )}
 
         {success && (
-          <div className="mb-4 rounded-lg bg-emerald-100 p-4 ring-1 ring-emerald-300 text-emerald-700">
+          <Alert type="success" className="mb-4">
             {success}
-          </div>
+          </Alert>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -258,14 +270,14 @@ export default function AdminProfilePage() {
             {showPasswordForm ? 'Ocultar formulario' : 'Cambiar contraseña'}
           </button>
           {passwordError && (
-            <div className="mt-4 rounded-lg bg-rose-100 p-3 text-sm text-rose-700 ring-1 ring-rose-200">
+            <Alert type="error" className="mt-4">
               {passwordError}
-            </div>
+            </Alert>
           )}
           {passwordSuccess && (
-            <div className="mt-4 rounded-lg bg-emerald-100 p-3 text-sm text-emerald-700 ring-1 ring-emerald-200">
+            <Alert type="success" className="mt-4">
               {passwordSuccess}
-            </div>
+            </Alert>
           )}
           {showPasswordForm && (
             <form onSubmit={handlePasswordChange} className="mt-4 grid gap-3 md:grid-cols-3">
@@ -323,9 +335,9 @@ export default function AdminProfilePage() {
             {showDeleteForm ? 'Ocultar formulario' : 'Eliminar cuenta'}
           </button>
           {deleteError && (
-            <div className="mt-4 rounded-lg bg-rose-100 p-3 text-sm text-rose-700 ring-1 ring-rose-200">
+            <Alert type="error" className="mt-4">
               {deleteError}
-            </div>
+            </Alert>
           )}
           {showDeleteForm && (
             <form onSubmit={handleDeleteAccount} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -350,6 +362,15 @@ export default function AdminProfilePage() {
           )}
         </section>
       </div>
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        tone={confirmState.tone}
+        onClose={() => setConfirmState({ open: false })}
+        onConfirm={confirmState.onConfirm}
+      />
     </div>
   );
 }

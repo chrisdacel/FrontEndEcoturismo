@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchUserHistory, fetchUserReviews } from './services/api';
+import Alert from './components/Alert';
 
 export default function HistorialPage() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function HistorialPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       <div className="mx-auto max-w-6xl px-4 md:px-6 py-10">
         <button
           onClick={() => navigate(-1)}
@@ -48,9 +49,9 @@ export default function HistorialPage() {
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <Alert type="error" className="mb-4">
             {error}
-          </div>
+          </Alert>
         )}
 
         {loading ? (
@@ -59,7 +60,28 @@ export default function HistorialPage() {
           <>
             <div className="mb-10">
               <h2 className="text-xl font-semibold text-slate-900 mb-3">Sitios visitados recientemente</h2>
-              <div className="overflow-x-auto bg-white border-b border-slate-200">
+              <div className="md:hidden space-y-3">
+                {history.map((item) => {
+                  const placeName = item.place?.name || item.place_name || '—';
+                  const placeLocalization = item.place?.localization || item.place_localization || '—';
+                  const key = item.id || `${item.place_id || placeName}-${item.visited_at || ''}`;
+                  return (
+                    <div key={key} className="rounded-xl border border-slate-200 bg-white p-4">
+                      <p className="text-sm font-semibold text-slate-900">{placeName}</p>
+                      <p className="mt-1 text-xs text-slate-600">{placeLocalization}</p>
+                      <p className="mt-2 text-xs text-slate-500">
+                        Ultima visita: {item.visited_at ? new Date(item.visited_at).toLocaleString() : '—'}
+                      </p>
+                    </div>
+                  );
+                })}
+                {history.length === 0 && (
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 text-center text-sm text-slate-600">
+                    No hay visitas recientes
+                  </div>
+                )}
+              </div>
+              <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200">
                 <table className="min-w-full text-sm">
                   <thead className="bg-white">
                     <tr>
@@ -100,7 +122,26 @@ export default function HistorialPage() {
 
             <div>
               <h2 className="text-xl font-semibold text-slate-900 mb-3">Comentarios realizados</h2>
-              <div className="overflow-x-auto bg-white border-b border-slate-200">
+              <div className="md:hidden space-y-3">
+                {reviews.map((rev) => (
+                  <div key={rev.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                    <p className="text-sm font-semibold text-slate-900">{rev.place?.name || '—'}</p>
+                    <p className="mt-1 text-xs text-slate-600">Calificacion: {rev.rating} / 5</p>
+                    <p className="mt-2 text-xs text-slate-700">
+                      {rev.is_restricted ? '[ Contenido restringido ]' : rev.comment}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {rev.created_at ? new Date(rev.created_at).toLocaleString() : '—'}
+                    </p>
+                  </div>
+                ))}
+                {reviews.length === 0 && (
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 text-center text-sm text-slate-600">
+                    No hay comentarios recientes
+                  </div>
+                )}
+              </div>
+              <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200">
                 <table className="min-w-full text-sm">
                   <thead className="bg-white">
                     <tr>

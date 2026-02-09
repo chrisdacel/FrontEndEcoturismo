@@ -4,6 +4,8 @@ import { useAuth } from './context/AuthContext';
 import { api } from './services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import Alert from './components/Alert';
+import ConfirmDialog from './components/ConfirmDialog';
 
 export default function FavoritosPage() {
   const { user } = useAuth();
@@ -13,6 +15,7 @@ export default function FavoritosPage() {
   const [favoritos, setFavoritos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [confirmState, setConfirmState] = useState({ open: false });
 
   useEffect(() => {
     loadFavorites();
@@ -43,13 +46,24 @@ export default function FavoritosPage() {
   };
 
   const handleRemoveFavorite = async (id) => {
-    if (!confirm('¿Eliminar este sitio de favoritos?')) return;
-    try {
-      await api.delete(`/api/places/${id}/favorite`);
-      setFavoritos((prev) => prev.filter((fav) => fav.id !== id));
-    } catch (err) {
-      setError(err.message || 'Error eliminando favorito');
-    }
+    setConfirmState({
+      open: true,
+      title: 'Eliminar favorito',
+      message: '¿Eliminar este sitio de favoritos?',
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/api/places/${id}/favorite`);
+          setFavoritos((prev) => prev.filter((fav) => fav.id !== id));
+          setError(null);
+        } catch (err) {
+          setError(err.message || 'Error eliminando favorito');
+        } finally {
+          setConfirmState({ open: false });
+        }
+      },
+    });
   };
 
   const handleNavigateToSite = (id) => {
@@ -73,6 +87,11 @@ export default function FavoritosPage() {
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
+                    {error && (
+                      <Alert type="error" className="mb-6 max-w-2xl mx-auto">
+                        {error}
+                      </Alert>
+                    )}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
               Mis Favoritos
@@ -259,6 +278,15 @@ export default function FavoritosPage() {
           </svg>
         </button>
       )}
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        tone={confirmState.tone}
+        onClose={() => setConfirmState({ open: false })}
+        onConfirm={confirmState.onConfirm}
+      />
     </div>
   );
 }

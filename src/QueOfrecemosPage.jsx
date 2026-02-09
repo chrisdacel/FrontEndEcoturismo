@@ -28,7 +28,7 @@ function QueOfrecemosPage({ onNavigateRegister }) {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       <main className="pt-24 pb-16">
         <div className="mx-auto max-w-6xl px-6 md:px-10">
           <div className="mb-16 flex flex-col gap-4 text-left">

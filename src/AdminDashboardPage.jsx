@@ -54,11 +54,11 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
             <div>
               <h1 className="text-4xl font-bold text-slate-900 mb-2">
                 Panel de Administración
@@ -112,9 +112,9 @@ export default function AdminDashboardPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <span className="text-3xl font-bold text-slate-900">{stats?.pending_operators || 0}</span>
+                <span className="text-3xl font-bold text-slate-900">{stats?.pending_approvals || 0}</span>
               </div>
-              <h3 className="text-sm font-medium text-slate-600">Pendientes</h3>
+              <h3 className="text-sm font-medium text-slate-600">Pendientes (sitios y eventos)</h3>
             </div>
           </div>
 
@@ -187,7 +187,7 @@ export default function AdminDashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">Aprobar Operadores</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">Gestionar aprobaciones</h3>
               <p className="text-sm text-slate-600">Revisar solicitudes pendientes</p>
             </button>
 

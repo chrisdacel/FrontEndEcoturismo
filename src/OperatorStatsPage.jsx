@@ -1,12 +1,91 @@
+import { useEffect, useState } from 'react';
 import { useAuth } from './context/AuthContext';
+import { fetchOperatorStats } from './services/api';
+import Alert from './components/Alert';
 
-export default function OperatorStatsPage() {
+function OperatorStatsPage() {
   const { user } = useAuth();
-  const stats = user?.operator_stats || {};
+  const [stats, setStats] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const recentComments = stats.recent_comments || [];
+  const formatDate = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('es-CO', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  };
+
+  useEffect(() => {
+    let active = true;
+    const loadStats = async () => {
+      if (!user || user.role !== 'operator') {
+        if (active) {
+          setStats({});
+          setLoading(false);
+        }
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const data = await fetchOperatorStats();
+        if (active) {
+          setStats(data || {});
+          setError('');
+        }
+      } catch (err) {
+        if (active) {
+          setError(err?.message || 'Error cargando estadisticas');
+          setStats({});
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    loadStats();
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-emerald-400/30 border-t-emerald-400"></div>
+          <p className="text-sm text-slate-600">Cargando estadisticas...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-4">
+        <div className="w-full max-w-md">
+          <Alert type="error" className="mb-4">
+            {error}
+          </Alert>
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded-full bg-emerald-500 px-6 py-2 text-white hover:bg-emerald-600"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       <section className="relative pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
@@ -62,13 +141,20 @@ export default function OperatorStatsPage() {
           <div className="bg-white rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-slate-900">Comentarios recientes</h3>
-              <span className="text-xs text-slate-400">Ultimos 3</span>
+              <span className="text-xs text-slate-400">Ultimos 6</span>
             </div>
             <div className="space-y-3 text-sm text-slate-700">
               {recentComments.length > 0 ? (
-                recentComments.slice(0, 3).map((comment, index) => (
+                recentComments.map((comment, index) => (
                   <div key={`comment-${index}`} className="rounded-lg bg-slate-50 p-3">
-                    {comment}
+                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                      {comment.place_name || 'Sitio'}
+                    </p>
+                    <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                      <span className="font-semibold text-slate-700">{comment.user_name || 'Usuario'}</span>
+                      <span>{formatDate(comment.created_at)}</span>
+                    </div>
+                    <p className="mt-2 text-sm text-slate-700">{comment.comment || ''}</p>
                   </div>
                 ))
               ) : (
@@ -81,3 +167,5 @@ export default function OperatorStatsPage() {
     </div>
   );
 }
+
+export default OperatorStatsPage;

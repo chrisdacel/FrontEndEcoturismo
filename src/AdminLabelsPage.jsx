@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createAdminPreference, deleteAdminPreference, getAdminPreferences, updateAdminPreference } from './services/adminApi';
+import Alert from './components/Alert';
+import ConfirmDialog from './components/ConfirmDialog';
 
 const defaultForm = { name: '', color: '' };
 
 export default function AdminLabelsPage() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -11,6 +15,7 @@ export default function AdminLabelsPage() {
   const [labels, setLabels] = useState([]);
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
+  const [confirmState, setConfirmState] = useState({ open: false });
 
   const load = async () => {
     try {
@@ -84,29 +89,53 @@ export default function AdminLabelsPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('¿Eliminar esta etiqueta?')) return;
-    try {
-      await deleteAdminPreference(id);
-      setLabels((prev) => prev.filter((item) => item.id !== id));
-    } catch (err) {
-      setError(err?.message || 'Error eliminando etiqueta');
-    }
+    setConfirmState({
+      open: true,
+      title: 'Eliminar etiqueta',
+      message: '¿Eliminar esta etiqueta? Esta accion no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      tone: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteAdminPreference(id);
+          setLabels((prev) => prev.filter((item) => item.id !== id));
+          setError('');
+        } catch (err) {
+          setError(err?.message || 'Error eliminando etiqueta');
+        } finally {
+          setConfirmState({ open: false });
+        }
+      },
+    });
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       <section className="relative pt-24 pb-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition mb-4"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Volver
+            </button>
             <h1 className="text-3xl font-bold">Gestionar etiquetas</h1>
             <p className="text-slate-600">Crea, edita o elimina etiquetas para clasificar los sitios.</p>
           </div>
 
           {error && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+            <Alert type="error" className="mb-4">
+              {error}
+            </Alert>
           )}
           {success && (
-            <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</div>
+            <Alert type="success" className="mb-4">
+              {success}
+            </Alert>
           )}
 
           <form onSubmit={handleSubmit} className="mb-8 rounded-lg border border-emerald-100 bg-white p-6 shadow-sm">
@@ -128,7 +157,7 @@ export default function AdminLabelsPage() {
                     type="color"
                     value={normalizeColor(form.color || '#10b981')}
                     onChange={(e) => setForm((prev) => ({ ...prev, color: e.target.value.replace('#', '') }))}
-                    className="h-10 w-12 rounded border border-emerald-200"
+                    className="color-circle h-10 w-10 rounded-full border border-emerald-200"
                     aria-label="Seleccionar color"
                   />
                   <input
@@ -164,20 +193,20 @@ export default function AdminLabelsPage() {
           {loading ? (
             <div className="text-sm text-slate-600">Cargando etiquetas...</div>
           ) : (
-            <div className="overflow-x-auto rounded-lg border border-slate-200">
+            <div className="overflow-x-auto bg-white border-b border-slate-200">
               <table className="min-w-full text-sm">
-                <thead className="bg-slate-50">
+                <thead className="bg-white">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Nombre</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Color</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-slate-600">Acciones</th>
+                    <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Nombre</th>
+                    <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Color</th>
+                    <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {labels.map((label) => (
-                    <tr key={label.id}>
-                      <td className="px-4 py-3 text-slate-800">{label.name}</td>
-                      <td className="px-4 py-3">
+                    <tr key={label.id} className="hover:bg-slate-50">
+                      <td className="px-6 py-4 text-slate-800">{label.name}</td>
+                      <td className="px-6 py-4">
                         <span className="inline-flex items-center gap-2">
                           <span
                             className="h-3 w-3 rounded-full"
@@ -186,7 +215,7 @@ export default function AdminLabelsPage() {
                           <span className="text-slate-600">#{label.color}</span>
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-6 py-4">
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleEdit(label)}
@@ -206,7 +235,7 @@ export default function AdminLabelsPage() {
                   ))}
                   {labels.length === 0 && (
                     <tr>
-                      <td colSpan="3" className="px-4 py-6 text-center text-slate-600">No hay etiquetas registradas.</td>
+                      <td colSpan="3" className="px-6 py-6 text-center text-slate-600">No hay etiquetas registradas.</td>
                     </tr>
                   )}
                 </tbody>
@@ -215,6 +244,15 @@ export default function AdminLabelsPage() {
           )}
         </div>
       </section>
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        tone={confirmState.tone}
+        onClose={() => setConfirmState({ open: false })}
+        onConfirm={confirmState.onConfirm}
+      />
     </div>
   );
 }
