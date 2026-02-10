@@ -578,10 +578,27 @@ export default function SitioDetailPage({
     return (
       <div className="min-h-screen bg-white grid place-items-center p-6">
         <div className="max-w-md text-center">
-          <Alert type="error" title="No se pudo cargar el sitio" className="mb-4 text-left">
-            {error}
-          </Alert>
-          <button onClick={() => navigate('/coleccion')} className="rounded-full bg-emerald-600 px-6 py-3 text-white">Volver a Colección</button>
+          <div className="rounded-2xl border border-green-200 bg-green-50/80 p-6 flex items-center gap-4 mb-8">
+            <div className="flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="#bbf7d0" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01" />
+              </svg>
+            </div>
+            <div>
+              <div className="font-semibold text-green-800 text-lg mb-1">El sitio no está disponible en este momento.</div>
+              <div className="text-green-700 text-sm">Es posible que haya sido eliminado o ya no sea visible.</div>
+              <button
+                onClick={() => navigate('/coleccion')}
+                className="mt-3 inline-flex items-center gap-2 rounded-full bg-green-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+                Explorar colección
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );

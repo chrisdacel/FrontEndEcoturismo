@@ -217,7 +217,7 @@ export async function archiveAllNotifications() {
 // Evento publico (turista)
 export async function fetchPublicEvent(eventId) {
   try {
-    const { data } = await api.get(`/api/events/${eventId}/public`);
+    const { data } = await api.get(`/api/events/${eventId}`);
     return data;
   } catch (error) {
     throw error.response?.data || { message: 'No se pudo cargar el evento' };
