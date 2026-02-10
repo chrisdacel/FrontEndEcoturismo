@@ -9,6 +9,7 @@ export default function HistorialPage() {
   const [history, setHistory] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState({});
 
   useEffect(() => {
     const load = async () => {
@@ -123,18 +124,42 @@ export default function HistorialPage() {
             <div>
               <h2 className="text-xl font-semibold text-slate-900 mb-3">Comentarios realizados</h2>
               <div className="md:hidden space-y-3">
-                {reviews.map((rev) => (
-                  <div key={rev.id} className="rounded-xl border border-slate-200 bg-white p-4">
-                    <p className="text-sm font-semibold text-slate-900">{rev.place?.name || '—'}</p>
-                    <p className="mt-1 text-xs text-slate-600">Calificacion: {rev.rating} / 5</p>
-                    <p className="mt-2 text-xs text-slate-700">
-                      {rev.is_restricted ? '[ Contenido restringido ]' : rev.comment}
-                    </p>
-                    <p className="mt-2 text-xs text-slate-500">
-                      {rev.created_at ? new Date(rev.created_at).toLocaleString() : '—'}
-                    </p>
-                  </div>
-                ))}
+                {reviews.map((rev) => {
+                  const isLong = rev.comment && rev.comment.length > 40;
+                  const showFull = expanded[rev.id];
+                  return (
+                    <div key={rev.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                      <p className="text-sm font-semibold text-slate-900">{rev.place?.name || '—'}</p>
+                      <p className="mt-1 text-xs text-slate-600">
+                        Calificación: {Array.from({length: 5}, (_, i) => (
+                          <span key={i} style={{color: i < rev.rating ? '#FFD700' : '#E5E7EB'}}>&#9733;</span>
+                        ))}
+                      </p>
+                      <p className="mt-2 text-xs text-slate-700">
+                        {rev.is_restricted
+                          ? '[ Contenido restringido ]'
+                          : isLong && !showFull
+                            ? rev.comment.slice(0, 40) + '...'
+                            : rev.comment}
+                        {isLong && !showFull && (
+                          <button
+                            className="ml-2 text-emerald-600 hover:underline text-xs"
+                            onClick={() => setExpanded((prev) => ({ ...prev, [rev.id]: true }))}
+                          >Ver más</button>
+                        )}
+                        {isLong && showFull && (
+                          <button
+                            className="ml-2 text-emerald-600 hover:underline text-xs"
+                            onClick={() => setExpanded((prev) => ({ ...prev, [rev.id]: false }))}
+                          >Ver menos</button>
+                        )}
+                      </p>
+                      <p className="mt-2 text-xs text-slate-500">
+                        {rev.created_at ? new Date(rev.created_at).toLocaleString() : '—'}
+                      </p>
+                    </div>
+                  );
+                })}
                 {reviews.length === 0 && (
                   <div className="rounded-xl border border-slate-200 bg-white p-4 text-center text-sm text-slate-600">
                     No hay comentarios recientes
@@ -156,8 +181,36 @@ export default function HistorialPage() {
                       <tr key={rev.id} className="hover:bg-slate-50">
                         <td className="px-4 py-3 text-slate-800">{rev.place?.name || '—'}</td>
                         <td className="px-4 py-3 text-slate-700">{rev.rating} / 5</td>
+                                                <td className="px-4 py-3 text-slate-700">
+                                                  {Array.from({length: 5}, (_, i) => (
+                                                    <span key={i} style={{color: i < rev.rating ? '#FFD700' : '#E5E7EB'}}>&#9733;</span>
+                                                  ))}
+                                                </td>
                         <td className="px-4 py-3 text-slate-700 max-w-xs break-words">
-                          {rev.is_restricted ? '[ Contenido restringido ]' : rev.comment}
+                          {(() => {
+                            const isLong = rev.comment && rev.comment.length > 40;
+                            const showFull = expanded[rev.id];
+                            if (rev.is_restricted) return '[ Contenido restringido ]';
+                            if (isLong && !showFull) return (
+                              <>
+                                {rev.comment.slice(0, 40) + '...'}
+                                <button
+                                  className="ml-2 text-emerald-600 hover:underline text-xs"
+                                  onClick={() => setExpanded((prev) => ({ ...prev, [rev.id]: true }))}
+                                >Ver más</button>
+                              </>
+                            );
+                            if (isLong && showFull) return (
+                              <>
+                                {rev.comment}
+                                <button
+                                  className="ml-2 text-emerald-600 hover:underline text-xs"
+                                  onClick={() => setExpanded((prev) => ({ ...prev, [rev.id]: false }))}
+                                >Ver menos</button>
+                              </>
+                            );
+                            return rev.comment;
+                          })()}
                         </td>
                         <td className="px-4 py-3 text-slate-600 text-xs">
                           {rev.created_at ? new Date(rev.created_at).toLocaleString() : '—'}

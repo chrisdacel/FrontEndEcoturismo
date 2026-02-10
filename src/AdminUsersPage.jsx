@@ -88,6 +88,8 @@ export default function AdminUsersPage() {
   };
 
   const handleReactivate = async (id) => {
+    const userObj = users.find(u => u.id === id);
+    const originalEmail = userObj?.original_email || userObj?.email;
     setConfirmState({
       open: true,
       title: 'Reactivar usuario',
@@ -97,9 +99,10 @@ export default function AdminUsersPage() {
       onConfirm: async () => {
         try {
           setBusyId(id);
-          const { user } = await updateUser(id, { status: 'active' });
-          setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'active', email: user.email } : u));
+          const { user } = await updateUser(id, { status: 'active', email: originalEmail });
+          setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'active', email: user.original_email || user.email } : u));
           setError('');
+          setConfirmState({ open: false });
         } catch (err) {
           // Si el error es por conflicto de email, mostrar opción de asignar correo temporal
           if (err?.response?.data?.error?.includes('correo original ya está en uso')) {
@@ -115,22 +118,21 @@ export default function AdminUsersPage() {
                   const { user } = await updateUser(id, { status: 'active', email: `${Date.now()}-reactivated-${Math.random().toString(36).slice(2)}@temporal.local` });
                   setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'active', email: user.email } : u));
                   setError('');
+                  setConfirmState({ open: false });
                 } catch (err2) {
                   setError(err2.message || 'No se pudo reactivar con correo temporal');
+                  setConfirmState({ open: false });
                 } finally {
                   setBusyId(null);
-                  setConfirmState({ open: false });
                 }
               },
             });
           } else {
             setError(err.message || 'No se pudo reactivar');
+            setConfirmState({ open: false });
           }
         } finally {
           setBusyId(null);
-          if (!err?.response?.data?.error?.includes('correo original ya está en uso')) {
-            setConfirmState({ open: false });
-          }
         }
       },
     });

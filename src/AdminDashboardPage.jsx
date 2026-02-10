@@ -178,21 +178,22 @@ export default function AdminDashboardPage() {
             </button>
 
             <button
-              onClick={() => navigate('/admin/operators')}
-              className="group bg-white rounded-lg p-6 hover:ring-emerald-200 transition text-left"
+              onClick={() => navigate('/admin/events')}
+              className="group bg-white rounded-lg p-6 hover:ring-amber-200 transition text-left"
             >
               <div className="flex items-center justify-between mb-4">
-                <div className="rounded-full bg-yellow-50 p-3 group-hover:bg-yellow-100 transition">
-                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div className="rounded-full bg-amber-50 p-3 group-hover:bg-amber-100 transition">
+                  <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M4 11h16M5 21h14a2 2 0 002-2v-8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15l2 2 4-4" />
                   </svg>
                 </div>
-                <svg className="w-5 h-5 text-yellow-600 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-amber-600 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">Gestionar aprobaciones</h3>
-              <p className="text-sm text-slate-600">Revisar solicitudes pendientes</p>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">Gestionar eventos</h3>
+              <p className="text-sm text-slate-600">Ver, aprobar y administrar eventos turísticos</p>
             </button>
 
             <button

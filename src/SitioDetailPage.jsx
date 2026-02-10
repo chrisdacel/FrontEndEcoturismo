@@ -124,6 +124,8 @@ export default function SitioDetailPage({
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const eventSectionRef = useRef(null);
+  // Para múltiples eventos: refs por id
+  const eventRefs = useRef({});
   const filterMenuRef = useRef(null);
   const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
   const isOperator = user?.role === 'operator';
@@ -209,10 +211,24 @@ export default function SitioDetailPage({
     markNotificationRead(notificationId).catch(() => {});
   }, [location.search]);
 
+  // Scroll automático robusto a la sección de evento
   useEffect(() => {
-    if (location.hash !== '#evento') return;
-    if (!eventSectionRef.current) return;
-    eventSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!location.hash.startsWith('#evento')) return;
+    const match = location.hash.match(/^#evento(?:-(\d+))?$/);
+    if (!match) return;
+    const eventId = match[1];
+    let attempts = 0;
+    function tryScroll() {
+      attempts++;
+      if (eventId && eventRefs.current[eventId]) {
+        eventRefs.current[eventId].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (!eventId && eventSectionRef.current) {
+        eventSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (attempts < 10) {
+        setTimeout(tryScroll, 200);
+      }
+    }
+    tryScroll();
   }, [location.hash, eventData]);
 
   // Inicializar mapa cuando sitio esté cargado
@@ -585,10 +601,10 @@ export default function SitioDetailPage({
           style={{ backgroundImage: `url('${storageUrl(sitio.cover)}')` }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
-          {isOperatorOwner && (
+          {(isOperatorOwner || isAdmin) && (
             <button
               type="button"
-              onClick={() => navigate(`/operador/sitio/${id}/editar`)}
+              onClick={() => navigate(`${isAdmin ? `/admin/sitio/${id}/editar` : `/operador/sitio/${id}/editar`}`)}
               className="absolute top-5 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-emerald-700 shadow-lg shadow-emerald-500/10 transition hover:bg-white"
             >
               Editar
@@ -867,7 +883,14 @@ export default function SitioDetailPage({
         )}
 
         {eventData && (
-          <section id="evento" ref={eventSectionRef} className="bg-white px-6 pb-16">
+          <section
+            id={`evento-${eventData.id}`}
+            ref={el => {
+              eventSectionRef.current = el;
+              if (eventData.id) eventRefs.current[eventData.id] = el;
+            }}
+            className="bg-white px-6 pb-16"
+          >
             <div className="mx-auto max-w-5xl">
               <div className="rounded-3xl border border-emerald-100 bg-emerald-50/40 p-8 shadow-sm">
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">

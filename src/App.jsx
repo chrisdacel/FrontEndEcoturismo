@@ -1,4 +1,5 @@
-﻿import { useEffect } from 'react';
+﻿import AdminEventsPage from './AdminEventsPage';
+import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import HomePage from './HomePage';
@@ -51,6 +52,10 @@ function AppRoutes() {
   const navigate = useNavigate();
   return (
     <Routes>
+      <Route
+        path="/admin/events"
+        element={<AdminEventsPage />}
+      />
       <Route
         path="/"
         element={

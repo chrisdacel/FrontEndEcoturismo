@@ -110,6 +110,14 @@ export async function rejectOperator(id) {
 }
 
 // ============ PLACES MANAGEMENT ============
+export async function updateAdminPlace(id, payload) {
+  try {
+    const { data } = await api.put(`/api/admin/places/${id}`, payload);
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error actualizando sitio' };
+  }
+}
 export async function getAdminPlaces() {
   try {
     const { data } = await api.get('/api/admin/places');

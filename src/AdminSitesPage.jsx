@@ -90,27 +90,27 @@ export default function AdminSitesPage() {
     });
   };
 
-  const updatePlaceApproval = async (id, status) => {
+  const updatePlaceApproval = async (id, approval_status) => {
     try {
       setApprovalBusyId(id);
-      await api.post(`/api/admin/places/${id}/approval`, { status });
+      await api.put(`/api/admin/places/${id}`, { approval_status });
       setPlaces((prev) => prev.map((p) => (
-        p.id === id ? { ...p, approval_status: status } : p
+        p.id === id ? { ...p, approval_status } : p
       )));
       setError('');
     } catch (err) {
-      setError(err?.message || 'Error actualizando la aprobacion');
+      setError(err?.message || 'Error actualizando la aprobación');
     } finally {
       setApprovalBusyId(null);
     }
   };
 
-  const updatePlaceStatus = async (id, status) => {
+  const updatePlaceStatus = async (id, opening_status) => {
     try {
       setStatusBusyId(id);
-      await api.post(`/api/admin/places/${id}/opening-status`, { status });
+      await api.put(`/api/admin/places/${id}`, { opening_status });
       setPlaces((prev) => prev.map((p) => (
-        p.id === id ? { ...p, opening_status: status } : p
+        p.id === id ? { ...p, opening_status } : p
       )));
       setError('');
     } catch (err) {

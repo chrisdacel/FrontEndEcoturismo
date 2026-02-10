@@ -709,8 +709,7 @@ export async function getOperatorReviews() {
 
 export async function restrictReviewAsOperator(reviewId, reason = null) {
   try {
-    const payload = reason ? { reason } : {};
-    const { data } = await api.post(`/api/operator/reviews/${reviewId}/restrict`, payload);
+    const { data } = await api.post(`/api/operator/reviews/${reviewId}/restrict`, {});
     return data;
   } catch (error) {
     throw error.response?.data || { message: 'Error restringiendo reseña' };
