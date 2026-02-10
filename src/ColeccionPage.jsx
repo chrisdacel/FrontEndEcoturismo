@@ -422,10 +422,11 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
               ) : null
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 md:px-12">
-                {sitiosAPI.map((sitio) => (
+                {sitiosAPI.map((sitio, index) => (
                   <article
                     key={sitio.id}
-                    className="group cursor-pointer rounded-lg border border-emerald-100 bg-white shadow-sm shadow-emerald-100/50 overflow-hidden hover:shadow-lg transition relative"
+                    className="group cursor-pointer rounded-lg border border-emerald-100 bg-white shadow-sm shadow-emerald-100/50 overflow-hidden hover:shadow-lg transition relative stagger-item"
+                    style={{ '--stagger-delay': `${Math.min(index, 12) * 40}ms` }}
                     onClick={() => {
                       if (user?.role === 'admin') {
                         navigate(`/admin/sitio/${sitio.id}`);
@@ -517,10 +518,11 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
               ) : recommendedList.length === 0 ? (
                 <div className="text-sm text-slate-600">No hay recomendaciones disponibles.</div>
               ) : (
-                recommendedList.map((rec) => (
+                recommendedList.map((rec, index) => (
                   <article
                     key={rec.id}
-                    className="group relative shrink-0 snap-start w-[260px] sm:w-[300px] md:w-[340px] aspect-[9/16] rounded-[26px] overflow-hidden shadow-xl cursor-pointer"
+                    className="group relative shrink-0 snap-start w-[260px] sm:w-[300px] md:w-[340px] aspect-[9/16] rounded-[26px] overflow-hidden shadow-xl cursor-pointer stagger-item"
+                    style={{ '--stagger-delay': `${Math.min(index, 10) * 50}ms` }}
                     onClick={() => {
                       if (user?.role === 'admin') {
                         navigate(`/admin/sitio/${rec.id}`);

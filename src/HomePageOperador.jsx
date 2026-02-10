@@ -132,7 +132,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
       {/* Main Content */}
       <main className="mt-16">
         {/* Hero Section */}
-        <section className="relative h-screen bg-cover bg-center" style={{ backgroundImage: "url('/images/Pagina_inicio/ecoturismo.jpg')" }}>
+        <section className="hero-viewport relative bg-cover bg-center" style={{ backgroundImage: "url('/images/Pagina_inicio/ecoturismo.jpg')" }}>
           <div className="absolute inset-0 bg-black/40"></div>
           <div className="relative flex h-full flex-col items-start justify-center px-8 text-white md:px-20">
             <h1 className="mb-4 text-4xl font-bold md:text-6xl">Descubre los mejores</h1>

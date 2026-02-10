@@ -41,9 +41,10 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    const root = document.documentElement;
+    root.style.overflow = mobileOpen ? 'hidden' : '';
     return () => {
-      document.body.style.overflow = '';
+      root.style.overflow = '';
     };
   }, [mobileOpen]);
 

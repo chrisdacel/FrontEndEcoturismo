@@ -109,13 +109,6 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
 
   useEffect(() => {
     let active = true;
-    if (!user) {
-      setUpcomingEvents([]);
-      setEventCardIndex(0);
-      setRecommendedCount(0);
-      return undefined;
-    }
-
     const loadNextEvent = async () => {
       try {
         setLoadingNextEvent(true);

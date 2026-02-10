@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllUsers, deleteUser, updateUser } from './services/adminApi';
+import { getAllUsers, updateUser } from './services/adminApi';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
 
@@ -13,7 +13,7 @@ export default function AdminUsersPage() {
   const [filterRole, setFilterRole] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [busyId, setBusyId] = useState(null);
-  const [roleChanges, setRoleChanges] = useState({});
+  const [roleBusyId, setRoleBusyId] = useState(null);
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
   const [roleRowMenuOpen, setRoleRowMenuOpen] = useState(null);
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
@@ -57,28 +57,28 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleFilter = () => {
+  const handleFilter = (nextRole = filterRole, nextStatus = filterStatus) => {
     const params = {};
-    if (filterRole) params.role = filterRole;
-    if (filterStatus) params.status = filterStatus;
+    if (nextRole) params.role = nextRole;
+    if (nextStatus) params.status = nextStatus;
     loadUsers(params);
   };
 
-  const handleDelete = async (id) => {
+  const handleDeactivate = async (id) => {
     setConfirmState({
       open: true,
-      title: 'Eliminar usuario',
-      message: '¿Eliminar este usuario? Esta accion no se puede deshacer.',
-      confirmLabel: 'Eliminar',
+      title: 'Desactivar usuario',
+      message: '¿Desea desactivar este usuario? El usuario no podrá iniciar sesión y su correo podrá ser reutilizado.',
+      confirmLabel: 'Desactivar',
       tone: 'danger',
       onConfirm: async () => {
         try {
           setBusyId(id);
-          await deleteUser(id);
-          setUsers((prev) => prev.filter((u) => u.id !== id));
+          const { user } = await updateUser(id, { status: 'inactive', email: `${Date.now()}-deactivated-${Math.random().toString(36).slice(2)}@deactivated.local` });
+          setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'inactive', email: user.email } : u));
           setError('');
         } catch (err) {
-          setError(err.message || 'No se pudo eliminar');
+          setError(err.message || 'No se pudo desactivar');
         } finally {
           setBusyId(null);
           setConfirmState({ open: false });
@@ -87,22 +87,68 @@ export default function AdminUsersPage() {
     });
   };
 
-  const handleRoleChange = (id, role) => {
-    setRoleChanges((prev) => ({ ...prev, [id]: role }));
+  const handleReactivate = async (id) => {
+    setConfirmState({
+      open: true,
+      title: 'Reactivar usuario',
+      message: '¿Desea reactivar este usuario? El usuario podrá volver a iniciar sesión.',
+      confirmLabel: 'Reactivar',
+      tone: 'success',
+      onConfirm: async () => {
+        try {
+          setBusyId(id);
+          const { user } = await updateUser(id, { status: 'active' });
+          setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'active', email: user.email } : u));
+          setError('');
+        } catch (err) {
+          // Si el error es por conflicto de email, mostrar opción de asignar correo temporal
+          if (err?.response?.data?.error?.includes('correo original ya está en uso')) {
+            setConfirmState({
+              open: true,
+              title: 'Correo en uso',
+              message: 'El correo original ya está en uso por otro usuario. ¿Desea reactivar asignando un correo temporal?',
+              confirmLabel: 'Asignar temporal',
+              tone: 'warning',
+              onConfirm: async () => {
+                try {
+                  setBusyId(id);
+                  const { user } = await updateUser(id, { status: 'active', email: `${Date.now()}-reactivated-${Math.random().toString(36).slice(2)}@temporal.local` });
+                  setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'active', email: user.email } : u));
+                  setError('');
+                } catch (err2) {
+                  setError(err2.message || 'No se pudo reactivar con correo temporal');
+                } finally {
+                  setBusyId(null);
+                  setConfirmState({ open: false });
+                }
+              },
+            });
+          } else {
+            setError(err.message || 'No se pudo reactivar');
+          }
+        } finally {
+          setBusyId(null);
+          if (!err?.response?.data?.error?.includes('correo original ya está en uso')) {
+            setConfirmState({ open: false });
+          }
+        }
+      },
+    });
   };
 
-  const saveRole = async (id) => {
-    const newRole = roleChanges[id];
-    if (!newRole) return;
+  const updateUserRole = async (id, role) => {
+    const previousUsers = users;
+    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role } : u)));
     try {
-      setBusyId(id);
-      const { user } = await updateUser(id, { role: newRole });
-      setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role: user?.role || newRole } : u)));
+      setRoleBusyId(id);
+      const { user } = await updateUser(id, { role });
+      setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role: user?.role || role } : u)));
       setError('');
     } catch (err) {
+      setUsers(previousUsers);
       setError(err.message || 'No se pudo actualizar el rol');
     } finally {
-      setBusyId(null);
+      setRoleBusyId(null);
     }
   };
 
@@ -221,6 +267,7 @@ export default function AdminUsersPage() {
                       onClick={() => {
                         setFilterRole(option.value);
                         setRoleMenuOpen(false);
+                        handleFilter(option.value, filterStatus);
                       }}
                       className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
                     >
@@ -255,6 +302,7 @@ export default function AdminUsersPage() {
                       onClick={() => {
                         setFilterStatus(option.value);
                         setStatusMenuOpen(false);
+                        handleFilter(filterRole, option.value);
                       }}
                       className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
                     >
@@ -264,14 +312,7 @@ export default function AdminUsersPage() {
                 </div>
               )}
             </div>
-            <div className="flex items-end">
-              <button
-                onClick={handleFilter}
-                className="inline-flex items-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-600"
-              >
-                Filtrar
-              </button>
-            </div>
+            <div className="hidden md:block" />
           </div>
         </div>
 
@@ -282,18 +323,19 @@ export default function AdminUsersPage() {
               <p className="mt-1 text-xs text-slate-600">{u.email}</p>
               <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-600">
                 <span>Estado: {statusLabels[u.status] || 'Activo'}</span>
-                <span>Rol: {roleLabels[roleChanges[u.id] ?? u.role ?? 'user'] || 'Turista'}</span>
+                <span>Rol: {roleLabels[u.role ?? 'user'] || 'Turista'}</span>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <div className="relative" data-role-menu-id={u.id}>
+                <div className="relative" data-role-menu-id={`mobile-role-${u.id}`}>
                   <button
                     type="button"
-                    onClick={() => setRoleRowMenuOpen((prev) => (prev === u.id ? null : u.id))}
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
+                    onClick={() => setRoleRowMenuOpen((prev) => (prev === `mobile-role-${u.id}` ? null : `mobile-role-${u.id}`))}
+                    disabled={roleBusyId === u.id}
+                    className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50 disabled:opacity-60"
                   >
-                    <span>{roleLabels[roleChanges[u.id] ?? u.role ?? 'user'] || 'Turista'}</span>
+                    <span>{roleLabels[u.role ?? 'user'] || 'Turista'}</span>
                     <svg
-                      className={`h-3.5 w-3.5 transition-transform duration-200 ${roleRowMenuOpen === u.id ? 'rotate-180' : ''}`}
+                      className={`h-3.5 w-3.5 transition-transform duration-200 ${roleRowMenuOpen === `mobile-role-${u.id}` ? 'rotate-180' : ''}`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -301,7 +343,7 @@ export default function AdminUsersPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
-                  {roleRowMenuOpen === u.id && (
+                  {roleRowMenuOpen === `mobile-role-${u.id}` && (
                     <div className="absolute left-0 mt-2 w-40 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
                       {roleOptions
                         .filter((option) => option.value)
@@ -310,9 +352,10 @@ export default function AdminUsersPage() {
                             key={option.value}
                             type="button"
                             onClick={() => {
-                              handleRoleChange(u.id, option.value);
+                              updateUserRole(u.id, option.value);
                               setRoleRowMenuOpen(null);
                             }}
+                            disabled={roleBusyId === u.id}
                             className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
                           >
                             {option.label}
@@ -321,19 +364,26 @@ export default function AdminUsersPage() {
                     </div>
                   )}
                 </div>
-                <button
-                  onClick={() => saveRole(u.id)}
-                  disabled={!roleChanges[u.id] || busyId === u.id}
-                  className="rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
-                >
-                  Guardar
-                </button>
-                <button
-                  onClick={() => handleDelete(u.id)}
-                  className="rounded-full bg-rose-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-600"
-                >
-                  Eliminar
-                </button>
+                {roleBusyId === u.id && (
+                  <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-emerald-300 border-t-emerald-600" />
+                )}
+                {u.status === 'inactive' ? (
+                  <button
+                    onClick={() => handleReactivate(u.id)}
+                    disabled={busyId === u.id}
+                    className="rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
+                  >
+                    Reactivar
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleDeactivate(u.id)}
+                    disabled={busyId === u.id}
+                    className="rounded-full bg-rose-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-600 disabled:opacity-60"
+                  >
+                    Desactivar
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -359,24 +409,25 @@ export default function AdminUsersPage() {
               {filteredUsers.map((u) => (
                 <tr key={u.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 text-sm text-slate-900">{u.name} {u.last_name || ''}</td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{u.email}</td>
+                  <td className="px-4 py-3 text-sm text-slate-600">{u.status === 'inactive' ? '[email inactivo]' : u.email}</td>
                   <td className="px-4 py-3 text-sm text-slate-700">
-                    {statusLabels[u.status] || 'Activo'}
+                    {u.status === 'inactive' ? 'Inactivo' : (statusLabels[u.status] || 'Activo')}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-2">
-                      <div className="relative" data-role-menu-id={u.id}>
+                      <div className="relative" data-role-menu-id={`table-role-${u.id}`}> 
                         <button
                           type="button"
                           onClick={() =>
-                            setRoleRowMenuOpen((prev) => (prev === u.id ? null : u.id))
+                            setRoleRowMenuOpen((prev) => (prev === `table-role-${u.id}` ? null : `table-role-${u.id}`))
                           }
-                          className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
+                          disabled={roleBusyId === u.id || u.status === 'inactive'}
+                          className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50 disabled:opacity-60"
                         >
-                          <span>{roleLabels[roleChanges[u.id] ?? u.role ?? 'user'] || 'Turista'}</span>
+                          <span>{roleLabels[u.role ?? 'user'] || 'Turista'}</span>
                           <svg
                             className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                              roleRowMenuOpen === u.id ? 'rotate-180' : ''
+                              roleRowMenuOpen === `table-role-${u.id}` ? 'rotate-180' : ''
                             }`}
                             fill="none"
                             stroke="currentColor"
@@ -385,7 +436,7 @@ export default function AdminUsersPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </button>
-                        {roleRowMenuOpen === u.id && (
+                        {roleRowMenuOpen === `table-role-${u.id}` && u.status !== 'inactive' && (
                           <div className="absolute left-0 mt-2 w-40 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
                             {roleOptions
                               .filter((option) => option.value)
@@ -394,9 +445,10 @@ export default function AdminUsersPage() {
                                   key={option.value}
                                   type="button"
                                   onClick={() => {
-                                    handleRoleChange(u.id, option.value);
+                                    updateUserRole(u.id, option.value);
                                     setRoleRowMenuOpen(null);
                                   }}
+                                  disabled={roleBusyId === u.id}
                                   className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
                                 >
                                   {option.label}
@@ -405,23 +457,29 @@ export default function AdminUsersPage() {
                           </div>
                         )}
                       </div>
-                      <button
-                        onClick={() => saveRole(u.id)}
-                        disabled={busyId === u.id || (roleChanges[u.id] ?? u.role) === u.role}
-                        className="inline-flex items-center rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-emerald-600 disabled:opacity-50"
-                      >
-                        Guardar
-                      </button>
+                      {roleBusyId === u.id && (
+                        <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-emerald-300 border-t-emerald-600" />
+                      )}
                     </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-right">
-                    <button
-                      onClick={() => handleDelete(u.id)}
-                      disabled={busyId === u.id}
-                      className="inline-flex items-center gap-1 rounded-full bg-red-500/80 px-3 py-1 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-60"
-                    >
-                      {busyId === u.id ? 'Eliminando...' : 'Eliminar'}
-                    </button>
+                    {u.status === 'inactive' ? (
+                      <button
+                        onClick={() => handleReactivate(u.id)}
+                        disabled={busyId === u.id}
+                        className="inline-flex items-center gap-1 rounded-full bg-emerald-500/80 px-3 py-1 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-60"
+                      >
+                        {busyId === u.id ? 'Reactivando...' : 'Reactivar'}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleDeactivate(u.id)}
+                        disabled={busyId === u.id}
+                        className="inline-flex items-center gap-1 rounded-full bg-red-500/80 px-3 py-1 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-60"
+                      >
+                        {busyId === u.id ? 'Desactivando...' : 'Desactivar'}
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

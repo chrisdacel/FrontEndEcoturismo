@@ -12,6 +12,10 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+  height: 100%;
 }
 
 a {
@@ -22,6 +26,8 @@ a {
 body {
   margin: 0;
   overflow-x: hidden;
+  overflow-y: visible;
+  min-height: 100%;
 }
 
 #root {
@@ -38,43 +44,48 @@ body {
 @keyframes pageFadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: scale(0.995);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
   }
 }
 
 .page-enter {
-  animation: pageFadeIn 420ms ease;
+  animation: pageFadeIn 320ms ease;
+}
+
+.hero-viewport {
+  min-height: 100vh;
+  min-height: 100svh;
 }
 
 @keyframes pageTextIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: scale(0.99);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
   }
 }
 
 .page-enter h1,
 .page-enter h2 {
-  animation: pageTextIn 520ms ease both;
+  animation: pageTextIn 360ms ease both;
 }
 
 .page-enter p {
-  animation: pageTextIn 520ms ease both;
-  animation-delay: 40ms;
+  animation: pageTextIn 360ms ease both;
+  animation-delay: 30ms;
 }
 
 @keyframes dropdownIn {
   from {
     opacity: 0;
-    transform: translateY(-6px) scale(0.98);
+    transform: translateY(-4px) scale(0.985);
   }
   to {
     opacity: 1;
@@ -84,24 +95,51 @@ body {
 
 .dropdown-open {
   transform-origin: top right;
-  animation: dropdownIn 180ms ease;
+  animation: dropdownIn 140ms ease;
+}
+
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.stagger-item {
+  opacity: 0;
+  transform: scale(0.985);
+  animation: staggerIn 360ms ease both;
+  animation-delay: var(--stagger-delay, 0ms);
+  will-change: transform, opacity;
 }
 
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 600ms ease, transform 600ms ease;
+  transform: scale(0.99);
+  transition: opacity 420ms ease, transform 420ms ease;
   will-change: opacity, transform;
 }
 
 .scroll-reveal.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: scale(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 
   .page-enter,
@@ -119,6 +157,24 @@ body {
 
   .dropdown-open {
     animation: none;
+  }
+
+  .stagger-item {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+@layer utilities {
+  .transition,
+  .transition-all,
+  .transition-colors,
+  .transition-opacity,
+  .transition-transform,
+  .transition-shadow {
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
   }
 }
 
@@ -155,12 +211,12 @@ body {
   border: 1px solid #d1fae5; /* equivalente a border-emerald-100 */
   background: #ffffff;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  transition: transform 160ms ease, box-shadow 160ms ease;
 }
 
 .coleccion-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
 }
 
 .coleccion-pill-input {
@@ -184,7 +240,7 @@ body {
   overflow: hidden;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.14);
   transform: translateY(0);
-  transition: transform 220ms ease, box-shadow 220ms ease;
+  transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
 .coleccion-reco-card::after {
@@ -193,12 +249,12 @@ body {
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.55) 100%);
   opacity: 0.9;
-  transition: opacity 220ms ease;
+  transition: opacity 180ms ease;
 }
 
 .coleccion-reco-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
+  transform: translateY(-6px);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.14);
 }
 
 .coleccion-reco-card:hover::after {
@@ -224,7 +280,7 @@ body {
 
 .site-filter-select {
   border-radius: 999px;
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
 }
 
 .site-filter-select:focus {

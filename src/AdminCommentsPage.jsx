@@ -9,6 +9,7 @@ export default function AdminCommentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [expandedComments, setExpandedComments] = useState(() => new Set());
+  const [expandedPlaceNames, setExpandedPlaceNames] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
   const [dateMenuOpen, setDateMenuOpen] = useState(false);
@@ -95,6 +96,40 @@ export default function AdminCommentsPage() {
       }
       return next;
     });
+  };
+
+  const shouldTruncateName = (value) => (value || '').length > 39;
+
+  const togglePlaceName = (key) => {
+    setExpandedPlaceNames((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const renderPlaceName = (value, key, spanClass = '') => {
+    const expanded = !!expandedPlaceNames[key];
+    const canToggle = shouldTruncateName(value);
+    return (
+      <div className="flex flex-col gap-1">
+        <span
+          className={`max-w-[260px] ${
+            expanded ? 'whitespace-normal break-words' : 'line-clamp-1'
+          } ${spanClass}`}
+        >
+          {value}
+        </span>
+        {canToggle && (
+          <button
+            type="button"
+            onClick={() => togglePlaceName(key)}
+            className="self-start text-xs font-semibold text-emerald-600 hover:text-emerald-700"
+          >
+            {expanded ? 'Ver menos' : 'Ver mas'}
+          </button>
+        )}
+      </div>
+    );
   };
 
   const getPreviewText = (text, limit = 140) => {
@@ -239,7 +274,7 @@ export default function AdminCommentsPage() {
             <div className="md:hidden space-y-3 mb-4">
               {filteredReviews.map((r) => (
                 <div key={r.id} className="rounded-xl border border-slate-200 bg-white p-4">
-                  <p className="text-sm font-semibold text-slate-900">{r.place?.name || '—'}</p>
+                  {renderPlaceName(r.place?.name || '—', `mobile-place-${r.id}`, 'text-sm font-semibold text-slate-900')}
                   <p className="mt-1 text-xs text-slate-600">{r.user ? (r.user?.name || 'Usuario') : '[usuario no encontrado]'}</p>
                   <div className="mt-2">{renderStars(r.rating)}</div>
                   <div className="mt-2 text-xs text-slate-700">
@@ -308,7 +343,9 @@ export default function AdminCommentsPage() {
               <tbody className="divide-y divide-slate-200">
                 {filteredReviews.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 text-slate-800">{r.place?.name || '—'}</td>
+                    <td className="px-4 py-3 text-slate-800">
+                      {renderPlaceName(r.place?.name || '—', `table-place-${r.id}`, 'text-slate-800')}
+                    </td>
                     <td className="px-4 py-3 text-slate-800">{r.user ? (r.user?.name || 'Usuario') : '[usuario no encontrado]'}</td>
                     <td className="px-4 py-3 text-slate-800">{renderStars(r.rating)}</td>
                     <td className="px-4 py-3 text-slate-700 max-w-xs break-words">

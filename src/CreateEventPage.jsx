@@ -141,15 +141,18 @@ export default function CreateEventPage() {
       return;
     }
 
+    if (!imageFile) {
+      setError('La imagen del evento es obligatoria');
+      return;
+    }
+
     try {
       setSaving(true);
       const payload = new FormData();
       payload.append('title', formData.title);
       payload.append('description', formData.description || '');
       payload.append('starts_at', formData.starts_at);
-      if (imageFile) {
-        payload.append('image', imageFile);
-      }
+      payload.append('image', imageFile);
 
       await api.post(`/api/places/${id}/events`, payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -157,7 +160,7 @@ export default function CreateEventPage() {
 
       setSuccess(true);
       setTimeout(() => {
-        navigate(`${basePath}/sitio/${id}`);
+        navigate(`${basePath}/sitio/${id}#evento`);
       }, 1200);
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || 'Error creando el evento';
@@ -279,12 +282,13 @@ export default function CreateEventPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Imagen del evento (opcional)
+                      Imagen del evento *
                     </label>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleImageChange}
+                      required
                       className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     />
                     {imagePreview && (

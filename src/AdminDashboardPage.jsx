@@ -71,50 +71,54 @@ export default function AdminDashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="bg-white rounded-lg p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <div className="rounded-full bg-blue-100 p-3">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                <div className="rounded-full bg-emerald-100 p-3">
+                  <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 20h14a2 2 0 002-2v-1a4 4 0 00-4-4H7a4 4 0 00-4 4v1a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12a4 4 0 100-8 4 4 0 000 8z" />
                   </svg>
                 </div>
-                <span className="text-3xl font-bold text-slate-900">{stats?.total_users || 0}</span>
+                <span className="text-3xl font-bold text-slate-900">{stats?.active_turistas || 0}</span>
               </div>
-              <h3 className="text-sm font-medium text-slate-600">Total Usuarios</h3>
+              <h3 className="text-sm font-medium text-slate-600">Turistas activos</h3>
             </div>
 
             <div className="bg-white rounded-lg p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <div className="rounded-full bg-green-100 p-3">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <div className="rounded-full bg-indigo-100 p-3">
+                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 6h6M9 10h6M4 6h1m-1 4h1m-1 4h1" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
                   </svg>
                 </div>
-                <span className="text-3xl font-bold text-slate-900">{stats?.total_turistas || 0}</span>
+                <span className="text-3xl font-bold text-slate-900">{stats?.active_operators || 0}</span>
               </div>
-              <h3 className="text-sm font-medium text-slate-600">Turistas</h3>
+              <h3 className="text-sm font-medium text-slate-600">Operadores activos</h3>
             </div>
 
             <div className="bg-white rounded-lg p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <div className="rounded-full bg-purple-100 p-3">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <div className="rounded-full bg-amber-100 p-3">
+                  <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724a1 1 0 01-.553-.894V5a1 1 0 01.553-.894L9 1.382a1 1 0 011 0l5.447 2.724a1 1 0 01.553.894v11.382a1 1 0 01-.553.894L10 20a1 1 0 01-1 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 4l5.447 2.724M9 10l5.447 2.724M9 16l5.447 2.724" />
                   </svg>
                 </div>
-                <span className="text-3xl font-bold text-slate-900">{stats?.total_operators || 0}</span>
+                <span className="text-3xl font-bold text-slate-900">{stats?.active_places || 0}</span>
               </div>
-              <h3 className="text-sm font-medium text-slate-600">Operadores</h3>
+              <h3 className="text-sm font-medium text-slate-600">Sitios activos</h3>
             </div>
 
             <div className="bg-white rounded-lg p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <div className="rounded-full bg-yellow-100 p-3">
-                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div className="rounded-full bg-rose-100 p-3">
+                  <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M4 11h16M5 21h14a2 2 0 002-2v-8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15l2 2 4-4" />
                   </svg>
                 </div>
-                <span className="text-3xl font-bold text-slate-900">{stats?.pending_approvals || 0}</span>
+                <span className="text-3xl font-bold text-slate-900">{stats?.active_events || 0}</span>
               </div>
-              <h3 className="text-sm font-medium text-slate-600">Pendientes (sitios y eventos)</h3>
+              <h3 className="text-sm font-medium text-slate-600">Eventos activos</h3>
             </div>
           </div>
 

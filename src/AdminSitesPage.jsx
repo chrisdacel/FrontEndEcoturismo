@@ -13,10 +13,17 @@ export default function AdminSitesPage() {
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [approvalFilter, setApprovalFilter] = useState('all');
   const [approvalMenuOpen, setApprovalMenuOpen] = useState(false);
+  const [approvalBusyId, setApprovalBusyId] = useState(null);
+  const [approvalEditOpen, setApprovalEditOpen] = useState(null);
+  const [approvalEditDirection, setApprovalEditDirection] = useState('down');
+  const [statusBusyId, setStatusBusyId] = useState(null);
+  const [statusEditOpen, setStatusEditOpen] = useState(null);
+  const [statusEditDirection, setStatusEditDirection] = useState('down');
   const statusMenuRef = useRef(null);
   const approvalMenuRef = useRef(null);
   const navigate = useNavigate();
   const [confirmState, setConfirmState] = useState({ open: false });
+  const [expandedSiteNames, setExpandedSiteNames] = useState({});
 
   const loadPlaces = async () => {
     setLoading(true);
@@ -43,10 +50,22 @@ export default function AdminSitesPage() {
       if (approvalMenuRef.current && !approvalMenuRef.current.contains(event.target)) {
         setApprovalMenuOpen(false);
       }
+      if (approvalEditOpen !== null) {
+        const editMenu = document.querySelector(`[data-approval-edit-id="${approvalEditOpen}"]`);
+        if (editMenu && !editMenu.contains(event.target)) {
+          setApprovalEditOpen(null);
+        }
+      }
+      if (statusEditOpen !== null) {
+        const statusMenu = document.querySelector(`[data-status-edit-id="${statusEditOpen}"]`);
+        if (statusMenu && !statusMenu.contains(event.target)) {
+          setStatusEditOpen(null);
+        }
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [approvalEditOpen, statusEditOpen]);
 
   const goEdit = (id) => navigate(`/admin/sitio/${id}/editar`);
 
@@ -71,6 +90,60 @@ export default function AdminSitesPage() {
     });
   };
 
+  const updatePlaceApproval = async (id, status) => {
+    try {
+      setApprovalBusyId(id);
+      await api.post(`/api/admin/places/${id}/approval`, { status });
+      setPlaces((prev) => prev.map((p) => (
+        p.id === id ? { ...p, approval_status: status } : p
+      )));
+      setError('');
+    } catch (err) {
+      setError(err?.message || 'Error actualizando la aprobacion');
+    } finally {
+      setApprovalBusyId(null);
+    }
+  };
+
+  const updatePlaceStatus = async (id, status) => {
+    try {
+      setStatusBusyId(id);
+      await api.post(`/api/admin/places/${id}/opening-status`, { status });
+      setPlaces((prev) => prev.map((p) => (
+        p.id === id ? { ...p, opening_status: status } : p
+      )));
+      setError('');
+    } catch (err) {
+      setError(err?.message || 'Error actualizando el estado');
+    } finally {
+      setStatusBusyId(null);
+    }
+  };
+
+  const getApprovalButtonClass = (status) => {
+    switch (status) {
+      case 'approved':
+        return 'ring-emerald-200 hover:bg-emerald-50';
+      case 'rejected':
+        return 'ring-rose-200 hover:bg-rose-50';
+      default:
+        return 'ring-amber-200 hover:bg-amber-50';
+    }
+  };
+
+  const getStatusButtonClass = (status) => {
+    switch (status) {
+      case 'closed_temporarily':
+        return 'text-rose-700 ring-rose-200 hover:bg-rose-50';
+      case 'open':
+        return 'text-emerald-700 ring-emerald-200 hover:bg-emerald-50';
+      case 'open_with_restrictions':
+        return 'text-amber-700 ring-amber-200 hover:bg-amber-50';
+      default:
+        return 'text-amber-700 ring-amber-200 hover:bg-amber-50';
+    }
+  };
+
 
   const goDetail = (id) => navigate(`/admin/sitio/${id}`);
 
@@ -92,8 +165,8 @@ export default function AdminSitesPage() {
   const statusOptions = [
     { value: 'all', label: 'Todos los estados' },
     { value: 'open', label: 'Abierto' },
-    { value: 'closed_temporarily', label: 'Cerrado temporalmente' },
     { value: 'open_with_restrictions', label: 'Abierto con restricciones' },
+    { value: 'closed_temporarily', label: 'Cerrado temporalmente' },
   ];
 
   const approvalOptions = [
@@ -102,6 +175,15 @@ export default function AdminSitesPage() {
     { value: 'approved', label: 'Aprobado' },
     { value: 'rejected', label: 'Rechazado' },
   ];
+
+  const shouldTruncate = (value) => (value || '').length > 40;
+
+  const toggleSiteName = (key) => {
+    setExpandedSiteNames((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
 
   const filteredPlaces = places.filter((place) => {
     const name = place?.name || place?.nombre || '';
@@ -249,10 +331,140 @@ export default function AdminSitesPage() {
                         {p.nombre || p.name || '—'}
                       </button>
                       <p className="mt-1 text-xs text-slate-600">{p.user?.email || p.creator_email || '—'}</p>
-                      <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-600">
-                        <span>Estado: {statusLabels[p.opening_status || p.estado_apertura] || '—'}</span>
-                        <span>Aprobacion: {approvalLabels[p.approval_status] || 'Pendiente'}</span>
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-600">
+                        <div className="flex items-center gap-2" data-status-edit-id={`mobile-status-${p.id}`}>
+                          <span>Estado:</span>
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                const rect = event.currentTarget.getBoundingClientRect();
+                                const spaceBelow = window.innerHeight - rect.bottom;
+                                setStatusEditDirection(spaceBelow < 220 ? 'up' : 'down');
+                                setStatusEditOpen((prev) => (prev === `mobile-status-${p.id}` ? null : `mobile-status-${p.id}`));
+                              }}
+                              disabled={statusBusyId === p.id}
+                              className={`inline-flex items-center gap-2 rounded-full bg-white px-2 py-1 text-xs text-slate-700 ring-1 transition disabled:opacity-60 ${getStatusButtonClass(p.opening_status || p.estado_apertura)}`}
+                            >
+                              {statusLabels[p.opening_status || p.estado_apertura] || '—'}
+                              <svg
+                                className={`h-3.5 w-3.5 text-current transition-transform duration-200 ${
+                                  statusEditOpen === `mobile-status-${p.id}` ? 'rotate-180' : ''
+                                }`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                            {statusEditOpen === `mobile-status-${p.id}` && (
+                              <div
+                                className={`absolute right-0 w-52 rounded-xl overflow-visible bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[999] ${
+                                  statusEditDirection === 'up'
+                                    ? 'bottom-full mb-2 origin-bottom-right'
+                                    : 'top-full mt-2 origin-top-right'
+                                }`}
+                              >
+                                {statusOptions.filter((option) => option.value !== 'all').map((option) => (
+                                  <button
+                                    key={option.value}
+                                    type="button"
+                                    onClick={() => {
+                                      updatePlaceStatus(p.id, option.value);
+                                      setStatusEditOpen(null);
+                                    }}
+                                    disabled={statusBusyId === p.id}
+                                    className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500 disabled:opacity-60"
+                                  >
+                                    {option.label}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          {statusBusyId === p.id && (
+                            <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-emerald-300 border-t-emerald-600" />
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span>Aprobacion:</span>
+                          <div className="relative" data-approval-edit-id={`mobile-${p.id}`}>
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                const rect = event.currentTarget.getBoundingClientRect();
+                                const spaceBelow = window.innerHeight - rect.bottom;
+                                setApprovalEditDirection(spaceBelow < 220 ? 'up' : 'down');
+                                setApprovalEditOpen((prev) => (prev === `mobile-${p.id}` ? null : `mobile-${p.id}`));
+                              }}
+                              disabled={approvalBusyId === p.id}
+                              className={`inline-flex items-center gap-2 rounded-full bg-white px-2 py-1 text-xs text-slate-700 ring-1 transition disabled:opacity-60 ${getApprovalButtonClass(p.approval_status || 'pending')}`}
+                            >
+                              {approvalLabels[p.approval_status] || 'Pendiente'}
+                              <svg
+                                className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                                  approvalEditOpen === `mobile-${p.id}` ? 'rotate-180' : ''
+                                }`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                            {approvalEditOpen === `mobile-${p.id}` && (
+                              <div
+                                className={`absolute right-0 w-44 rounded-xl overflow-visible bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[999] ${
+                                  approvalEditDirection === 'up'
+                                    ? 'bottom-full mb-2 origin-bottom-right'
+                                    : 'top-full mt-2 origin-top-right'
+                                }`}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    updatePlaceApproval(p.id, 'pending');
+                                    setApprovalEditOpen(null);
+                                  }}
+                                  disabled={approvalBusyId === p.id}
+                                  className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500 disabled:opacity-60"
+                                >
+                                  Pendiente
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    updatePlaceApproval(p.id, 'approved');
+                                    setApprovalEditOpen(null);
+                                  }}
+                                  disabled={approvalBusyId === p.id}
+                                  className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500 disabled:opacity-60"
+                                >
+                                  Aprobado
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    updatePlaceApproval(p.id, 'rejected');
+                                    setApprovalEditOpen(null);
+                                  }}
+                                  disabled={approvalBusyId === p.id}
+                                  className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500 disabled:opacity-60"
+                                >
+                                  Rechazado
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
+                      {approvalBusyId === p.id && (
+                        <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+                          <span className="h-3 w-3 animate-spin rounded-full border-2 border-emerald-300 border-t-emerald-600" />
+                          Cargando...
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -307,26 +519,158 @@ export default function AdminSitesPage() {
                             </svg>
                           </div>
                         )}
-                        <button
-                          className="text-emerald-600 hover:text-emerald-700 font-medium underline underline-offset-4"
-                          onClick={() => goDetail(p.id)}
-                        >
-                          {p.nombre || p.name || '—'}
-                        </button>
+                        <div className="flex flex-col items-start gap-1">
+                          <button
+                            className={`max-w-[260px] text-left text-emerald-600 hover:text-emerald-700 font-medium underline underline-offset-4 ${
+                              expandedSiteNames[`site-${p.id}`]
+                                ? 'whitespace-normal break-words'
+                                : 'line-clamp-1'
+                            }`}
+                            onClick={() => goDetail(p.id)}
+                          >
+                            {p.nombre || p.name || '—'}
+                          </button>
+                          {shouldTruncate(p.nombre || p.name || '—') && (
+                            <button
+                              type="button"
+                              onClick={() => toggleSiteName(`site-${p.id}`)}
+                              className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
+                            >
+                              {expandedSiteNames[`site-${p.id}`] ? 'Ver menos' : 'Ver mas'}
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-slate-700">{p.user?.email || p.creator_email || '—'}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-slate-700">
-                        {statusLabels[p.opening_status || p.estado_apertura] || '—'}
-                      </span>
+                      <div className="relative inline-flex items-center gap-2" data-status-edit-id={`table-status-${p.id}`}>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            const rect = event.currentTarget.getBoundingClientRect();
+                            const spaceBelow = window.innerHeight - rect.bottom;
+                            setStatusEditDirection(spaceBelow < 220 ? 'up' : 'down');
+                            setStatusEditOpen((prev) => (prev === `table-status-${p.id}` ? null : `table-status-${p.id}`));
+                          }}
+                          disabled={statusBusyId === p.id}
+                          className={`inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs text-slate-700 ring-1 transition disabled:opacity-60 ${getStatusButtonClass(p.opening_status || p.estado_apertura)}`}
+                        >
+                          {statusLabels[p.opening_status || p.estado_apertura] || '—'}
+                          <svg
+                            className={`h-3.5 w-3.5 text-current transition-transform duration-200 ${
+                              statusEditOpen === `table-status-${p.id}` ? 'rotate-180' : ''
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                        {statusEditOpen === `table-status-${p.id}` && (
+                          <div
+                            className={`absolute right-0 w-52 rounded-xl overflow-visible bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[999] ${
+                              statusEditDirection === 'up'
+                                ? 'bottom-full mb-2 origin-bottom-right'
+                                : 'top-full mt-2 origin-top-right'
+                            }`}
+                          >
+                            {statusOptions.filter((option) => option.value !== 'all').map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => {
+                                  updatePlaceStatus(p.id, option.value);
+                                  setStatusEditOpen(null);
+                                }}
+                                disabled={statusBusyId === p.id}
+                                className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500 disabled:opacity-60"
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {statusBusyId === p.id && (
+                          <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-emerald-300 border-t-emerald-600" />
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-slate-700">
-                        {approvalLabels[p.approval_status] || 'Pendiente'}
-                      </span>
+                      <div className="relative inline-flex items-center gap-2" data-approval-edit-id={`table-${p.id}`}>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            const rect = event.currentTarget.getBoundingClientRect();
+                            const spaceBelow = window.innerHeight - rect.bottom;
+                            setApprovalEditDirection(spaceBelow < 220 ? 'up' : 'down');
+                            setApprovalEditOpen((prev) => (prev === `table-${p.id}` ? null : `table-${p.id}`));
+                          }}
+                          disabled={approvalBusyId === p.id}
+                          className={`inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs text-slate-700 ring-1 transition disabled:opacity-60 ${getApprovalButtonClass(p.approval_status || 'pending')}`}
+                        >
+                          {approvalLabels[p.approval_status] || 'Pendiente'}
+                          <svg
+                            className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                              approvalEditOpen === `table-${p.id}` ? 'rotate-180' : ''
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                        {approvalEditOpen === `table-${p.id}` && (
+                          <div
+                            className={`absolute right-0 w-44 rounded-xl overflow-visible bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[999] ${
+                              approvalEditDirection === 'up'
+                                ? 'bottom-full mb-2 origin-bottom-right'
+                                : 'top-full mt-2 origin-top-right'
+                            }`}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => {
+                                updatePlaceApproval(p.id, 'pending');
+                                setApprovalEditOpen(null);
+                              }}
+                              disabled={approvalBusyId === p.id}
+                              className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500 disabled:opacity-60"
+                            >
+                              Pendiente
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                updatePlaceApproval(p.id, 'approved');
+                                setApprovalEditOpen(null);
+                              }}
+                              disabled={approvalBusyId === p.id}
+                              className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500 disabled:opacity-60"
+                            >
+                              Aprobado
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                updatePlaceApproval(p.id, 'rejected');
+                                setApprovalEditOpen(null);
+                              }}
+                              disabled={approvalBusyId === p.id}
+                              className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500 disabled:opacity-60"
+                            >
+                              Rechazado
+                            </button>
+                          </div>
+                        )}
+                        {approvalBusyId === p.id && (
+                          <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-emerald-300 border-t-emerald-600" />
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1">

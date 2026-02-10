@@ -158,7 +158,8 @@ export default function ColeccionPageTurista({
                     <div
                       key={index}
                       onClick={onNavigateSitio}
-                      className="coleccion-card bg-white rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition"
+                      className="coleccion-card bg-white rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition stagger-item"
+                      style={{ '--stagger-delay': `${index * 40}ms` }}
                     >
                       <img src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
                       <div className="p-4">
@@ -195,7 +196,8 @@ export default function ColeccionPageTurista({
                     <div
                       key={index}
                       onClick={onNavigateSitio}
-                      className="coleccion-card bg-white rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition"
+                      className="coleccion-card bg-white rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition stagger-item"
+                      style={{ '--stagger-delay': `${index * 40}ms` }}
                     >
                       <img src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
                       <div className="p-4">
@@ -232,7 +234,8 @@ export default function ColeccionPageTurista({
                     <div
                       key={index}
                       onClick={onNavigateSitio}
-                      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition"
+                      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition stagger-item"
+                      style={{ '--stagger-delay': `${index * 40}ms` }}
                     >
                       <img src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
                       <div className="p-4">
@@ -256,7 +259,8 @@ export default function ColeccionPageTurista({
                 <div
                   key={index}
                   onClick={onNavigateSitio}
-                  className="coleccion-reco-card relative group cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition"
+                  className="coleccion-reco-card relative group cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition stagger-item"
+                  style={{ '--stagger-delay': `${Math.min(index, 10) * 50}ms` }}
                 >
                   <img src={item.img} alt={item.title} className="w-full h-64 object-cover" />
                   <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">

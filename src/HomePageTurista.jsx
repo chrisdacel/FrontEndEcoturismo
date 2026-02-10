@@ -142,7 +142,7 @@ export default function HomePageTurista({
       <main>
         {/* Hero Section */}
         <section
-          className="relative h-screen bg-cover bg-center flex items-center justify-center"
+          className="hero-viewport relative bg-cover bg-center flex items-center justify-center"
           style={{ backgroundImage: "url('/images/Pagina_inicio/Paisaje_1.jpg')" }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>

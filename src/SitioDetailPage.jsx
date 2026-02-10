@@ -209,6 +209,12 @@ export default function SitioDetailPage({
     markNotificationRead(notificationId).catch(() => {});
   }, [location.search]);
 
+  useEffect(() => {
+    if (location.hash !== '#evento') return;
+    if (!eventSectionRef.current) return;
+    eventSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [location.hash, eventData]);
+
   // Inicializar mapa cuando sitio esté cargado
   useEffect(() => {
     if (sitio && sitio.lat && sitio.lng && mapRef.current && !mapInstanceRef.current) {
@@ -861,7 +867,7 @@ export default function SitioDetailPage({
         )}
 
         {eventData && (
-          <section ref={eventSectionRef} className="bg-white px-6 pb-16">
+          <section id="evento" ref={eventSectionRef} className="bg-white px-6 pb-16">
             <div className="mx-auto max-w-5xl">
               <div className="rounded-3xl border border-emerald-100 bg-emerald-50/40 p-8 shadow-sm">
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">

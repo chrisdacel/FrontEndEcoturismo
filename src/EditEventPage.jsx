@@ -160,6 +160,10 @@ export default function EditEventPage() {
       setDateError(currentDateError);
       return;
     }
+    if (!imageFile && !imagePreview) {
+      setError('La imagen del evento es obligatoria');
+      return;
+    }
 
     try {
       setSaving(true);
@@ -179,7 +183,7 @@ export default function EditEventPage() {
       setSuccess(true);
       if (place?.id) {
         setTimeout(() => {
-          navigate(`${basePath}/sitio/${place.id}`);
+          navigate(`${basePath}/sitio/${place.id}#evento`);
         }, 1200);
       }
     } catch (err) {
@@ -302,7 +306,7 @@ export default function EditEventPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Imagen del evento (opcional)
+                      Imagen del evento *
                     </label>
                     <input
                       type="file"

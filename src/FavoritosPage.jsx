@@ -138,10 +138,11 @@ export default function FavoritosPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {favoritos.map((fav) => (
+              {favoritos.map((fav, index) => (
                 <div
                   key={fav.id}
-                  className="group relative bg-white rounded-2xl overflow-hidden ring-1 ring-slate-200 hover:ring-emerald-500 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105"
+                  className="group relative bg-white rounded-2xl overflow-hidden ring-1 ring-slate-200 hover:ring-emerald-500 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 stagger-item"
+                  style={{ '--stagger-delay': `${Math.min(index, 12) * 40}ms` }}
                 >
                   {/* Imagen */}
                   <div className="relative h-48 overflow-hidden">

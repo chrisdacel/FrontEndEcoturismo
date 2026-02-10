@@ -122,11 +122,12 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
           <div className="relative">
             <div className="overflow-hidden">
               <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${carouselIndex[0] * 25}%)` }}>
-                {sitios.map((sitio) => (
+                {sitios.map((sitio, index) => (
                   <div key={sitio.id} className="min-w-[25%] px-2">
                     <button
                       onClick={onNavigateSitio}
-                      className="coleccion-card w-full overflow-hidden bg-white transition hover:shadow-xl"
+                      className="coleccion-card w-full overflow-hidden bg-white transition hover:shadow-xl stagger-item"
+                      style={{ '--stagger-delay': `${Math.min(index, 8) * 40}ms` }}
                     >
                       <div className="h-48 bg-gray-300 bg-cover bg-center" style={{ backgroundImage: `url('${sitio.imagen}')` }}></div>
                       <div className="p-4">
@@ -163,11 +164,12 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
           <div className="relative">
             <div className="overflow-hidden">
               <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${carouselIndex[1] * 25}%)` }}>
-                {sitios.map((sitio) => (
+                {sitios.map((sitio, index) => (
                   <div key={sitio.id} className="min-w-[25%] px-2">
                     <button
                       onClick={onNavigateSitio}
-                      className="coleccion-card w-full overflow-hidden bg-white transition hover:shadow-xl"
+                      className="coleccion-card w-full overflow-hidden bg-white transition hover:shadow-xl stagger-item"
+                      style={{ '--stagger-delay': `${Math.min(index, 8) * 40}ms` }}
                     >
                       <div className="h-48 bg-gray-300 bg-cover bg-center" style={{ backgroundImage: `url('${sitio.imagen}')` }}></div>
                       <div className="p-4">
@@ -204,11 +206,12 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
           <div className="relative">
             <div className="overflow-hidden">
               <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${carouselIndex[2] * 25}%)` }}>
-                {sitios.map((sitio) => (
+                {sitios.map((sitio, index) => (
                   <div key={sitio.id} className="min-w-[25%] px-2">
                     <button
                       onClick={onNavigateSitio}
-                      className="coleccion-card w-full overflow-hidden bg-white transition hover:shadow-xl"
+                      className="coleccion-card w-full overflow-hidden bg-white transition hover:shadow-xl stagger-item"
+                      style={{ '--stagger-delay': `${Math.min(index, 8) * 40}ms` }}
                     >
                       <div className="h-48 bg-gray-300 bg-cover bg-center" style={{ backgroundImage: `url('${sitio.imagen}')` }}></div>
                       <div className="p-4">
@@ -243,11 +246,12 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
           <h1 className="mb-12 text-center text-4xl font-bold text-[#267E1B]">Recomendaciones</h1>
 
           <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {recomendaciones.map((recomendacion) => (
+            {recomendaciones.map((recomendacion, index) => (
               <button
                 key={recomendacion.id}
                 onClick={onNavigateSitio}
-                className="coleccion-reco-card group relative overflow-hidden shadow-lg transition hover:shadow-2xl"
+                className="coleccion-reco-card group relative overflow-hidden shadow-lg transition hover:shadow-2xl stagger-item"
+                style={{ '--stagger-delay': `${Math.min(index, 10) * 50}ms` }}
               >
                 <div className="h-64 bg-cover bg-center" style={{ backgroundImage: `url('${recomendacion.imagen}')` }}></div>
                 <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
