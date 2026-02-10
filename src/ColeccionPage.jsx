@@ -346,7 +346,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
 
   return (
-    <div className="min-h-screen coleccion-shell text-slate-900 overflow-x-hidden">
+    <div className="min-h-screen coleccion-shell text-slate-900 overflow-x-hidden pt-14">
       {/* Scroll to Top Button */}
       {scrollToTop && (
         <button

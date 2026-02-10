@@ -6,7 +6,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white text-slate-900">
+  <div className="flex min-h-screen flex-col bg-white text-slate-900 pt-14">
       {/* Header */}
       <header className="fixed top-0 z-50 w-full bg-white shadow-md">
         <div className="flex items-center justify-between px-6 py-4 md:px-12">

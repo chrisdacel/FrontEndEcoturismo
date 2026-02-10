@@ -103,6 +103,12 @@ export default function CreateSitioPageLeaflet() {
     contacto: '',
     estado_apertura: 'open',
   });
+
+  // Asegura que el estado_apertura siempre sea válido antes de enviar
+  function getValidEstadoApertura(value) {
+    const valid = ['open', 'closed_temporarily', 'open_with_restrictions'];
+    return valid.includes(value) ? value : 'open';
+  }
   const [openDays, setOpenDays] = useState(defaultOpenDays);
 
   const [images, setImages] = useState({
@@ -311,7 +317,11 @@ export default function CreateSitioPageLeaflet() {
       if (isEdit) {
         await updatePlace(
           id,
-          { ...formData, preferences: selectedPreferences, dias_abiertos: openDays },
+          { ...formData, 
+            estado_apertura: getValidEstadoApertura(formData.estado_apertura),
+            preferences: selectedPreferences, 
+            dias_abiertos: openDays 
+          },
           images.portada,
           images.clima_img,
           images.caracteristicas_img,
@@ -367,7 +377,7 @@ export default function CreateSitioPageLeaflet() {
   };
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
+    <div className="min-h-screen bg-white overflow-x-hidden pt-14">
       <section className="relative pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}

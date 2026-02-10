@@ -200,7 +200,7 @@ export default function CreateSitioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-14">
       <section className="relative pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}

@@ -59,7 +59,7 @@ export default function EventDetailPage() {
   const place = eventData?.place;
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
       <div className="min-h-[70vh] flex items-center justify-center px-4 md:px-6">
         {loading ? (
           <div className="text-sm text-slate-600">Cargando evento...</div>

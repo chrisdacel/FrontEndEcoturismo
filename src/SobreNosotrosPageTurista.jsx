@@ -29,7 +29,7 @@ export default function SobreNosotrosPageTurista({
   };
 
   return (
-    <div className="min-h-screen bg-white font-['Albert_Sans']">
+    <div className="min-h-screen bg-white font-['Albert_Sans'] pt-14">
 
       {/* Scroll to top button */}
       {showScrollTop && (

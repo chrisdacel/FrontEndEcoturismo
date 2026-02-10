@@ -12,7 +12,7 @@ export default function SitioPageTurista({
     <div className="min-h-screen bg-white font-['Albert_Sans']">
       {/* Header */}
       <header className="bg-white shadow-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between pt-14">
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={onNavigateHome}>
             <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-12 w-12" />

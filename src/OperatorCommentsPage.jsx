@@ -165,7 +165,7 @@ export default function OperatorCommentsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
       <div className="mx-auto max-w-7xl px-4 md:px-6 py-10">
         <button
           onClick={() => navigate(-1)}

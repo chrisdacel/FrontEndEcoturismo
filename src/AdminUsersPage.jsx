@@ -204,7 +204,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 px-4 pb-16 overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 px-4 pb-16 overflow-x-hidden pt-14">
       <div className="max-w-6xl mx-auto pt-24">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
           <div>

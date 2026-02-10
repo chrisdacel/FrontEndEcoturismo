@@ -82,7 +82,7 @@ export default function FavoritosPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-white overflow-x-hidden">
+    <div className="relative min-h-screen bg-white overflow-x-hidden pt-14">
       
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-4">

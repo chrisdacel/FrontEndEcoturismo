@@ -162,7 +162,7 @@ export default function AdminProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 px-4 overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 px-4 overflow-x-hidden pt-14">
       <div className="max-w-4xl mx-auto pt-24 pb-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Perfil</h1>
