@@ -82,13 +82,13 @@ export default function HistorialPage() {
                   </div>
                 )}
               </div>
-              <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200">
-                <table className="min-w-full text-sm">
+              <div className="hidden md:block bg-white border-b border-slate-200">
+                <table className="w-full text-sm table-fixed">
                   <thead className="bg-white">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Sitio</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Ubicacion</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Ultima visita</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-1/3 truncate">Sitio</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-1/3 truncate">Ubicación</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-1/3 truncate">Última visita</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
@@ -99,15 +99,9 @@ export default function HistorialPage() {
 
                       return (
                         <tr key={key} className="hover:bg-slate-50">
-                          <td className="px-4 py-3 text-slate-800">
-                            {placeName}
-                          </td>
-                          <td className="px-4 py-3 text-slate-600">
-                            {placeLocalization}
-                          </td>
-                          <td className="px-4 py-3 text-slate-600 text-xs">
-                            {item.visited_at ? new Date(item.visited_at).toLocaleString() : '—'}
-                          </td>
+                          <td className="px-4 py-3 text-slate-800 break-words max-w-xs">{placeName}</td>
+                          <td className="px-4 py-3 text-slate-600 break-words max-w-xs">{placeLocalization}</td>
+                          <td className="px-4 py-3 text-slate-600 text-xs break-words max-w-xs">{item.visited_at ? new Date(item.visited_at).toLocaleString() : '—'}</td>
                         </tr>
                       );
                     })}
@@ -166,27 +160,27 @@ export default function HistorialPage() {
                   </div>
                 )}
               </div>
-              <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200">
-                <table className="min-w-full text-sm">
+              <div className="hidden md:block bg-white border-b border-slate-200">
+                <table className="w-full text-sm table-fixed">
                   <thead className="bg-white">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Sitio</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Calificacion</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Comentario</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Fecha</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-1/4 truncate">Sitio</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-1/6 truncate">Calificación</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-2/6 truncate">Comentario</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-1/4 truncate">Fecha</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
                     {reviews.map((rev) => (
                       <tr key={rev.id} className="hover:bg-slate-50">
-                        <td className="px-4 py-3 text-slate-800">{rev.place?.name || '—'}</td>
-                        <td className="px-4 py-3 text-slate-700">{rev.rating} / 5</td>
-                                                <td className="px-4 py-3 text-slate-700">
-                                                  {Array.from({length: 5}, (_, i) => (
-                                                    <span key={i} style={{color: i < rev.rating ? '#FFD700' : '#E5E7EB'}}>&#9733;</span>
-                                                  ))}
-                                                </td>
-                        <td className="px-4 py-3 text-slate-700 max-w-xs break-words">
+                        <td className="px-4 py-3 text-slate-800 break-words max-w-xs">{rev.place?.name || '—'}</td>
+                        <td className="px-4 py-3 text-slate-700 break-words max-w-xs">{rev.rating} / 5</td>
+                        <td className="px-4 py-3 text-slate-700 break-words max-w-xs">
+                          {Array.from({length: 5}, (_, i) => (
+                            <span key={i} style={{color: i < rev.rating ? '#FFD700' : '#E5E7EB'}}>&#9733;</span>
+                          ))}
+                        </td>
+                        <td className="px-4 py-3 text-slate-700 break-words max-w-xs">
                           {(() => {
                             const isLong = rev.comment && rev.comment.length > 40;
                             const showFull = expanded[rev.id];
