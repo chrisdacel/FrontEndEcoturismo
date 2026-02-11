@@ -7,6 +7,7 @@ export default function AdminCreateOperatorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const [formData, setFormData] = useState({
     name: '',
@@ -19,48 +20,68 @@ export default function AdminCreateOperatorPage() {
     birth_date: '',
   });
 
+  const calculateAge = (dateString) => {
+    if (!dateString) return null;
+    const birthDate = new Date(dateString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const validatePassword = (pwd) => {
+    if (!pwd) return '';
+    if (pwd.length < 8 || pwd.length > 64) return 'La contraseña debe tener entre 8 y 64 caracteres';
+    if (!/[A-Z]/.test(pwd)) return 'La contraseña debe incluir al menos una letra mayúscula';
+    if (!/[a-z]/.test(pwd)) return 'La contraseña debe incluir al menos una letra minúscula';
+    if (!/[0-9]/.test(pwd)) return 'La contraseña debe incluir al menos un dígito';
+    if (!/^[A-Za-z0-9@?#$%()_=*\\:;'.\/\+<>¿,\[\]]+$/.test(pwd)) return 'La contraseña contiene caracteres no permitidos';
+    return '';
+  };
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
     setError('');
+    setFieldErrors((prev) => ({ ...prev, [name]: '' }));
+
+    // Validaciones en tiempo real
+    if (name === 'password') {
+      setFieldErrors((prev) => ({ ...prev, password: validatePassword(value) }));
+    }
+    if (name === 'confirmPassword') {
+      setFieldErrors((prev) => ({ ...prev, confirmPassword: value !== formData.password ? 'Las contraseñas no coinciden' : '' }));
+    }
+    if (name === 'birth_date') {
+      const age = calculateAge(value);
+      setFieldErrors((prev) => ({ ...prev, birth_date: age !== null && age < 16 ? 'Debes ser mayor de 16 años para registrarte' : '' }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Validaciones
-    if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
-      return;
-    }
 
-    if (formData.password.length < 8 || formData.password.length > 64) {
-      setError('La contraseña debe tener entre 8 y 64 caracteres');
-      return;
+    // Validaciones completas
+    const newFieldErrors = {};
+    if (!formData.name.trim()) newFieldErrors.name = 'El nombre es obligatorio';
+    if (!formData.email.trim()) newFieldErrors.email = 'El correo es obligatorio';
+    if (!formData.password) newFieldErrors.password = 'La contraseña es obligatoria';
+    else {
+      const pwdErr = validatePassword(formData.password);
+      if (pwdErr) newFieldErrors.password = pwdErr;
     }
-
-    if (!/[A-Z]/.test(formData.password)) {
-      setError('La contraseña debe incluir al menos una letra mayúscula');
-      return;
+    if (formData.password !== formData.confirmPassword) newFieldErrors.confirmPassword = 'Las contraseñas no coinciden';
+    if (formData.birth_date) {
+      const age = calculateAge(formData.birth_date);
+      if (age !== null && age < 16) newFieldErrors.birth_date = 'Debes ser mayor de 16 años para registrarte';
     }
-
-    if (!/[a-z]/.test(formData.password)) {
-      setError('La contraseña debe incluir al menos una letra minúscula');
-      return;
-    }
-
-    if (!/[0-9]/.test(formData.password)) {
-      setError('La contraseña debe incluir al menos un dígito');
-      return;
-    }
-
-    if (!/^[A-Za-z0-9@?#$%()_=*\\:;'.\/\+<>¿,\[\]]+$/.test(formData.password)) {
-      setError('La contraseña contiene caracteres no permitidos');
-      return;
-    }
+    setFieldErrors(newFieldErrors);
+    if (Object.keys(newFieldErrors).length > 0) return;
 
     try {
       setLoading(true);
@@ -142,6 +163,9 @@ export default function AdminCreateOperatorPage() {
                   className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="Juan"
                 />
+                {fieldErrors.name && (
+                  <p className="mt-1 text-xs text-red-500">{fieldErrors.name}</p>
+                )}
               </div>
 
               {/* Apellido */}
@@ -173,6 +197,9 @@ export default function AdminCreateOperatorPage() {
                   className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="correo@ejemplo.com"
                 />
+                {fieldErrors.email && (
+                  <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>
+                )}
               </div>
 
               {/* Rol */}
@@ -209,6 +236,9 @@ export default function AdminCreateOperatorPage() {
                   className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="8-64 caracteres"
                 />
+                {fieldErrors.password && (
+                  <p className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>
+                )}
               </div>
 
               {/* Confirmar Contraseña */}
@@ -227,6 +257,9 @@ export default function AdminCreateOperatorPage() {
                   className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   placeholder="Repite la contraseña"
                 />
+                {fieldErrors.confirmPassword && (
+                  <p className="mt-1 text-xs text-red-500">{fieldErrors.confirmPassword}</p>
+                )}
               </div>
 
               {/* País */}
@@ -256,6 +289,9 @@ export default function AdminCreateOperatorPage() {
                   onChange={handleChange}
                   className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                 />
+                {fieldErrors.birth_date && (
+                  <p className="mt-1 text-xs text-red-500">{fieldErrors.birth_date}</p>
+                )}
               </div>
             </div>
 
@@ -270,7 +306,7 @@ export default function AdminCreateOperatorPage() {
               </button>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || Object.values(fieldErrors).some(Boolean)}
                 className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {loading ? (

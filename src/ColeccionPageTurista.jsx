@@ -163,7 +163,7 @@ export default function ColeccionPageTurista({
                     >
                       <img src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
                       <div className="p-4">
-                        <h3 className="font-semibold text-gray-800 mb-1">{sitio.title}</h3>
+                        <h3 className="font-semibold text-gray-800 mb-1" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{sitio.title}</h3>
                         <p className="text-sm text-gray-600">{sitio.location}</p>
                       </div>
                     </div>
@@ -313,9 +313,8 @@ export default function ColeccionPageTurista({
           <div>
             <h4 className="text-lg font-semibold mb-4">Información</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Conexión EcoRisaralda</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Descripción</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Lema</a></li>
+                <li><button onClick={onNavigateSobreNosotros} className="text-gray-400 hover:text-white transition">Sobre nosotros</button></li>
+                <li><button onClick={onNavigatePrivacidad} className="text-gray-400 hover:text-white transition">Privacidad</button></li>
             </ul>
           </div>
 

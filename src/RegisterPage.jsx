@@ -1,18 +1,33 @@
+import React from 'react';
 import { useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { register as apiRegister } from './services/api';
 import Alert from './components/Alert';
+import { fetchCountries } from './services/api';
 
 export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNavigatePreferences, onNavigateConfirm }) {
+      const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [nameError, setNameError] = useState('');
+    const [lastNameError, setLastNameError] = useState('');
   const { setUser } = useAuth();
   const role = 'turist'; // Registro solo turista
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [country, setCountry] = useState('');
+  const [countries, setCountries] = useState([]);
+    // Fetch countries on mount
+    React.useEffect(() => {
+      fetchCountries()
+        .then((data) => {
+          setCountries(Array.isArray(data) ? data : []);
+        })
+        .catch(() => setCountries([]));
+    }, []);
   const [birthDate, setBirthDate] = useState(''); // YYYY-MM-DD
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
+  const [passwordMatchError, setPasswordMatchError] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -95,7 +110,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
         password,
         role,
         lastName.trim() || null,
-        country.trim() || null,
+        country || null,
         birthDate || null
       );
       setSuccess('Registro exitoso. Te enviamos un correo para confirmar la cuenta.');
@@ -142,10 +157,6 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
             <div className="mb-6">
               <h2 className="text-2xl font-semibold">Crear cuenta</h2>
               <p className="mt-1 text-sm text-emerald-100/80">Completa tus datos para comenzar</p>
-            </div>
-
-            {/* Registro turista (único) */}
-            <div className="mb-5">
               <span className="inline-flex items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-200 ring-1 ring-emerald-400/30">
                 Registro de Turista
               </span>
@@ -169,48 +180,109 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                   <input
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.slice(0, 50);
+                      setName(val);
+                      if (val.length > 0 && val.length < 2) {
+                        setNameError('El nombre debe tener al menos 2 caracteres');
+                      } else {
+                        setNameError('');
+                      }
+                    }}
                     required
+                    minLength={2}
+                    maxLength={50}
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
-                    placeholder="Tu nombre"
+                    placeholder="Tu nombre (2-50 caracteres)"
                   />
+                  {nameError && (
+                    <p className="mt-1 text-xs text-red-300">{nameError}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-emerald-100">Apellido (opcional)</label>
                   <input
                     type="text"
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.slice(0, 50);
+                      setLastName(val);
+                      if (val.length > 0 && val.length < 2) {
+                        setLastNameError('El apellido debe tener al menos 2 caracteres');
+                      } else {
+                        setLastNameError('');
+                      }
+                    }}
+                    minLength={2}
+                    maxLength={50}
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
-                    placeholder="Tu apellido"
+                    placeholder="Tu apellido (2-50 caracteres)"
                   />
+                  {lastNameError && (
+                    <p className="mt-1 text-xs text-red-300">{lastNameError}</p>
+                  )}
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-emerald-100">Correo electrónico</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
-                  placeholder="tu@correo.com"
-                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-emerald-100">País</label>
+                  <label className="block text-sm font-medium text-emerald-100">Correo electrónico</label>
                   <input
-                    type="text"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
-                    placeholder="Colombia"
+                    placeholder="tu@correo.com"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-emerald-100">País</label>
+                  <div className="relative mt-1">
+                    <button
+                      type="button"
+                      className="w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white text-left outline-none focus:ring-2 focus:ring-emerald-400/60 transition flex items-center justify-between"
+                      onClick={() => setDropdownOpen((open) => !open)}
+                    >
+                      <span>
+                        {country
+                          ? (countries.find(c => c.id === country)?.name || 'Selecciona tu país')
+                          : 'Selecciona tu país'}
+                      </span>
+                      <span
+                        className={`ml-2 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+                        aria-hidden="true"
+                      >
+                        {/* Chevron Down SVG */}
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                          <path d="M7 10l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                    </button>
+                    {dropdownOpen && (
+                      <div className="absolute z-10 mt-2 w-full rounded-lg bg-white shadow-lg ring-1 ring-black/10">
+                        <div className="max-h-60 overflow-y-auto">
+                          {countries.map((c) => (
+                            <button
+                              key={c.id}
+                              type="button"
+                              className="w-full text-left px-4 py-2 text-slate-700 hover:bg-emerald-100 hover:text-emerald-700 focus:bg-emerald-100 focus:text-emerald-700"
+                              onClick={() => {
+                                setCountry(c.id);
+                                setDropdownOpen(false);
+                              }}
+                            >
+                              {c.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-emerald-100">Fecha de nacimiento</label>
                   <input
@@ -232,9 +304,6 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                     <p className="mt-1 text-xs text-red-300">{ageError}</p>
                   )}
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-emerald-100">Contraseña</label>
                   <input
@@ -254,24 +323,46 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                     <p className="mt-1 text-xs text-red-300">{passwordError}</p>
                   )}
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-emerald-100">Confirmar contraseña</label>
                   <input
                     type="password"
                     value={password2}
-                    onChange={(e) => setPassword2(e.target.value)}
+                    onChange={(e) => {
+                      setPassword2(e.target.value);
+                      if (e.target.value !== password) {
+                        setPasswordMatchError('Las contraseñas no coinciden');
+                      } else {
+                        setPasswordMatchError('');
+                      }
+                    }}
                     required
                     minLength={8}
                     maxLength={64}
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
                     placeholder="Repite tu contraseña"
                   />
+                  {passwordMatchError && (
+                    <p className="mt-1 text-xs text-red-300">{passwordMatchError}</p>
+                  )}
                 </div>
               </div>
 
               <button
                 type="submit"
-                disabled={loading || ageError !== '' || passwordError !== ''}
+                disabled={
+                  loading ||
+                  ageError !== '' ||
+                  passwordError !== '' ||
+                  name.trim().length < 2 ||
+                  password.trim().length === 0 ||
+                  password2.trim().length === 0 ||
+                  !country ||
+                  passwordMatchError !== ''
+                }
                 className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-60"
               >
                 {loading ? 'Creando cuenta…' : 'Crear cuenta'}

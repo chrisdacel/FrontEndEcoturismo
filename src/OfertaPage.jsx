@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from './context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
 
 function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNavigatePrivacidad, onNavigateSobreNosotros }) {
+  const { user } = useAuth();
   const [showSearch, setShowSearch] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -186,12 +188,14 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
                 />
                 <h3 className="text-2xl font-semibold text-slate-900">{section.title}</h3>
                 <p className="text-base text-gray-700 leading-relaxed">{section.description}</p>
-                <button
-                  onClick={onNavigateRegister}
-                  className="w-fit rounded-lg bg-[#267E1B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-[#267E1B] hover:outline hover:outline-[#267E1B]"
-                >
-                  {section.cta}
-                </button>
+                {!user && (
+                  <button
+                    onClick={onNavigateRegister}
+                    className="w-fit rounded-lg bg-[#267E1B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-[#267E1B] hover:outline hover:outline-[#267E1B]"
+                  >
+                    {section.cta}
+                  </button>
+                )}
               </div>
             ))}
           </section>
@@ -222,9 +226,8 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
           <div>
             <h4 className="mb-3 font-bold text-slate-900">Información</h4>
             <ul className="space-y-2 text-sm text-gray-700">
-              <li><a href="#" onClick={onNavigateHome} className="hover:underline">Conexión EcoRisaralda</a></li>
-              <li><a href="#" onClick={onNavigateHome} className="hover:underline">Descripción</a></li>
-              <li><a href="#" onClick={onNavigateHome} className="hover:underline">Lema</a></li>
+                <li><button onClick={onNavigateSobreNosotros} className="hover:underline">Sobre nosotros</button></li>
+                <li><button onClick={onNavigatePrivacidad} className="hover:underline">Privacidad</button></li>
             </ul>
           </div>
 

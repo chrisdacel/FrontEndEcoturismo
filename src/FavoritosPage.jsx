@@ -7,7 +7,7 @@ import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/fre
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
 
-export default function FavoritosPage() {
+export default function FavoritosPage({ onNavigateSobreNosotros, onNavigatePrivacidad }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [scrollY, setScrollY] = useState(0);
@@ -233,9 +233,8 @@ export default function FavoritosPage() {
             <div>
               <h4 className="mb-4 font-bold text-slate-900">Información</h4>
               <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="#" className="hover:text-slate-900">Conexión EcoRisaralda</a></li>
-                <li><a href="#" className="hover:text-slate-900">Descripción</a></li>
-                <li><a href="#" className="hover:text-slate-900">Lema</a></li>
+                 <li><button onClick={onNavigateSobreNosotros} className="hover:text-slate-900">Sobre nosotros</button></li>
+                 <li><button onClick={onNavigatePrivacidad} className="hover:text-slate-900">Privacidad</button></li>
               </ul>
             </div>
 

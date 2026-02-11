@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchProfile, updateProfile, changePassword, uploadAvatar, deleteAvatar, deleteAccount } from './services/api';
+import { fetchProfile, updateProfile, changePassword, uploadAvatar, deleteAvatar, deleteAccount, logout, login } from './services/api';
 import { useAuth } from './context/AuthContext';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
@@ -107,10 +107,11 @@ export default function ProfilePageTurista() {
 
   const handleDeleteAccount = async (e) => {
     e.preventDefault();
+    setDeleteError('');
     setConfirmState({
       open: true,
       title: 'Eliminar cuenta',
-      message: '¿Eliminar tu cuenta? Esta accion no se puede deshacer.',
+      message: '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es IRREVERSIBLE y perderás TODOS tus datos (perfil, sitios, eventos, favoritos, reseñas, etc).',
       confirmLabel: 'Eliminar',
       tone: 'danger',
       onConfirm: async () => {
@@ -171,6 +172,19 @@ export default function ProfilePageTurista() {
       await changePassword(passwords.current_password, passwords.password, passwords.password_confirmation);
       setPasswords({ current_password: '', password: '', password_confirmation: '' });
       setPasswordSuccess('Contraseña actualizada correctamente');
+      // Forzar logout y login con la nueva contraseña para renovar sesión/cookie y evitar bug de eliminación
+      setTimeout(async () => {
+        try {
+          await logout();
+          const userEmail = profile.email;
+          const user = await login(userEmail, passwords.password);
+          setUser(user);
+          setPasswordSuccess('Contraseña actualizada y sesión renovada');
+        } catch (err) {
+          setUser(null);
+          navigate('/login');
+        }
+      }, 1200);
     } catch (err) {
       setPasswordError(err.message || 'No se pudo actualizar la contraseña');
     } finally {
@@ -254,10 +268,12 @@ export default function ProfilePageTurista() {
               <label className="block text-sm text-slate-700 mb-1">Nombre</label>
               <input
                 value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                onChange={(e) => setProfile({ ...profile, name: e.target.value.slice(0, 50) })}
+                maxLength={50}
                 required
                 className="w-full rounded-lg bg-white px-4 py-2 text-slate-900 ring-1 ring-slate-200 focus:ring-2 focus:ring-emerald-400 outline-none"
               />
+              <p className="text-xs text-slate-500 mt-1">Máximo 50 caracteres</p>
             </div>
             <div>
               <label className="block text-sm text-slate-700 mb-1">Apellido</label>
@@ -409,9 +425,7 @@ export default function ProfilePageTurista() {
             {showDeleteForm ? 'Ocultar formulario' : 'Eliminar cuenta'}
           </button>
           {deleteError && (
-            <div className="mt-4 rounded-lg bg-rose-100 p-3 text-sm text-rose-700 ring-1 ring-rose-200">
-              {deleteError}
-            </div>
+            <p className="mb-2 text-xs text-rose-600 font-medium">{deleteError}</p>
           )}
           {showDeleteForm && (
             <form onSubmit={handleDeleteAccount} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">

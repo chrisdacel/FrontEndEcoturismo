@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchProfile, updateProfile, uploadAvatar, deleteAvatar, deleteAccount, changePassword } from './services/api';
+import { fetchProfile, updateProfile, uploadAvatar, deleteAvatar, deleteAccount, changePassword, logout, login } from './services/api';
 import { useAuth } from './context/AuthContext';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
@@ -130,6 +130,32 @@ export default function AdminProfilePage() {
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
+    const pwd = passwords.password;
+    if (pwd.length < 8 || pwd.length > 64) {
+      setPasswordError('La contraseña debe tener entre 8 y 64 caracteres');
+      setPasswordSuccess('');
+      return;
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      setPasswordError('La contraseña debe incluir al menos una letra mayúscula');
+      setPasswordSuccess('');
+      return;
+    }
+    if (!/[a-z]/.test(pwd)) {
+      setPasswordError('La contraseña debe incluir al menos una letra minúscula');
+      setPasswordSuccess('');
+      return;
+    }
+    if (!/[0-9]/.test(pwd)) {
+      setPasswordError('La contraseña debe incluir al menos un dígito');
+      setPasswordSuccess('');
+      return;
+    }
+    if (!/^[A-Za-z0-9@?#$%()_=*\\:;'.\/\+<>¿,\[\]]+$/.test(pwd)) {
+      setPasswordError('La contraseña contiene caracteres no permitidos');
+      setPasswordSuccess('');
+      return;
+    }
     if (passwords.password !== passwords.password_confirmation) {
       setPasswordError('La nueva contraseña y la confirmación no coinciden');
       setPasswordSuccess('');
@@ -143,6 +169,19 @@ export default function AdminProfilePage() {
       await changePassword(passwords.current_password, passwords.password, passwords.password_confirmation);
       setPasswords({ current_password: '', password: '', password_confirmation: '' });
       setPasswordSuccess('Contraseña actualizada correctamente');
+      // Forzar logout y login con la nueva contraseña para renovar sesión/cookie y evitar bug de eliminación
+      setTimeout(async () => {
+        try {
+          await logout();
+          const userEmail = profile.email;
+          const user = await login(userEmail, passwords.password);
+          setUser(user);
+          setPasswordSuccess('Contraseña actualizada y sesión renovada');
+        } catch (err) {
+          setUser(null);
+          navigate('/login');
+        }
+      }, 1200);
     } catch (err) {
       setPasswordError(err.message || 'No se pudo actualizar la contraseña');
     } finally {
@@ -225,10 +264,12 @@ export default function AdminProfilePage() {
               <label className="block text-sm text-slate-700 mb-1">Nombre</label>
               <input
                 value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                onChange={(e) => setProfile({ ...profile, name: e.target.value.slice(0, 50) })}
+                maxLength={50}
                 required
                 className="w-full rounded-lg bg-white px-4 py-2 text-slate-900 ring-1 ring-slate-200 focus:ring-2 focus:ring-emerald-400 outline-none"
               />
+              <p className="text-xs text-slate-500 mt-1">Máximo 50 caracteres</p>
             </div>
             <div>
               <label className="block text-sm text-slate-700 mb-1">Apellido</label>

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import Footer from './components/Footer';
 import { useAuth } from './context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { api, fetchRecommendations, fetchUpcomingEvents } from './services/api';
@@ -267,7 +266,20 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
               {user ? (
                 <>
                   <h1 className="text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
-                    {`Hola, ${user.name || 'usuario'}`}
+                    <span className="flex flex-row items-center gap-2">
+                      <span>Hola,</span>
+                      <span
+                        style={{maxWidth:'none',overflow:'visible',textOverflow:'clip',whiteSpace:'normal',display:'inline'}}
+                        title={user.name}
+                        className="align-middle"
+                      >
+                        {user.name
+                          ? (user.name.length > 20
+                              ? user.name.slice(0, 20) + '...'
+                              : user.name)
+                          : 'usuario'}
+                      </span>
+                    </span>
                   </h1>
                   <p className="text-lg text-slate-700">
                     Nos alegra tenerte de regreso. Inspírate con nuevos destinos, guarda tus rutas preferidas
@@ -296,25 +308,26 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
           </div>
           
           {/* Cards flotantes a la derecha */}
-          <div className="absolute bottom-6 left-4 right-4 z-40 flex flex-col gap-3 md:bottom-8 md:left-auto md:right-8 md:flex-row">
+          <div className="absolute bottom-4 left-2 right-2 z-40 flex flex-col gap-2 sm:gap-3 md:bottom-8 md:left-auto md:right-8 md:flex-row">
             {user && (
               <button
                 type="button"
                 onClick={handleEventClick}
                 disabled={!activeEventPlaceId}
-                className={`w-full rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 text-left shadow-2xl transition-all duration-500 md:w-auto ${activeEventPlaceId ? 'cursor-pointer hover:-translate-y-0.5 hover:bg-white/20' : 'cursor-default'} ${eventCardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+                className={`w-full max-w-xs mx-auto rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-2 sm:p-3 md:p-4 text-left shadow-2xl transition-all duration-500 md:w-auto md:max-w-md ${activeEventPlaceId ? 'cursor-pointer hover:-translate-y-0.5 hover:bg-white/20' : 'cursor-default'} ${eventCardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+                style={{ fontSize: '0.95rem' }}
               >
                 <p className="text-xs uppercase tracking-wide text-white font-bold">PRÓXIMO EVENTO</p>
                 {loadingNextEvent ? (
-                  <p className="mt-2 text-sm text-white/90">Cargando evento...</p>
+                  <p className="mt-1 text-xs text-white/90">Cargando evento...</p>
                 ) : activeEvent ? (
                   <>
-                    <p className="mt-2 text-lg font-bold text-white">{activeEvent.title || 'Evento ecoturistico'}</p>
-                    <p className="text-sm text-white/90">{activeEvent.place?.name || 'Sitio ecoturistico'}</p>
-                    <p className="text-sm text-white">{formatEventDate(activeEvent.starts_at)}</p>
+                    <p className="mt-1 text-base font-bold text-white line-clamp-1">{activeEvent.title || 'Evento ecoturistico'}</p>
+                    <p className="text-xs text-white/90 line-clamp-1">{activeEvent.place?.name || 'Sitio ecoturistico'}</p>
+                    <p className="text-xs text-white">{formatEventDate(activeEvent.starts_at)}</p>
                   </>
                 ) : (
-                  <p className="mt-2 text-sm text-white/90">No hay eventos proximos, mantente atento.</p>
+                  <p className="mt-1 text-xs text-white/90">No hay eventos proximos, mantente atento.</p>
                 )}
               </button>
             )}
@@ -322,13 +335,14 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
               <button
                 type="button"
                 onClick={() => navigate('/turista/coleccion#recomendaciones')}
-                className="w-full rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-4 text-left shadow-2xl transition hover:-translate-y-0.5 hover:bg-white/20 md:w-auto"
+                className="w-full max-w-xs mx-auto rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-2 sm:p-3 md:p-4 text-left shadow-2xl transition hover:-translate-y-0.5 hover:bg-white/20 md:w-auto md:max-w-md"
+                style={{ fontSize: '0.95rem' }}
               >
                 <p className="text-xs uppercase tracking-wide text-white font-bold">FAVORITOS</p>
-                <p className="mt-2 text-lg font-bold text-white">
+                <p className="mt-1 text-base font-bold text-white">
                   {recommendedCount} {recommendedCount === 1 ? 'nuevo sitio' : 'nuevos sitios'}
                 </p>
-                <p className="text-sm text-white">Listos para explorar</p>
+                <p className="text-xs text-white">Listos para explorar</p>
               </button>
             )}
           </div>
@@ -482,65 +496,14 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-emerald-100 bg-emerald-50/50">
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Col 1 */}
-            <div>
-              <h3 className="mb-2 text-lg font-bold text-slate-900">Conexion</h3>
-              <p className="mb-4 text-sm text-slate-700">EcoRisaralda</p>
-              <div className="flex gap-4 text-lg text-emerald-600">
-                <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
-                <a href="#"><FontAwesomeIcon icon={faLinkedin} /></a>
-                <a href="#"><FontAwesomeIcon icon={faYoutube} /></a>
-                <a href="#"><FontAwesomeIcon icon={faInstagram} /></a>
-              </div>
-              <div className="mt-4 text-sm text-slate-700">
-                🌐
-                <select className="ml-2 rounded border border-emerald-200 bg-white px-2 py-1 text-slate-700 outline-none">
-                  <option>Español</option>
-                  <option>English</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Col 2 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Información</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="#" className="hover:text-slate-900">Conexión EcoRisaralda</a></li>
-                <li><a href="#" className="hover:text-slate-900">Descripción</a></li>
-                <li><a href="#" className="hover:text-slate-900">Lema</a></li>
-              </ul>
-            </div>
-
-            {/* Col 3 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Navegación rápida</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><button onClick={onNavigateColeccion} className="text-left hover:text-slate-900">Inicio</button></li>
-                <li><button onClick={onNavigateSobreNosotros} className="text-left hover:text-slate-900">Sobre nosotros</button></li>
-                <li><button onClick={onNavigatePrivacidad} className="text-left hover:text-slate-900">Políticas</button></li>
-              </ul>
-            </div>
-
-            {/* Col 4 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Contacto y soporte</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="mailto:ecorisaralda@contacto.com" className="hover:text-slate-900">ecorisaralda@contacto.com</a></li>
-                <li><a href="#" className="hover:text-slate-900">300 445 80055</a></li>
-                <li><a href="#" className="hover:text-slate-900">Preguntas</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-12 border-t border-emerald-100 pt-6 text-center text-sm text-slate-600">
-            <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
-            <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer 
+        onNavigateSobreNosotros={onNavigateSobreNosotros}
+        onNavigatePrivacidad={onNavigatePrivacidad}
+        onNavigateQueOfrecemos={() => window.location.href = '/que-ofrecemos'}
+        onNavigateColeccion={() => window.location.href = '/coleccion'}
+        onNavigateLogin={() => window.location.href = '/login'}
+        onNavigateInicio={() => window.location.href = '/'}
+      />
     </div>
   );
 }

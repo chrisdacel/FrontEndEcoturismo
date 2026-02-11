@@ -295,9 +295,8 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
           <div>
             <h4 className="mb-3 font-bold text-slate-900">Información</h4>
             <ul className="space-y-2 text-sm text-gray-700">
-              <li><a href="#" className="hover:underline">Conexión EcoRisaralda</a></li>
-              <li><a href="#" className="hover:underline">Descripción</a></li>
-              <li><a href="#" className="hover:underline">Lema</a></li>
+                <li><button onClick={onNavigateSobreNosotros} className="hover:underline">Sobre nosotros</button></li>
+                <li><button onClick={onNavigatePrivacidad} className="hover:underline">Privacidad</button></li>
             </ul>
           </div>
 

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import Footer from './components/Footer';
 
 function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNavigatePrivacidad }) {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -24,7 +23,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
+    <div className="flex min-h-screen flex-col bg-white text-slate-900 overflow-x-hidden pt-14">
 
       {/* Scroll to Top Button */}
       {showScrollTop && (
@@ -39,6 +38,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
 
       <main>
         {/* Hero */}
+        {/* Hero: igual a PrivacidadPage */}
         <section
           className="relative overflow-hidden bg-cover bg-center min-h-[70vh]"
           style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.jpg')" }}
@@ -65,7 +65,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
             <div className="flex flex-col md:flex-row gap-12 items-center">
               <div className="w-full md:w-[45%]">
                 <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 mb-6">Nuestra Misión</h2>
-                <p className="text-gray-700 leading-relaxed">Te ayudamos a descubrir destinos ecoturísticos cuidadosamente seleccionados, ofreciéndote toda la información práctica que necesitas: cómo llegar, actividades disponibles, alojamientos sostenibles y recomendaciones locales. Queremos que planifiques tu aventura con confianza y que, al mismo tiempo, contribuyas al cuidado del medio ambiente y al desarrollo de las comunidades anfitrionas.</p>
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed">Te ayudamos a descubrir destinos ecoturísticos cuidadosamente seleccionados, ofreciéndote toda la información práctica que necesitas: cómo llegar, actividades disponibles, alojamientos sostenibles y recomendaciones locales. Queremos que planifiques tu aventura con confianza y que, al mismo tiempo, contribuyas al cuidado del medio ambiente y al desarrollo de las comunidades anfitrionas.</p>
               </div>
               <div className="w-full md:w-[50%]">
                 <img src="/images/Sobre_Nosotros/fondo ciudad.jpg" alt="Nuestra Misión" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
@@ -80,7 +80,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
             <div className="flex flex-col md:flex-row gap-12 items-center">
               <div className="w-full md:w-[45%]">
                 <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 mb-6">¿Qué Ofrecemos?</h2>
-                <ul className="space-y-3 text-gray-700">
+                <ul className="space-y-3 text-base md:text-lg text-gray-700 leading-relaxed">
                   <li className="flex items-start gap-2"><span className="text-emerald-600 font-bold mt-1">•</span><span>Guías completas de cada lugar: datos de interés, horarios, tarifas y consejos de conservación.</span></li>
                   <li className="flex items-start gap-2"><span className="text-emerald-600 font-bold mt-1">•</span><span>Recomendaciones personalizadas según tus gustos y nivel de aventura.</span></li>
                   <li className="flex items-start gap-2"><span className="text-emerald-600 font-bold mt-1">•</span><span>Notificaciones actuales sobre eventos y novedades en tus destinos favoritos.</span></li>
@@ -100,7 +100,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
             <div className="flex flex-col md:flex-row gap-12 items-center">
               <div className="w-full md:w-[45%]">
                 <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 mb-6">Nuestros Valores</h2>
-                <ul className="space-y-3 text-gray-700">
+                <ul className="space-y-3 text-base md:text-lg text-gray-700 leading-relaxed">
                   <li className="flex items-start gap-2"><span className="text-emerald-600 font-bold mt-1">•</span><span>Sostenibilidad: promovemos prácticas que minimizan el impacto ambiental.</span></li>
                   <li className="flex items-start gap-2"><span className="text-emerald-600 font-bold mt-1">•</span><span>Autenticidad: destacamos proyectos y comunidades locales de verdadera riqueza cultural.</span></li>
                   <li className="flex items-start gap-2"><span className="text-emerald-600 font-bold mt-1">•</span><span>Responsabilidad: educamos sobre el respeto a la flora, fauna y tradiciones locales.</span></li>
@@ -119,71 +119,16 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-base md:text-lg text-slate-700 leading-relaxed mb-2">Únete a nosotros y conviértete en un viajero consciente. Descubre, respeta y disfruta de la naturaleza — ¡tu</p>
             <p className="text-base md:text-lg text-slate-700 leading-relaxed">próxima gran aventura te espera!</p>
-            {/* CTA removed as requested for admin page */}
           </div>
         </section>
       </main>
 
       {/* Footer (estilo Home) */}
-      <footer className="border-t border-emerald-100 bg-emerald-50/50">
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Col 1 */}
-            <div>
-              <h3 className="mb-2 text-lg font-bold text-slate-900">Conexion</h3>
-              <p className="mb-4 text-sm text-slate-700">EcoRisaralda</p>
-              <div className="flex gap-4 text-lg text-emerald-600">
-                <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
-                <a href="#"><FontAwesomeIcon icon={faLinkedin} /></a>
-                <a href="#"><FontAwesomeIcon icon={faYoutube} /></a>
-                <a href="#"><FontAwesomeIcon icon={faInstagram} /></a>
-              </div>
-              <div className="mt-4 text-sm text-slate-700">
-                🌐
-                <select className="ml-2 rounded border border-emerald-200 bg-white px-2 py-1 text-slate-700 outline-none">
-                  <option>Español</option>
-                  <option>English</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Col 2 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Información</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="#" className="hover:text-slate-900">Conexión EcoRisaralda</a></li>
-                <li><a href="#" className="hover:text-slate-900">Descripción</a></li>
-                <li><a href="#" className="hover:text-slate-900">Lema</a></li>
-              </ul>
-            </div>
-
-            {/* Col 3 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Navegación rápida</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><button onClick={onNavigateHome} className="text-left hover:text-slate-900">Inicio</button></li>
-                <li><button className="text-left hover:text-slate-900">Sobre nosotros</button></li>
-                <li><button onClick={onNavigatePrivacidad} className="text-left hover:text-slate-900">Políticas</button></li>
-              </ul>
-            </div>
-
-            {/* Col 4 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Contacto y soporte</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="mailto:ecorisaralda@contacto.com" className="hover:text-slate-900">ecorisaralda@contacto.com</a></li>
-                <li><a href="#" className="hover:text-slate-900">300 445 80055</a></li>
-                <li><a href="#" className="hover:text-slate-900">Preguntas</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-12 border-t border-emerald-100 pt-6 text-center text-sm text-slate-600">
-            <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
-            <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer 
+        onNavigateSobreNosotros={() => window.location.href = '/sobre-nosotros'}
+        onNavigatePrivacidad={() => window.location.href = '/privacidad'}
+        onNavigateQueOfrecemos={() => window.location.href = '/que-ofrecemos'}
+      />
     </div>
   );
 }

@@ -1,4 +1,5 @@
-﻿import AdminEventsPage from './AdminEventsPage';
+﻿import PreguntasFrecuentesPage from './PreguntasFrecuentesPage';
+import AdminEventsPage from './AdminEventsPage';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
@@ -216,7 +217,10 @@ function AppRoutes() {
         path="/turista/favoritos"
         element={
           <ProtectedRoute>
-            <FavoritosPage />
+            <FavoritosPage
+              onNavigateSobreNosotros={() => navigate('/turista/sobre-nosotros')}
+              onNavigatePrivacidad={() => navigate('/turista/privacidad')}
+            />
           </ProtectedRoute>
         }
       />
@@ -653,6 +657,7 @@ function AppRoutes() {
           </AdminOperatorRoute>
         }
       />
+      <Route path="/preguntas-frecuentes" element={<PreguntasFrecuentesPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

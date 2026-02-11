@@ -1,4 +1,5 @@
 import React from 'react';
+import Footer from './components/Footer';
 
 export default function SitioPage({ 
   onNavigateHome,
@@ -179,72 +180,14 @@ export default function SitioPage({
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-emerald-100 bg-emerald-50/50 py-12 px-6 text-slate-700">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
-          {/* Column 1 */}
-          <div>
-            <h2 className="text-2xl font-bold mb-2 text-slate-900">Conexion</h2>
-            <p className="text-slate-700 mb-4">EcoRisaralda</p>
-            <div className="flex gap-4 mb-4 text-emerald-600">
-              <a href="#" className="hover:text-emerald-800 transition">
-                <i className="fab fa-facebook text-xl"></i>
-              </a>
-              <a href="#" className="hover:text-emerald-800 transition">
-                <i className="fab fa-linkedin text-xl"></i>
-              </a>
-              <a href="#" className="hover:text-emerald-800 transition">
-                <i className="fab fa-youtube text-xl"></i>
-              </a>
-              <a href="#" className="hover:text-emerald-800 transition">
-                <i className="fab fa-instagram text-xl"></i>
-              </a>
-            </div>
-            <div className="flex items-center gap-2">
-              <span>🌐</span>
-              <select className="bg-white text-slate-700 px-2 py-1 rounded border border-emerald-200">
-                <option>Español</option>
-                <option>English</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Column 2 */}
-          <div>
-            <h4 className="text-lg font-bold mb-4 text-slate-900">Información</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-slate-700 hover:text-slate-900">Conexión EcoRisaralda</a></li>
-              <li><a href="#" className="text-slate-700 hover:text-slate-900">Descripción</a></li>
-              <li><a href="#" className="text-slate-700 hover:text-slate-900">Lema</a></li>
-            </ul>
-          </div>
-
-          {/* Column 3 */}
-          <div>
-            <h4 className="text-lg font-bold mb-4 text-slate-900">Navegación rápida</h4>
-            <ul className="space-y-2 text-sm text-slate-700">
-              <li><button onClick={onNavigateHome} className="text-left hover:text-slate-900">Inicio</button></li>
-              <li><button onClick={onNavigateSobreNosotros} className="text-left hover:text-slate-900">Sobre nosotros</button></li>
-              <li><button onClick={onNavigatePrivacidad} className="text-left hover:text-slate-900">Políticas</button></li>
-            </ul>
-          </div>
-
-          {/* Column 4 */}
-          <div>
-            <h4 className="text-lg font-bold mb-4 text-slate-900">Contacto y soporte</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="mailto:ecorisaralda@contacto.com" className="text-slate-700 hover:text-slate-900">ecorisaralda@contacto.com</a></li>
-              <li><a href="#" className="text-slate-700 hover:text-slate-900">300 445 80055</a></li>
-              <li><a href="#" className="text-slate-700 hover:text-slate-900">Preguntas</a></li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Footer bottom */}
-        <div className="max-w-7xl mx-auto mt-12 border-t border-emerald-100 pt-6 text-center text-sm text-slate-600">
-          <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
-          <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
-        </div>
-      </footer>
+      <Footer 
+        onNavigateSobreNosotros={() => window.location.href = '/sobre-nosotros'}
+        onNavigatePrivacidad={() => window.location.href = '/privacidad'}
+        onNavigateQueOfrecemos={() => window.location.href = '/que-ofrecemos'}
+        onNavigateColeccion={() => window.location.href = '/coleccion'}
+        onNavigateLogin={() => window.location.href = '/login'}
+        onNavigateInicio={() => window.location.href = '/'}
+      />
     </div>
   );
 }

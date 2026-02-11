@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { useAuth } from './context/AuthContext';
+import Footer from './components/Footer';
 
 function QueOfrecemosPage({ onNavigateRegister }) {
+  const { user } = useAuth();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
@@ -54,7 +55,9 @@ function QueOfrecemosPage({ onNavigateRegister }) {
                 <img src={section.image} alt={section.title} className="h-[380px] w-full rounded-lg object-cover shadow-md" />
                 <h3 className="text-2xl font-semibold text-slate-900">{section.title}</h3>
                 <p className="text-base text-gray-700 leading-relaxed">{section.description}</p>
-                <button onClick={onNavigateRegister} className="w-fit rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:bg-emerald-400">{section.cta}</button>
+                {!user && (
+                  <button onClick={onNavigateRegister} className="w-fit rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:bg-emerald-400">{section.cta}</button>
+                )}
               </div>
             ))}
           </section>
@@ -66,65 +69,11 @@ function QueOfrecemosPage({ onNavigateRegister }) {
       )}
 
       {/* FOOTER */}
-      <footer className="border-t border-emerald-100 bg-emerald-50/50">
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Col 1 */}
-            <div>
-              <h3 className="mb-2 text-lg font-bold text-slate-900">Conexion</h3>
-              <p className="mb-4 text-sm text-slate-700">EcoRisaralda</p>
-              <div className="flex gap-4 text-lg text-emerald-600">
-                <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
-                <a href="#"><FontAwesomeIcon icon={faLinkedin} /></a>
-                <a href="#"><FontAwesomeIcon icon={faYoutube} /></a>
-                <a href="#"><FontAwesomeIcon icon={faInstagram} /></a>
-              </div>
-              <div className="mt-4 text-sm text-slate-700">
-                🌐
-                <select className="ml-2 rounded border border-emerald-200 bg-white px-2 py-1 text-slate-700 outline-none">
-                  <option>Español</option>
-                  <option>English</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Col 2 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Información</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="#" className="hover:text-slate-900">Conexión EcoRisaralda</a></li>
-                <li><a href="#" className="hover:text-slate-900">Descripción</a></li>
-                <li><a href="#" className="hover:text-slate-900">Lema</a></li>
-              </ul>
-            </div>
-
-            {/* Col 3 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Navegación rápida</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="/" className="hover:text-slate-900">Inicio</a></li>
-                <li><a href="/sobre-nosotros" className="hover:text-slate-900">Sobre nosotros</a></li>
-                <li><a href="/privacidad" className="hover:text-slate-900">Políticas</a></li>
-              </ul>
-            </div>
-
-            {/* Col 4 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Contacto y soporte</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="mailto:ecorisaralda@contacto.com" className="hover:text-slate-900">ecorisaralda@contacto.com</a></li>
-                <li><a href="#" className="hover:text-slate-900">300 445 80055</a></li>
-                <li><a href="#" className="hover:text-slate-900">Preguntas</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-12 border-t border-emerald-100 pt-6 text-center text-sm text-slate-600">
-            <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
-            <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer 
+        onNavigateSobreNosotros={() => window.location.href = '/sobre-nosotros'}
+        onNavigatePrivacidad={() => window.location.href = '/privacidad'}
+        onNavigateQueOfrecemos={() => window.location.href = '/que-ofrecemos'}
+      />
     </div>
   );
 }

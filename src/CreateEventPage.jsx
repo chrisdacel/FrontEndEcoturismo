@@ -11,7 +11,7 @@ export default function CreateEventPage() {
   const basePath = user?.role === 'admin' ? '/admin' : '/operador';
   const fieldLimits = {
     title: { min: 5, max: 120 },
-    description: { min: 20, max: 800, optional: true },
+    description: { min: 20, max: 800, optional: false },
   };
 
   const getCounterClass = (length, min, max, optional = false) => {
@@ -42,14 +42,17 @@ export default function CreateEventPage() {
     title: '',
     description: '',
     starts_at: '',
+    ends_at: '',
   });
+  const [endDateError, setEndDateError] = useState('');
   const [imageFile, setImageFile] = useState(null);
+    const [imageError, setImageError] = useState('');
   const [imagePreview, setImagePreview] = useState('');
 
   const getDateLimits = () => {
     const now = new Date();
     const minDate = new Date(now);
-    minDate.setDate(minDate.getDate() + 7);
+    minDate.setDate(minDate.getDate() + 5);
     const maxDate = new Date(now);
     maxDate.setMonth(maxDate.getMonth() + 3);
     return { minDate, maxDate };
@@ -69,7 +72,7 @@ export default function CreateEventPage() {
     if (Number.isNaN(inputDate.getTime())) return 'La fecha no es valida.';
     const { minDate, maxDate } = getDateLimits();
     if (inputDate < minDate || inputDate > maxDate) {
-      return 'La fecha debe ser mayor a 7 dias y menor a 3 meses desde hoy.';
+      return 'La fecha debe ser mayor a 5 dias y menor a 3 meses desde hoy.';
     }
     return '';
   };
@@ -106,19 +109,43 @@ export default function CreateEventPage() {
     setError('');
     if (e.target.name === 'starts_at') {
       setDateError(getDateError(e.target.value));
+      setEndDateError(getEndDateError(e.target.value, formData.ends_at));
     }
+    if (e.target.name === 'ends_at') {
+      setEndDateError(getEndDateError(formData.starts_at, e.target.value));
+    }
+  };
+
+  const getEndDateError = (start, end) => {
+    if (!end) return '';
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (Number.isNaN(endDate.getTime()) || Number.isNaN(startDate.getTime())) return 'La fecha no es valida.';
+    // Si la fecha de finalización es menor o igual a la de inicio
+    if (endDate <= startDate) return 'La fecha de finalización debe ser posterior a la de inicio.';
+    // Si la diferencia es menor a 1 hora
+    if ((endDate - startDate) < 3600000) return 'El evento debe durar mínimo 1 hora.';
+    return '';
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    setImageFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      setImageError('La imagen supera el límite de 2MB.');
+      setImageFile(null);
+      setImagePreview('');
+      return;
+    } else {
+      setImageError('');
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -134,15 +161,28 @@ export default function CreateEventPage() {
       setError('La fecha y hora del evento es obligatoria');
       return;
     }
+    if (!formData.ends_at) {
+      setError('La fecha y hora de finalización es obligatoria');
+      return;
+    }
 
     const currentDateError = getDateError(formData.starts_at);
     if (currentDateError) {
       setDateError(currentDateError);
       return;
     }
+    const currentEndDateError = getEndDateError(formData.starts_at, formData.ends_at);
+    if (currentEndDateError) {
+      setEndDateError(currentEndDateError);
+      return;
+    }
 
     if (!imageFile) {
       setError('La imagen del evento es obligatoria');
+      return;
+    }
+    if (imageError) {
+      setError(imageError);
       return;
     }
 
@@ -152,6 +192,7 @@ export default function CreateEventPage() {
       payload.append('title', formData.title);
       payload.append('description', formData.description || '');
       payload.append('starts_at', formData.starts_at);
+      payload.append('ends_at', formData.ends_at);
       payload.append('image', imageFile);
 
       await api.post(`/api/places/${id}/events`, payload, {
@@ -252,6 +293,7 @@ export default function CreateEventPage() {
                       rows={4}
                       minLength={fieldLimits.description.min}
                       maxLength={fieldLimits.description.max}
+                      required
                       className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                       placeholder="Detalles del evento"
                     />
@@ -259,26 +301,39 @@ export default function CreateEventPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Fecha y hora *
+                      Fecha y hora de inicio *
                     </label>
                     {(() => {
                       const { minDate, maxDate } = getDateLimits();
                       return (
-                    <input
-                      type="datetime-local"
-                      name="starts_at"
-                      value={formData.starts_at}
-                      onChange={handleChange}
-                      required
-                      min={toDateTimeLocal(minDate)}
-                      max={toDateTimeLocal(maxDate)}
-                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
-                    />
+                        <input
+                          type="datetime-local"
+                          name="starts_at"
+                          value={formData.starts_at}
+                          onChange={handleChange}
+                          required
+                          min={toDateTimeLocal(minDate)}
+                          max={toDateTimeLocal(maxDate)}
+                          className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus-border-emerald-400 outline-none transition"
+                        />
                       );
                     })()}
-                    {dateError && (
-                      <p className="mt-2 text-xs text-rose-600">{dateError}</p>
-                    )}
+                    <p className={"mt-2 text-xs " + (dateError ? "text-rose-600" : "text-slate-500")}>{dateError ? dateError : "La fecha debe ser mayor a 5 dias y menor a 3 meses desde hoy."}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Fecha y hora de finalización *
+                    </label>
+                    <input
+                      type="datetime-local"
+                      name="ends_at"
+                      value={formData.ends_at}
+                      onChange={handleChange}
+                      required
+                      min={formData.starts_at ? formData.starts_at : ''}
+                      className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus-border-emerald-400 outline-none transition"
+                    />
+                    <p className={"mt-2 text-xs " + (endDateError ? "text-rose-600" : "text-slate-500")}>{endDateError ? endDateError : "La fecha de finalización debe ser posterior a la de inicio y el evento debe durar mínimo 1 hora."}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -291,6 +346,7 @@ export default function CreateEventPage() {
                       required
                       className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     />
+                    <p className={"mt-2 text-xs " + (imageError ? "text-rose-600" : "text-slate-500")}>Límite de imagen: 2MB.{imageError ? ` ${imageError}` : ''}</p>
                     {imagePreview && (
                       <img src={imagePreview} alt="Evento" className="mt-2 h-32 w-auto rounded-lg object-cover" />
                     )}
@@ -308,7 +364,7 @@ export default function CreateEventPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving || Boolean(dateError)}
+                  disabled={saving || Boolean(dateError) || Boolean(endDateError) || Boolean(imageError)}
                   className="rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-70"
                 >
                   {saving ? 'Guardando...' : 'Crear evento'}

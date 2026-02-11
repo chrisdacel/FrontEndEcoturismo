@@ -1,3 +1,14 @@
+/**
+ * Obtener listado de países
+ */
+export async function fetchCountries() {
+  try {
+    const { data } = await api.get('/api/countries');
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo países' };
+  }
+}
 import axios from 'axios';
 
 // Variable para controlar reintentos

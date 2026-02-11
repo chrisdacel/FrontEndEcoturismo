@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import Footer from './components/Footer';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { getAllPlaces } from './services/placesApi';
@@ -32,6 +31,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const [scrollToTop, setScrollToTop] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState([0, 0, 0]);
   const [sitiosAPI, setSitiosAPI] = useState([]);
+  const [apiError, setApiError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [favoriteIds, setFavoriteIds] = useState(new Set());
@@ -45,9 +45,16 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const loadSites = useCallback(async (query = searchText) => {
     try {
       setLoading(true);
+      setApiError(null);
       const data = await getAllPlaces(query);
       setSitiosAPI(data);
+      if (!Array.isArray(data) || data.length === 0) {
+        setApiError('La API respondió vacío o no hay sitios disponibles.');
+        console.warn('API /api/places respondió vacío:', data);
+      }
     } catch (error) {
+      setApiError('Error cargando sitios: ' + (error?.message || 'Error desconocido'));
+      setSitiosAPI([]);
       console.error('Error cargando sitios:', error);
     } finally {
       setLoading(false);
@@ -56,8 +63,10 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
 
   // Cargar sitios desde la API
   useEffect(() => {
+    // Carga inicial de sitios al montar el componente, cada vez que cambia el usuario o la ruta
     loadSites();
-  }, [loadSites]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, location.pathname]);
 
   useEffect(() => {
     if (location.hash !== '#recomendaciones') return;
@@ -285,10 +294,21 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
             ? sitio.labels.map((label) => label?.name ?? label)
             : [];
         const labelsText = labelNames.filter(Boolean).slice(0, 3).join(' • ') || 'Sin etiqueta';
+        // Mostrar imagen debajo del nombre
+        let imageUrl = '';
+        // Prioridad: cover > portada > imagen
+        if (sitio.cover) {
+          imageUrl = sitio.cover.startsWith('http') ? sitio.cover : `http://localhost:8000/api/files/${sitio.cover}`;
+        } else if (sitio.portada) {
+          imageUrl = sitio.portada.startsWith('http') ? sitio.portada : `http://localhost:8000/api/files/${sitio.portada}`;
+        } else if (sitio.imagen) {
+          imageUrl = sitio.imagen.startsWith('http') ? sitio.imagen : `http://localhost:8000/api/files/${sitio.imagen}`;
+        }
         const popupHtml = `
-          <div class="popup-card" style="display:flex;flex-direction:column;gap:6px;cursor:pointer;max-width:220px;">
-            <strong style="font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${sitio.name || 'Sitio'}</strong>
-            <span style="font-size:12px;color:#059669;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${labelsText}</span>
+          <div class="popup-card" style="display:flex;flex-direction:column;gap:6px;cursor:pointer;max-width:220px;align-items:center;">
+            <strong style="font-size:14px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;display:block;">${sitio.name || 'Sitio'}</strong>
+            ${imageUrl ? `<img src='${imageUrl}' alt='${sitio.name || 'Sitio'}' style='width:100%;max-width:180px;max-height:110px;object-fit:cover;border-radius:10px;margin:4px 0;'/>` : ''}
+            <span style="font-size:12px;color:#059669;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:center;">${labelsText}</span>
           </div>
         `;
         marker.bindPopup(popupHtml);
@@ -417,9 +437,11 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-400/30 border-t-emerald-400"></div>
               </div>
             ) : sitiosAPI.length === 0 ? (
-              searchText.trim() !== '' ? (
-                <div className="px-6 md:px-12 py-12 text-center text-slate-600">No se encontraron sitios para "{searchText}"</div>
-              ) : null
+              <div className="px-6 md:px-12 py-12 text-center text-rose-600 font-semibold">
+                No hay sitios disponibles para mostrar.<br />
+                {apiError && <span className="block text-xs text-rose-700 mt-2">{apiError}</span>}
+                <span className="block text-xs text-slate-500 mt-2">(Si deberías ver sitios aquí, revisa tu conexión, permisos, o contacta soporte. Revisa la consola para más detalles.)</span>
+              </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 md:px-12">
                 {sitiosAPI.map((sitio, index) => (
@@ -623,65 +645,14 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
       </main>
 
       {/* Footer (estilo Home) */}
-      <footer className="border-t border-emerald-100 bg-emerald-50/50">
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Col 1 */}
-            <div>
-              <h3 className="mb-2 text-lg font-bold text-slate-900">Conexion</h3>
-              <p className="mb-4 text-sm text-slate-700">EcoRisaralda</p>
-              <div className="flex gap-4 text-lg text-emerald-600">
-                <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
-                <a href="#"><FontAwesomeIcon icon={faLinkedin} /></a>
-                <a href="#"><FontAwesomeIcon icon={faYoutube} /></a>
-                <a href="#"><FontAwesomeIcon icon={faInstagram} /></a>
-              </div>
-              <div className="mt-4 text-sm text-slate-700">
-                🌐
-                <select className="ml-2 rounded border border-emerald-200 bg-white px-2 py-1 text-slate-700 outline-none">
-                  <option>Español</option>
-                  <option>English</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Col 2 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Información</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="#" className="hover:text-slate-900">Conexión EcoRisaralda</a></li>
-                <li><a href="#" className="hover:text-slate-900">Descripción</a></li>
-                <li><a href="#" className="hover:text-slate-900">Lema</a></li>
-              </ul>
-            </div>
-
-            {/* Col 3 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Navegación rápida</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><button onClick={onNavigateHome} className="text-left hover:text-slate-900">Inicio</button></li>
-                <li><button onClick={onNavigateSobreNosotros} className="text-left hover:text-slate-900">Sobre nosotros</button></li>
-                <li><button onClick={onNavigatePrivacidad} className="text-left hover:text-slate-900">Políticas</button></li>
-              </ul>
-            </div>
-
-            {/* Col 4 */}
-            <div>
-              <h4 className="mb-4 font-bold text-slate-900">Contacto y soporte</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li><a href="mailto:ecorisaralda@contacto.com" className="hover:text-slate-900">ecorisaralda@contacto.com</a></li>
-                <li><a href="#" className="hover:text-slate-900">300 445 80055</a></li>
-                <li><a href="#" className="hover:text-slate-900">Preguntas</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-12 border-t border-emerald-100 pt-6 text-center text-sm text-slate-600">
-            <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
-            <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer 
+        onNavigateSobreNosotros={() => window.location.href = '/sobre-nosotros'}
+        onNavigatePrivacidad={() => window.location.href = '/privacidad'}
+        onNavigateQueOfrecemos={() => window.location.href = '/que-ofrecemos'}
+        onNavigateColeccion={() => window.location.href = '/coleccion'}
+        onNavigateLogin={() => window.location.href = '/login'}
+        onNavigateInicio={() => window.location.href = '/'}
+      />
     </div>
   );
 }

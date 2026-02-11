@@ -154,16 +154,15 @@ export default function Header() {
     setMobileOpen(false);
   };
 
-  const isScrolled = isAuthPage ? false : scrollY > 20;
-  const textColor = isScrolled ? "text-slate-900" : "text-white";
-  const secondaryTextColor = isScrolled
-    ? "text-slate-700"
-    : "text-emerald-100/80";
-  const dotColor = isScrolled ? "bg-emerald-500" : "bg-emerald-400";
+  // Siempre fija y visible en móvil/tablet, color adaptativo solo en desktop
   const isColeccionPage = location.pathname.includes("/coleccion");
-
+  const isMobileOrTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
+  const isScrolled = isAuthPage ? false : (!isMobileOrTablet && scrollY > 20);
+  const textColor = isMobileOrTablet ? "text-white" : (isScrolled ? "text-slate-900" : "text-white");
+  const secondaryTextColor = isMobileOrTablet ? "text-emerald-100/80" : (isScrolled ? "text-slate-700" : "text-emerald-100/80");
+  const dotColor = isMobileOrTablet ? "bg-emerald-500" : (isScrolled ? "bg-emerald-500" : "bg-emerald-400");
   const baseLink = (isActive) =>
-    `px-3 py-2 text-sm font-medium transition ${isActive ? "text-emerald-500" : isScrolled ? "text-slate-700 hover:text-emerald-500" : "text-emerald-100/80 hover:text-emerald-500"}`;
+    `px-3 py-2 text-sm font-medium transition ${isActive ? "text-emerald-500" : isMobileOrTablet ? "text-white hover:text-emerald-500" : isScrolled ? "text-slate-700 hover:text-emerald-500" : "text-emerald-100/80 hover:text-emerald-500"}`;
 
   const navLinks =
     user?.role === "admin"
@@ -217,14 +216,15 @@ export default function Header() {
   };
   const unreadCount = notifications.filter((item) => !item.read_at).length;
 
-  // Barra verde pegada al fondo solo al inicio
-  // Siempre fixed para evitar superposición
+  // Siempre fixed y visible en móvil/tablet, color adaptativo solo en desktop
   const headerBg = `fixed top-0 left-0 right-0 z-[9999] w-full transition-all duration-[1200ms] ease-in-out ${
     isAuthPage
       ? "bg-transparent"
-      : scrollY <= 20
-        ? "bg-emerald-950/90"
-        : `backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-white/5 ${isColeccionPage ? "" : "ring-1 ring-white/10"}`
+      : isMobileOrTablet
+        ? "bg-emerald-950/90 shadow-md"
+        : scrollY <= 20
+          ? "bg-emerald-950/90"
+          : `backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-white/5 ${isColeccionPage ? "" : "ring-1 ring-white/10"}`
   }`;
 
   return (
@@ -421,7 +421,13 @@ export default function Header() {
                       {user?.name?.charAt(0).toUpperCase() || "U"}
                     </div>
                   )}
-                  <span>{user.name || "Usuario"}</span>
+                  <span style={{maxWidth:120,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',display:'inline-block'}} title={user.name}>
+                    {user.name
+                      ? (user.name.length > 20
+                          ? user.name.slice(0, 20) + '...'
+                          : user.name)
+                      : "Usuario"}
+                  </span>
                   <svg
                     className={`w-4 h-4 transition-transform duration-200 ${menuOpen ? "rotate-180" : ""}`}
                     fill="none"

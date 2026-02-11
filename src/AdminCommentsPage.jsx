@@ -47,9 +47,9 @@ export default function AdminCommentsPage() {
   const handleRestrict = async (id) => {
     setConfirmState({
       open: true,
-      title: 'Restringir reseña',
-      message: '¿Restringir esta reseña por incumplir las normas?',
-      confirmLabel: 'Restringir',
+      title: 'Ocultar reseña',
+      message: '¿Ocultar esta reseña por incumplir las normas?',
+      confirmLabel: 'Ocultar',
       tone: 'warning',
       onConfirm: async () => {
         try {
@@ -68,7 +68,7 @@ export default function AdminCommentsPage() {
   const handleUnrestrict = async (id) => {
     setConfirmState({
       open: true,
-      title: 'Desrestringir reseña',
+      title: 'Mostrar reseña',
       message: '¿Mostrar nuevamente esta reseña?',
       confirmLabel: 'Mostrar',
       tone: 'info',
@@ -308,14 +308,14 @@ export default function AdminCommentsPage() {
                         className="inline-flex items-center rounded-full bg-green-500 px-3 py-1.5 text-white text-xs shadow-sm hover:bg-green-600"
                         onClick={() => handleUnrestrict(r.id)}
                       >
-                        Desrestringir
+                        Mostrar
                       </button>
                     ) : (
                       <button
                         className="inline-flex items-center rounded-full bg-orange-500 px-3 py-1.5 text-white text-xs shadow-sm hover:bg-orange-600"
                         onClick={() => handleRestrict(r.id)}
                       >
-                        Restringir
+                        Ocultar
                       </button>
                     )}
                   </div>
@@ -379,7 +379,7 @@ export default function AdminCommentsPage() {
                             className="inline-flex items-center rounded-full bg-green-500 px-3 py-1.5 text-white text-xs shadow-sm hover:bg-green-600"
                             onClick={() => handleUnrestrict(r.id)}
                           >
-                            Desrestringir
+                            Mostrar
                           </button>
                         </div>
                       ) : (
@@ -387,7 +387,7 @@ export default function AdminCommentsPage() {
                           className="inline-flex items-center rounded-full bg-orange-500 px-3 py-1.5 text-white text-xs shadow-sm hover:bg-orange-600"
                           onClick={() => handleRestrict(r.id)}
                         >
-                          Restringir
+                          Ocultar
                         </button>
                       )}
                     </td>

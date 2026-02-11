@@ -1,3 +1,4 @@
+import Footer from './components/Footer';
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getPlaceById } from './services/placesApi';
@@ -113,7 +114,10 @@ export default function SitioDetailPage({
   const [averageRating, setAverageRating] = useState(null);
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState(5);
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false); // Para crear comentario
+  const [editSubmitting, setEditSubmitting] = useState(false); // Para editar comentario
+  const [commentsToday, setCommentsToday] = useState(0);
+  const [commentLimitReached, setCommentLimitReached] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editComment, setEditComment] = useState('');
   const [editRating, setEditRating] = useState(5);
@@ -190,6 +194,17 @@ export default function SitioDetailPage({
         setEventData(data.event || null);
         const avgFromApi = data.average_rating ?? null;
         setAverageRating(avgFromApi !== null ? Number(avgFromApi) : calcAverage(data.reviews || []));
+        // Calcular comentarios de hoy del usuario
+        if (user && data.reviews) {
+          const today = new Date();
+          const todayStr = today.toISOString().slice(0, 10);
+          const count = data.reviews.filter(r => r.user && r.user.id === user.id && r.created_at && r.created_at.slice(0, 10) === todayStr).length;
+          setCommentsToday(count);
+          setCommentLimitReached(count >= 3);
+        } else {
+          setCommentsToday(0);
+          setCommentLimitReached(false);
+        }
       } catch (err) {
         setError(err.message || 'Error cargando el sitio');
       } finally {
@@ -197,7 +212,7 @@ export default function SitioDetailPage({
       }
     };
     load();
-  }, [id]);
+  }, [id, user]);
 
   useEffect(() => {
     if (!user || !id) return;
@@ -455,7 +470,7 @@ export default function SitioDetailPage({
   };
 
   const handleUpdateReview = async (reviewId) => {
-    setSubmitting(true);
+    setEditSubmitting(true);
     setEditError(null);
     try {
       const res = await updateReview(reviewId, editRating, editComment);
@@ -471,7 +486,7 @@ export default function SitioDetailPage({
     } catch (err) {
       setEditError(err.message || 'Error actualizando reseña');
     } finally {
-      setSubmitting(false);
+      setEditSubmitting(false);
     }
   };
 
@@ -618,19 +633,7 @@ export default function SitioDetailPage({
           style={{ backgroundImage: `url('${storageUrl(sitio.cover)}')` }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
-          {(isOperatorOwner || isAdmin) && (
-            <button
-              type="button"
-              onClick={() => navigate(`${isAdmin ? `/admin/sitio/${id}/editar` : `/operador/sitio/${id}/editar`}`)}
-              className="absolute top-5 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-emerald-700 shadow-lg shadow-emerald-500/10 transition hover:bg-white"
-            >
-              Editar
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z" />
-              </svg>
-            </button>
-          )}
+          {/* Botón Editar movido junto a Volver a Colección */}
           {(isOperatorOwner || isAdmin) && !eventData && (
             <span
               className={`absolute bottom-5 right-5 z-20 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide shadow-lg transition ${
@@ -663,24 +666,6 @@ export default function SitioDetailPage({
               </button>
             </div>
           )}
-          {isTourist && (
-            <button
-              type="button"
-              onClick={handleToggleFavorite}
-              disabled={favoriteLoading}
-              className={`absolute right-5 top-5 z-20 inline-flex h-12 w-12 items-center justify-center rounded-full ring-1 backdrop-blur transition ${
-                isFavorite
-                  ? 'bg-emerald-600 text-white ring-emerald-200'
-                  : 'bg-white/85 text-emerald-700 ring-white/60 hover:bg-white'
-              } ${favoriteLoading ? 'opacity-70' : ''}`}
-              aria-label="Guardar en favoritos"
-              title="Guardar en favoritos"
-            >
-              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
-              </svg>
-            </button>
-          )}
           <div className="relative z-10 w-full">
             <div className="mx-auto max-w-7xl px-6 py-16">
               <div className="max-w-2xl">
@@ -707,13 +692,45 @@ export default function SitioDetailPage({
                     );
                   })}
                 </div>
-                <div className="mt-6">
+                <div className="mt-6 flex flex-row items-center gap-4">
                   <button 
                     className="rounded-full bg-emerald-600 px-6 py-3 font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:-translate-y-0.5 hover:bg-emerald-700"
                     onClick={() => navigate('/coleccion')}
                   >
                     Volver a Colección
                   </button>
+                  {(isOperatorOwner || isAdmin) && (
+                    <button
+                      type="button"
+                      onClick={() => navigate(`${isAdmin ? `/admin/sitio/${id}/editar` : `/operador/sitio/${id}/editar`}`)}
+                      className="inline-flex items-center gap-2 rounded-full bg-white/90 px-6 py-3 text-xs font-semibold uppercase tracking-wide text-emerald-700 shadow-lg shadow-emerald-500/10 transition hover:bg-white"
+                      style={{ marginLeft: '0.5rem' }}
+                    >
+                      Editar
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z" />
+                      </svg>
+                    </button>
+                  )}
+                  {isTourist && (
+                    <button
+                      type="button"
+                      onClick={handleToggleFavorite}
+                      disabled={favoriteLoading}
+                      className={`inline-flex h-12 w-12 items-center justify-center rounded-full ring-1 backdrop-blur transition ${
+                        isFavorite
+                          ? 'bg-emerald-600 text-white ring-emerald-200'
+                          : 'bg-white/85 text-emerald-700 ring-white/60 hover:bg-white'
+                      } ${favoriteLoading ? 'opacity-70' : ''}`}
+                      aria-label="Guardar en favoritos"
+                      title="Guardar en favoritos"
+                    >
+                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -933,7 +950,20 @@ export default function SitioDetailPage({
                       </div>
                     )}
                     <h2 className="mt-2 text-2xl font-bold text-slate-900">{eventData.title || 'Evento ecoturistico'}</h2>
-                    <p className="mt-2 text-sm text-slate-600">{formatEventDate(eventData.starts_at)}</p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      <span className="font-semibold">Inicio:</span> {formatEventDate(eventData.starts_at)}<br />
+                      <span className="font-semibold">Finalización:</span> {(() => {
+                        const parsed = new Date(eventData && eventData.ends_at);
+                        if (!eventData || !eventData.ends_at) {
+                          return <span style={{color:'gray'}}>No disponible</span>;
+                        }
+                        if (!Number.isNaN(parsed.getTime())) {
+                          return formatEventDate(eventData.ends_at);
+                        } else {
+                          return eventData.ends_at;
+                        }
+                      })()}<br />
+                    </p>
                   </div>
                   {eventData.image && (
                     <img
@@ -1080,12 +1110,15 @@ export default function SitioDetailPage({
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    disabled={submitting || !rating || comment.length < 10 || comment.length > 1000}
+                    disabled={submitting || !rating || comment.length < 10 || comment.length > 1000 || commentLimitReached}
                     className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2 text-white font-semibold hover:bg-emerald-700 disabled:opacity-60"
                   >
                     {submitting ? 'Enviando...' : 'Publicar comentario'}
                   </button>
                 </div>
+                {commentLimitReached && (
+                  <div className="text-xs text-amber-600 mt-1">Ya has hecho 3 comentarios hoy en este sitio.</div>
+                )}
               </form>
             ) : (
               <p className="mb-8 text-sm text-slate-600">Inicia sesión para comentar.</p>
@@ -1164,10 +1197,10 @@ export default function SitioDetailPage({
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleUpdateReview(rev.id)}
-                                disabled={submitting || editComment.length === 0 || editComment.length > 1000}
+                                disabled={editSubmitting || editComment.length === 0 || editComment.length > 1000}
                                 className="rounded-full bg-emerald-600 px-4 py-2 text-white text-sm hover:bg-emerald-700 disabled:opacity-60"
                               >
-                                Guardar
+                                {editSubmitting ? 'Guardando...' : 'Guardar'}
                               </button>
                               <button
                                 onClick={() => setEditingId(null)}
@@ -1277,72 +1310,14 @@ export default function SitioDetailPage({
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-emerald-100 bg-emerald-50/50 py-12 px-6 text-slate-700">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
-          {/* Column 1 */}
-          <div>
-            <h2 className="text-2xl font-bold mb-2 text-slate-900">Conexion</h2>
-            <p className="text-slate-700 mb-4">EcoRisaralda</p>
-            <div className="flex gap-4 mb-4 text-emerald-600">
-              <a href="#" className="hover:text-emerald-800 transition">
-                <i className="fab fa-facebook text-xl"></i>
-              </a>
-              <a href="#" className="hover:text-emerald-800 transition">
-                <i className="fab fa-linkedin text-xl"></i>
-              </a>
-              <a href="#" className="hover:text-emerald-800 transition">
-                <i className="fab fa-youtube text-xl"></i>
-              </a>
-              <a href="#" className="hover:text-emerald-800 transition">
-                <i className="fab fa-instagram text-xl"></i>
-              </a>
-            </div>
-            <div className="flex items-center gap-2">
-              <span>🌐</span>
-              <select className="bg-white text-slate-700 px-2 py-1 rounded border border-emerald-200">
-                <option>Español</option>
-                <option>English</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Column 2 */}
-          <div>
-            <h4 className="text-lg font-bold mb-4 text-slate-900">Información</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-slate-700 hover:text-slate-900">Conexión EcoRisaralda</a></li>
-              <li><a href="#" className="text-slate-700 hover:text-slate-900">Descripción</a></li>
-              <li><a href="#" className="text-slate-700 hover:text-slate-900">Lema</a></li>
-            </ul>
-          </div>
-
-          {/* Column 3 */}
-          <div>
-            <h4 className="text-lg font-bold mb-4 text-slate-900">Navegación rápida</h4>
-            <ul className="space-y-2 text-sm text-slate-700">
-              <li><button onClick={onNavigateHome} className="text-left hover:text-slate-900">Inicio</button></li>
-              <li><button onClick={onNavigateSobreNosotros} className="text-left hover:text-slate-900">Sobre nosotros</button></li>
-              <li><button onClick={onNavigatePrivacidad} className="text-left hover:text-slate-900">Políticas</button></li>
-            </ul>
-          </div>
-
-          {/* Column 4 */}
-          <div>
-            <h4 className="text-lg font-bold mb-4 text-slate-900">Contacto y soporte</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="mailto:ecorisaralda@contacto.com" className="text-slate-700 hover:text-slate-900">ecorisaralda@contacto.com</a></li>
-              <li><a href="#" className="text-slate-700 hover:text-slate-900">300 445 80055</a></li>
-              <li><a href="#" className="text-slate-700 hover:text-slate-900">Preguntas</a></li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Footer bottom */}
-        <div className="max-w-7xl mx-auto mt-12 border-t border-emerald-100 pt-6 text-center text-sm text-slate-600">
-          <p className="mb-2"><em>Conectando viajeros con la naturaleza. Explora, guarda y comparte experiencias únicas.</em></p>
-          <p>© 2025 Conexión EcoRisaralda – Todos los derechos reservados.</p>
-        </div>
-      </footer>
+      <Footer 
+        onNavigateSobreNosotros={() => window.location.href = '/sobre-nosotros'}
+        onNavigatePrivacidad={() => window.location.href = '/privacidad'}
+        onNavigateQueOfrecemos={() => window.location.href = '/que-ofrecemos'}
+        onNavigateColeccion={() => window.location.href = '/coleccion'}
+        onNavigateLogin={() => window.location.href = '/login'}
+        onNavigateInicio={() => window.location.href = '/'}
+      />
 
       <ConfirmDialog
         open={confirmState.open}

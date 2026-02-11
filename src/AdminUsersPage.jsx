@@ -74,8 +74,8 @@ export default function AdminUsersPage() {
       onConfirm: async () => {
         try {
           setBusyId(id);
-          const { user } = await updateUser(id, { status: 'inactive', email: `${Date.now()}-deactivated-${Math.random().toString(36).slice(2)}@deactivated.local` });
-          setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'inactive', email: user.email } : u));
+          const { user } = await updateUser(id, { status: 'inactive' });
+          setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'inactive' } : u));
           setError('');
         } catch (err) {
           setError(err.message || 'No se pudo desactivar');
@@ -99,8 +99,8 @@ export default function AdminUsersPage() {
       onConfirm: async () => {
         try {
           setBusyId(id);
-          const { user } = await updateUser(id, { status: 'active', email: originalEmail });
-          setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'active', email: user.original_email || user.email } : u));
+          const { user } = await updateUser(id, { status: 'active' });
+          setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'active' } : u));
           setError('');
           setConfirmState({ open: false });
         } catch (err) {
@@ -115,8 +115,8 @@ export default function AdminUsersPage() {
               onConfirm: async () => {
                 try {
                   setBusyId(id);
-                  const { user } = await updateUser(id, { status: 'active', email: `${Date.now()}-reactivated-${Math.random().toString(36).slice(2)}@temporal.local` });
-                  setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'active', email: user.email } : u));
+                  const { user } = await updateUser(id, { status: 'active' });
+                  setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: 'active' } : u));
                   setError('');
                   setConfirmState({ open: false });
                 } catch (err2) {
