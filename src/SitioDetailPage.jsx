@@ -118,6 +118,9 @@ export default function SitioDetailPage({
   const [editSubmitting, setEditSubmitting] = useState(false); // Para editar comentario
   const [commentsToday, setCommentsToday] = useState(0);
   const [commentLimitReached, setCommentLimitReached] = useState(false);
+  const [userHasRatedReview, setUserHasRatedReview] = useState(false);
+  const [simpleCommentText, setSimpleCommentText] = useState('');
+  const [simpleCommentSubmitting, setSimpleCommentSubmitting] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editComment, setEditComment] = useState('');
   const [editRating, setEditRating] = useState(5);
@@ -151,6 +154,11 @@ export default function SitioDetailPage({
 
   const handleCommentChange = (e) => {
     setComment(e.target.value);
+    setCommentError(null);
+  };
+
+  const handleSimpleCommentChange = (e) => {
+    setSimpleCommentText(e.target.value);
     setCommentError(null);
   };
 
@@ -194,16 +202,12 @@ export default function SitioDetailPage({
         setEventData(data.event || null);
         const avgFromApi = data.average_rating ?? null;
         setAverageRating(avgFromApi !== null ? Number(avgFromApi) : calcAverage(data.reviews || []));
-        // Calcular comentarios de hoy del usuario
+        // Verificar si el usuario ya tiene comentario con calificación
         if (user && data.reviews) {
-          const today = new Date();
-          const todayStr = today.toISOString().slice(0, 10);
-          const count = data.reviews.filter(r => r.user && r.user.id === user.id && r.created_at && r.created_at.slice(0, 10) === todayStr).length;
-          setCommentsToday(count);
-          setCommentLimitReached(count >= 3);
+          const userReview = data.reviews.find(r => r.user && r.user.id === user.id && r.rating);
+          setUserHasRatedReview(!!userReview);
         } else {
-          setCommentsToday(0);
-          setCommentLimitReached(false);
+          setUserHasRatedReview(false);
         }
       } catch (err) {
         setError(err.message || 'Error cargando el sitio');
@@ -453,12 +457,31 @@ export default function SitioDetailPage({
         setAverageRating(calcAverage(updated));
         return updated;
       });
+      setUserHasRatedReview(true);
       setComment('');
       setRating(5);
     } catch (err) {
       setCommentError(err.message || 'Error enviando reseña');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleCreateSimpleComment = async (e) => {
+    e.preventDefault();
+    setSimpleCommentSubmitting(true);
+    setCommentError(null);
+    try {
+      await api.post(`/api/places/${id}/comments`, {
+        comment: simpleCommentText,
+      });
+      setSimpleCommentText('');
+      const data = await getPlaceById(id);
+      setReviews(data.reviews || []);
+    } catch (err) {
+      setCommentError(err.message || 'Error enviando comentario');
+    } finally {
+      setSimpleCommentSubmitting(false);
     }
   };
 
@@ -491,6 +514,9 @@ export default function SitioDetailPage({
   };
 
   const handleDeleteReview = async (reviewId) => {
+    const reviewToDelete = reviews.find(r => r.id === reviewId);
+    const isUserRatedReview = reviewToDelete && reviewToDelete.rating && user && reviewToDelete.user?.id === user.id;
+    
     setConfirmState({
       open: true,
       title: 'Eliminar comentario',
@@ -507,6 +533,9 @@ export default function SitioDetailPage({
             setAverageRating(calcAverage(next));
             return next;
           });
+          if (isUserRatedReview) {
+            setUserHasRatedReview(false);
+          }
         } catch (err) {
           setCommentError(err.message || 'Error eliminando reseña');
         } finally {
@@ -1079,47 +1108,90 @@ export default function SitioDetailPage({
             </div>
 
             {user && ['user','operator','admin'].includes(user.role) ? (
-              <form onSubmit={handleCreateReview} className="mb-8 space-y-3 bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
-                <div className="flex gap-4 items-center">
-                  <label className="text-sm font-semibold text-slate-700">Calificación</label>
-                  <StarRating rating={rating} onRatingChange={setRating} size="medium" />
-                  <span className="text-sm text-slate-600">({rating}/5)</span>
-                </div>
-                <div className="space-y-1">
-                  <textarea
-                    value={comment}
-                    onChange={handleCommentChange}
-                    required
-                    minLength={10}
-                    maxLength={1000}
-                    placeholder="Comparte tu experiencia..."
-                    className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
-                    rows={3}
-                  />
-                  <div className={`text-xs font-medium ${
-                    comment.length > 1000 ? 'text-red-600' : comment.length > 900 ? 'text-amber-600' : 'text-slate-500'
-                  }`}>
-                    {comment.length}/1000 caracteres máximo (mínimo 10)
-                  </div>
-                </div>
-                {commentError && (
-                  <Alert type="error" className="mb-2">
-                    {commentError}
-                  </Alert>
+              <>
+                {!userHasRatedReview ? (
+                  // FORM 1: CON CALIFICACIÓN
+                  <form onSubmit={handleCreateReview} className="mb-8 space-y-3 bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
+                    <div className="bg-emerald-50/60 border border-emerald-200 rounded-lg p-3 mb-2">
+                      <p className="text-xs font-semibold text-emerald-700">Deja tu evaluación y comentario</p>
+                    </div>
+                    <div className="flex gap-4 items-center">
+                      <label className="text-sm font-semibold text-slate-700">Calificación</label>
+                      <StarRating rating={rating} onRatingChange={setRating} size="medium" />
+                      <span className="text-sm text-slate-600">({rating}/5)</span>
+                    </div>
+                    <div className="space-y-1">
+                      <textarea
+                        value={comment}
+                        onChange={handleCommentChange}
+                        required
+                        minLength={10}
+                        maxLength={1000}
+                        placeholder="Comparte tu experiencia..."
+                        className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
+                        rows={3}
+                      />
+                      <div className={`text-xs font-medium ${
+                        comment.length > 1000 ? 'text-red-600' : comment.length > 900 ? 'text-amber-600' : 'text-slate-500'
+                      }`}>
+                        {comment.length}/1000 caracteres máximo (mínimo 10)
+                      </div>
+                    </div>
+                    {commentError && (
+                      <Alert type="error" className="mb-2">
+                        {commentError}
+                      </Alert>
+                    )}
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={submitting || !rating || comment.length < 10 || comment.length > 1000}
+                        className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2 text-white font-semibold hover:bg-emerald-700 disabled:opacity-60"
+                      >
+                        {submitting ? 'Enviando...' : 'Publicar evaluación'}
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  // FORM 2: SIN CALIFICACIÓN
+                  <form onSubmit={handleCreateSimpleComment} className="mb-8 space-y-3 bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
+                    <div className="bg-blue-50/60 border border-blue-200 rounded-lg p-3 mb-2">
+                      <p className="text-xs font-semibold text-blue-700">Ya has dejado tu evaluación. Puedes agregar más comentarios sin calificación.</p>
+                    </div>
+                    <div className="space-y-1">
+                      <textarea
+                        value={simpleCommentText}
+                        onChange={handleSimpleCommentChange}
+                        required
+                        minLength={10}
+                        maxLength={1000}
+                        placeholder="Comparte más detalles o experiencias..."
+                        className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
+                        rows={3}
+                      />
+                      <div className={`text-xs font-medium ${
+                        simpleCommentText.length > 1000 ? 'text-red-600' : simpleCommentText.length > 900 ? 'text-amber-600' : 'text-slate-500'
+                      }`}>
+                        {simpleCommentText.length}/1000 caracteres máximo (mínimo 10)
+                      </div>
+                    </div>
+                    {commentError && (
+                      <Alert type="error" className="mb-2">
+                        {commentError}
+                      </Alert>
+                    )}
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={simpleCommentSubmitting || simpleCommentText.length < 10 || simpleCommentText.length > 1000}
+                        className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-white font-semibold hover:bg-blue-700 disabled:opacity-60"
+                      >
+                        {simpleCommentSubmitting ? 'Enviando...' : 'Agregar comentario'}
+                      </button>
+                    </div>
+                  </form>
                 )}
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={submitting || !rating || comment.length < 10 || comment.length > 1000 || commentLimitReached}
-                    className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2 text-white font-semibold hover:bg-emerald-700 disabled:opacity-60"
-                  >
-                    {submitting ? 'Enviando...' : 'Publicar comentario'}
-                  </button>
-                </div>
-                {commentLimitReached && (
-                  <div className="text-xs text-amber-600 mt-1">Ya has hecho 3 comentarios hoy en este sitio.</div>
-                )}
-              </form>
+              </>
             ) : (
               <p className="mb-8 text-sm text-slate-600">Inicia sesión para comentar.</p>
             )}
