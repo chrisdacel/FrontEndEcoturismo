@@ -1,5 +1,9 @@
-import Footer from './components/Footer';
+import Alert from './components/Alert';
+import ConfirmDialog from './components/ConfirmDialog';
+import { useAuth } from './context/AuthContext';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { useEffect, useState, useRef } from 'react';
+import Footer from './components/Footer';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getPlaceById } from './services/placesApi';
 import {
@@ -9,16 +13,7 @@ import {
   deleteReview,
   reactToReview,
   logPlaceVisit,
-  restrictReviewAsOperator,
-  unrestrictReviewAsOperator,
-  markNotificationRead,
 } from './services/api';
-import { useAuth } from './context/AuthContext';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import Alert from './components/Alert';
-import ConfirmDialog from './components/ConfirmDialog';
 
 const greenMarkerSvg = `data:image/svg+xml,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">'
@@ -113,7 +108,7 @@ export default function SitioDetailPage({
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
   const [averageRating, setAverageRating] = useState(null);
   const [comment, setComment] = useState('');
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(0);
   const [submitting, setSubmitting] = useState(false); // Para crear comentario
   const [editSubmitting, setEditSubmitting] = useState(false); // Para editar comentario
   const [commentsToday, setCommentsToday] = useState(0);
@@ -165,21 +160,23 @@ export default function SitioDetailPage({
   // Aplicar filtros a las reseñas
   useEffect(() => {
     let sorted = [...reviews];
-    
-    switch (filterType) {
-      case 'recent':
-        sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        break;
-      case 'highest':
-        sorted.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'lowest':
-        sorted.sort((a, b) => a.rating - b.rating);
-        break;
-      default:
-        break;
+    // Ordenar por más recientes
+    if (filterType === 'recent') {
+      sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    } else if (filterType === 'highest') {
+      sorted.sort((a, b) => b.rating - a.rating);
+    } else if (filterType === 'lowest') {
+      sorted.sort((a, b) => a.rating - b.rating);
     }
-    
+
+    // Si el usuario está logueado y tiene comentario, mostrarlo primero solo para él
+    if (user && sorted.length > 0) {
+      const userReviewIdx = sorted.findIndex(r => r.user && r.user.id === user.id);
+      if (userReviewIdx !== -1) {
+        const [userReview] = sorted.splice(userReviewIdx, 1);
+        sorted = [userReview, ...sorted];
+      }
+    }
     setFilteredReviews(sorted);
   }, [reviews, filterType]);
 
@@ -453,13 +450,20 @@ export default function SitioDetailPage({
       const res = await createReview(id, rating, comment);
       const newReview = res.review || res;
       setReviews((prev) => {
-        const updated = [newReview, ...prev];
-        setAverageRating(calcAverage(updated));
-        return updated;
+        if (res.average_rating !== undefined && res.average_rating !== null) {
+          setAverageRating(Number(res.average_rating));
+        } else {
+          const updated = [newReview, ...prev];
+          setAverageRating(calcAverage(updated));
+        }
+        return [newReview, ...prev];
       });
       setUserHasRatedReview(true);
+      // Sincronizar edición con la reseña recién publicada
+      setEditComment(comment);
+      setEditRating(rating);
       setComment('');
-      setRating(5);
+      setRating(0);
     } catch (err) {
       setCommentError(err.message || 'Error enviando reseña');
     } finally {
@@ -493,15 +497,21 @@ export default function SitioDetailPage({
   };
 
   const handleUpdateReview = async (reviewId) => {
+    const prevReview = reviews.find(r => r.id === reviewId);
+    // Si el usuario baja la calificación, solo mostrar el texto inline (no popup)
     setEditSubmitting(true);
     setEditError(null);
     try {
       const res = await updateReview(reviewId, editRating, editComment);
       const updated = res.review || res;
       setReviews((prev) => {
-        const next = prev.map((r) => (r.id === reviewId ? updated : r));
-        setAverageRating(calcAverage(next));
-        return next;
+        if (res.average_rating !== undefined && res.average_rating !== null) {
+          setAverageRating(Number(res.average_rating));
+        } else {
+          const next = prev.map((r) => (r.id === reviewId ? updated : r));
+          setAverageRating(calcAverage(next));
+        }
+        return prev.map((r) => (r.id === reviewId ? updated : r));
       });
       setEditingId(null);
       setEditComment('');
@@ -527,10 +537,15 @@ export default function SitioDetailPage({
         setSubmitting(true);
         setCommentError(null);
         try {
-          await deleteReview(reviewId);
+          const res = await deleteReview(reviewId);
           setReviews((prev) => {
             const next = prev.filter((r) => r.id !== reviewId);
-            setAverageRating(calcAverage(next));
+            // Si el backend retorna average_rating actualizado, úsalo
+            if (res && res.average_rating !== undefined && res.average_rating !== null) {
+              setAverageRating(Number(res.average_rating));
+            } else {
+              setAverageRating(calcAverage(next));
+            }
             return next;
           });
           if (isUserRatedReview) {
@@ -1107,7 +1122,7 @@ export default function SitioDetailPage({
               </div>
             </div>
 
-            {user && ['user','operator','admin'].includes(user.role) ? (
+            {user && user.role === 'user' ? (
               <>
                 {!userHasRatedReview ? (
                   // FORM 1: CON CALIFICACIÓN
@@ -1152,48 +1167,10 @@ export default function SitioDetailPage({
                       </button>
                     </div>
                   </form>
-                ) : (
-                  // FORM 2: SIN CALIFICACIÓN
-                  <form onSubmit={handleCreateSimpleComment} className="mb-8 space-y-3 bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
-                    <div className="bg-blue-50/60 border border-blue-200 rounded-lg p-3 mb-2">
-                      <p className="text-xs font-semibold text-blue-700">Ya has dejado tu evaluación. Puedes agregar más comentarios sin calificación.</p>
-                    </div>
-                    <div className="space-y-1">
-                      <textarea
-                        value={simpleCommentText}
-                        onChange={handleSimpleCommentChange}
-                        required
-                        minLength={10}
-                        maxLength={1000}
-                        placeholder="Comparte más detalles o experiencias..."
-                        className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
-                        rows={3}
-                      />
-                      <div className={`text-xs font-medium ${
-                        simpleCommentText.length > 1000 ? 'text-red-600' : simpleCommentText.length > 900 ? 'text-amber-600' : 'text-slate-500'
-                      }`}>
-                        {simpleCommentText.length}/1000 caracteres máximo (mínimo 10)
-                      </div>
-                    </div>
-                    {commentError && (
-                      <Alert type="error" className="mb-2">
-                        {commentError}
-                      </Alert>
-                    )}
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        disabled={simpleCommentSubmitting || simpleCommentText.length < 10 || simpleCommentText.length > 1000}
-                        className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-white font-semibold hover:bg-blue-700 disabled:opacity-60"
-                      >
-                        {simpleCommentSubmitting ? 'Enviando...' : 'Agregar comentario'}
-                      </button>
-                    </div>
-                  </form>
-                )}
+                ) : null}
               </>
             ) : (
-              <p className="mb-8 text-sm text-slate-600">Inicia sesión para comentar.</p>
+              <p className="mb-8 text-sm text-slate-600">{user ? 'Solo los turistas pueden comentar y calificar.' : 'Inicia sesión para comentar.'}</p>
             )}
 
             {actionError && (
@@ -1209,7 +1186,10 @@ export default function SitioDetailPage({
                 const displayName = hasUser ? (rev.user?.name || 'Usuario') : '[usuario no encontrado]';
                 const avatarInitial = hasUser && rev.user?.name ? rev.user.name.charAt(0).toUpperCase() : 'U';
                 return (
-                  <div key={rev.id} className="group bg-white rounded-lg border border-emerald-100 p-4 shadow-sm overflow-hidden">
+                  <div
+                    key={rev.id}
+                    className={`group rounded-lg p-4 shadow-sm overflow-hidden ${isOwner ? 'border border-emerald-300 bg-white' : 'border border-emerald-100 bg-white'}`}
+                  >
                     <div className={editingId === rev.id ? "flex flex-col gap-3" : "flex items-start justify-between gap-3"}>
                       <div className="flex items-start gap-3 flex-1 min-w-0">
                         {/* Avatar del usuario */}
@@ -1236,8 +1216,16 @@ export default function SitioDetailPage({
                         
                         {/* Nombre y fecha */}
                         <div className="flex-1 min-w-0">
+                          {isOwner && (
+                            <span className="text-xs font-medium text-slate-400 mb-1 block">Tu comentario</span>
+                          )}
                           <p className={`text-sm font-semibold truncate ${isOwner ? 'text-emerald-700' : 'text-slate-900'}`}>{displayName}</p>
-                          <p className="text-xs text-slate-500">{rev.created_at ? new Date(rev.created_at).toLocaleString() : ''}</p>
+                          <p className="text-xs text-slate-500">
+                            {rev.created_at ? new Date(rev.created_at).toLocaleString() : ''}
+                            {rev.updated_at && rev.updated_at !== rev.created_at && (
+                              <span className="ml-2 text-amber-600 font-medium">(Editado el {new Date(rev.updated_at).toLocaleString()})</span>
+                            )}
+                          </p>
                         
                         {/* Contenido del comentario */}
                         {editingId === rev.id ? (
@@ -1246,6 +1234,18 @@ export default function SitioDetailPage({
                               <label className="text-xs font-semibold text-slate-700">Calificación</label>
                               <StarRating rating={editRating} onRatingChange={setEditRating} size="small" />
                               <span className="text-xs text-slate-600">({editRating}/5)</span>
+                              {/* Mensaje inline si reduce calificación */}
+                              {(() => {
+                                const prevReview = reviews.find(r => r.user && r.user.id === user.id && r.rating);
+                                if (prevReview && editRating < prevReview.rating) {
+                                  return (
+                                    <span className="ml-4 text-xs text-slate-600">
+                                      Estás reduciendo tu calificación. ¿Deseas actualizar tu comentario para reflejar tu nueva experiencia?
+                                    </span>
+                                  );
+                                }
+                                return null;
+                              })()}
                             </div>
                             <div className="space-y-1">
                               <textarea

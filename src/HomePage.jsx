@@ -414,20 +414,26 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
                   </div>
 
                   {/* Flechas navegación */}
-                  <button
-                    onClick={() => handleEventosChange((eventosIndex - 1 + upcomingEvents.length) % upcomingEvents.length)}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/25 px-2 py-1.5 text-xl font-semibold text-white/90 shadow-sm transition hover:bg-black/40 md:-left-6"
+                  <span
+                    onClick={e => { e.stopPropagation(); handleEventosChange((eventosIndex - 1 + upcomingEvents.length) % upcomingEvents.length); }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/25 px-2 py-1.5 text-xl font-semibold text-white/90 shadow-sm transition hover:bg-black/40 md:-left-6 cursor-pointer select-none"
                     aria-label="Evento anterior"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); handleEventosChange((eventosIndex - 1 + upcomingEvents.length) % upcomingEvents.length); } }}
                   >
                     &lt;
-                  </button>
-                  <button
-                    onClick={() => handleEventosChange((eventosIndex + 1) % upcomingEvents.length)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/25 px-2 py-1.5 text-xl font-semibold text-white/90 shadow-sm transition hover:bg-black/40 md:-right-6"
+                  </span>
+                  <span
+                    onClick={e => { e.stopPropagation(); handleEventosChange((eventosIndex + 1) % upcomingEvents.length); }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/25 px-2 py-1.5 text-xl font-semibold text-white/90 shadow-sm transition hover:bg-black/40 md:-right-6 cursor-pointer select-none"
                     aria-label="Siguiente evento"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); handleEventosChange((eventosIndex + 1) % upcomingEvents.length); } }}
                   >
                     &gt;
-                  </button>
+                  </span>
                 </button>
 
                 {/* Dots fuera de la card */}
