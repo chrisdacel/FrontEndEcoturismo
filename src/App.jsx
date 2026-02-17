@@ -20,7 +20,6 @@ import QueOfrecemosPage from './QueOfrecemosPage';
 import PrivacidadPage from './PrivacidadPage';
 import SobreNosotrosPage from './SobreNosotrosPage';
 import AdminDashboardPage from './AdminDashboardPage';
-import AdminCreateOperatorPage from './AdminCreateOperatorPage';
 import AdminUsersPage from './AdminUsersPage';
 import AdminOperatorsPage from './AdminOperatorsPage';
 import AdminProfilePage from './AdminProfilePage';
@@ -130,14 +129,6 @@ function AppRoutes() {
         element={
           <AdminRoute>
             <AdminDashboardPage />
-          </AdminRoute>
-        }
-      />
-      <Route
-        path="/admin/create-operator"
-        element={
-          <AdminRoute>
-            <AdminCreateOperatorPage />
           </AdminRoute>
         }
       />

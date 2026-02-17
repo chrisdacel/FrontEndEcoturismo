@@ -209,7 +209,13 @@ export default function AdminUsersPage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <button
-              onClick={() => navigate('/admin/dashboard')}
+              onClick={() => {
+                if (window.history.length > 2) {
+                  navigate(-1);
+                } else {
+                  navigate('/admin');
+                }
+              }}
               className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition mb-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

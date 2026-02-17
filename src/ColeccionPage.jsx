@@ -420,12 +420,12 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
 
         {/* Sección 2: Sitios Creados desde la API */}
         <section className="w-full bg-white py-16 px-0 md:px-0">
-            <div className="px-6 md:px-12 mb-8 flex items-center justify-between">
+            <div className="px-6 md:px-12 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-0">
               <h2 className="text-3xl font-bold">Sitios Ecoturísticos</h2>
               {(user?.role === 'admin' || user?.role === 'operator') && (
                 <button
                   onClick={() => navigate('/crear-sitio')}
-                  className="rounded-full bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-600 transition"
+                  className="rounded-full bg-emerald-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-600 transition md:px-6 md:py-3 md:text-lg"
                 >
                   + Crear Sitio
                 </button>
@@ -561,7 +561,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
 
           {/* Carril con scroll horizontal y snap */}
           <div className="overflow-x-auto scrollbar-none px-6 md:px-12">
-            <div className="flex gap-6 md:gap-8 snap-x snap-mandatory">
+            <div className="flex gap-6 md:gap-8 snap-x snap-mandatory pr-6 md:pr-12">
               {recommendationsLoading ? (
                 <div className="text-sm text-slate-600">Cargando recomendaciones...</div>
               ) : recommendedList.length === 0 ? (

@@ -193,20 +193,20 @@ export default function AdminLabelsPage() {
           {loading ? (
             <div className="text-sm text-slate-600">Cargando etiquetas...</div>
           ) : (
-            <div className="overflow-x-auto bg-white border-b border-slate-200">
-              <table className="min-w-full text-sm">
+            <div className="w-full bg-white border-b border-slate-200 rounded-lg overflow-hidden md:max-w-6xl md:mx-auto">
+              <table className="w-full text-sm">
                 <thead className="bg-white">
                   <tr>
-                    <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Nombre</th>
-                    <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Color</th>
-                    <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Acciones</th>
+                    <th className="px-2 py-2 text-left text-slate-700 uppercase tracking-wider text-xs whitespace-nowrap md:px-6">Nombre</th>
+                    <th className="px-2 py-2 text-left text-slate-700 uppercase tracking-wider text-xs whitespace-nowrap md:px-6">Color</th>
+                    <th className="px-2 py-2 text-left text-slate-700 uppercase tracking-wider text-xs whitespace-nowrap md:px-6">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {labels.map((label) => (
                     <tr key={label.id} className="hover:bg-slate-50">
-                      <td className="px-6 py-4 text-slate-800">{label.name}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-2 py-2 text-slate-800 break-words max-w-[120px] md:px-6 md:max-w-none">{label.name}</td>
+                      <td className="px-2 py-2 md:px-6">
                         <span className="inline-flex items-center gap-2">
                           <span
                             className="h-3 w-3 rounded-full"
@@ -215,8 +215,8 @@ export default function AdminLabelsPage() {
                           <span className="text-slate-600">#{label.color}</span>
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
+                      <td className="px-2 py-2 md:px-6">
+                        <div className="flex gap-2 flex-wrap">
                           <button
                             onClick={() => handleEdit(label)}
                             className="rounded-full border border-emerald-200 px-3 py-1 text-xs text-emerald-700 hover:bg-emerald-50"

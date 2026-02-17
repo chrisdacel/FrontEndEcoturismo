@@ -17,7 +17,7 @@ export default function Footer({ onNavigateSobreNosotros, onNavigatePrivacidad, 
   };
   return (
     <footer className="border-t border-emerald-100 bg-emerald-50/50 py-12 px-6 text-slate-700">
-      <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 text-center md:text-left justify-items-center md:justify-items-start">
         {/* Columna 1 */}
         <div>
           <h2 className="text-2xl font-bold mb-2 text-slate-900">Conexión</h2>

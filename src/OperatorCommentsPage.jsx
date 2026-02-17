@@ -178,9 +178,52 @@ export default function OperatorCommentsPage() {
         </button>
 
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">Gestionar Comentarios</h1>
-            <p className="text-sm text-slate-600">Revisa y restringe reseñas de tus sitios</p>
+          {/* Cabecera responsive organizada */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-6">
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <h1 className="text-2xl sm:text-3xl font-bold text-emerald-700">Comentarios</h1>
+                <span className="text-xs sm:text-sm text-slate-500 font-normal">{reviews.length} comentario(s)</span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-600">Revisa y restringe reseñas de tus sitios</p>
+            </div>
+            <div className="flex items-center gap-2 mt-2 sm:mt-0 w-full sm:w-auto">
+              <span className="text-xs sm:text-sm text-slate-700 font-semibold whitespace-nowrap">Ordenar por:</span>
+              <div className="relative w-full sm:w-auto" ref={dateMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setDateMenuOpen((prev) => !prev)}
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50 w-full sm:w-auto"
+                >
+                  <span className="truncate">{dateLabels[dateFilter] || 'Todas las fechas'}</span>
+                  <svg
+                    className={`h-4 w-4 transition-transform duration-200 ${dateMenuOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {dateMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 sm:w-56 max-h-none rounded-xl overflow-visible bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
+                    {dateOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setDateFilter(option.value);
+                          setDateMenuOpen(false);
+                        }}
+                        className="w-full px-4 py-2 text-left text-xs sm:text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

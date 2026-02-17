@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import { getAllPlaces } from './services/placesApi';
 
 export default function ColeccionPageTurista({ 
   userName = "Jane Mar",
@@ -7,9 +10,14 @@ export default function ColeccionPageTurista({
   onNavigatePrivacidad,
   onNavigateSitio
 }) {
+  const location = useLocation();
+  const { user } = useAuth ? useAuth() : { user: null };
   const [scrollToTop, setScrollToTop] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState([0, 0, 0]);
   const [searchText, setSearchText] = useState('');
+  const [sitios, setSitios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,16 +27,32 @@ export default function ColeccionPageTurista({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    async function fetchSitios() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getAllPlaces();
+        // Adaptar los datos a la estructura esperada por el componente
+        const adaptados = (Array.isArray(data) ? data : []).map(sitio => ({
+          img: sitio.cover || sitio.portada || sitio.imagen || '/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg',
+          title: sitio.name || sitio.title || 'Sitio',
+          location: sitio.localization || sitio.ubicacion || sitio.location || '',
+        }));
+        setSitios(adaptados);
+      } catch (e) {
+        setError('Error cargando sitios');
+        setSitios([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSitios();
+  }, [user, location.pathname]);
+
   const scrollTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const sitios = [
-    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg', title: 'Santuario Otún Quimbaya', location: 'Municipio de Santa Rosa de Cabal' },
-    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_02.jpeg', title: 'Cascadas de Santa Rosa', location: 'Municipio de Santa Rosa de Cabal' },
-    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_03.jpeg', title: 'Parque Natural La Marcada', location: 'Municipio de Dosquebradas' },
-    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_04.jpeg', title: 'Termales Santa Rosa', location: 'Municipio de Santa Rosa de Cabal' }
-  ];
 
   const recomendaciones = [
     { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg', title: 'Reserva La Nona', desc: 'Experiencia única en naturaleza' },
@@ -40,7 +64,8 @@ export default function ColeccionPageTurista({
   const handleCarouselNext = (carouselIdx) => {
     setCarouselIndex(prev => {
       const newIndexes = [...prev];
-      newIndexes[carouselIdx] = (newIndexes[carouselIdx] + 1) % sitios.length;
+      if (sitios.length === 0) return newIndexes;
+      newIndexes[carouselIdx] = (newIndexes[carouselIdx] + 1) % Math.max(sitios.length, 1);
       return newIndexes;
     });
   };
@@ -48,7 +73,8 @@ export default function ColeccionPageTurista({
   const handleCarouselPrev = (carouselIdx) => {
     setCarouselIndex(prev => {
       const newIndexes = [...prev];
-      newIndexes[carouselIdx] = (newIndexes[carouselIdx] - 1 + sitios.length) % sitios.length;
+      if (sitios.length === 0) return newIndexes;
+      newIndexes[carouselIdx] = (newIndexes[carouselIdx] - 1 + Math.max(sitios.length, 1)) % Math.max(sitios.length, 1);
       return newIndexes;
     });
   };
@@ -56,13 +82,23 @@ export default function ColeccionPageTurista({
   const getVisibleItems = (startIndex) => {
     const items = [];
     for (let i = 0; i < 4; i++) {
-      items.push(sitios[(startIndex + i) % sitios.length]);
+      if (sitios.length > 0) {
+        items.push(sitios[(startIndex + i) % sitios.length]);
+      }
     }
     return items;
   };
 
   return (
     <div className="min-h-screen coleccion-shell font-['Albert_Sans'] pt-14">
+      {loading && (
+        <div className="w-full flex justify-center items-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-400/30 border-t-emerald-400"></div>
+        </div>
+      )}
+      {error && (
+        <div className="w-full text-center text-rose-600 font-semibold py-8">{error}</div>
+      )}
       {/* Header */}
       <header className="bg-white shadow-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -254,26 +290,40 @@ export default function ColeccionPageTurista({
         <section className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Recomendaciones</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {recomendaciones.map((item, index) => (
-                <div
-                  key={index}
-                  onClick={onNavigateSitio}
-                  className="coleccion-reco-card relative group cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition stagger-item"
-                  style={{ '--stagger-delay': `${Math.min(index, 10) * 50}ms` }}
-                >
-                  <img src={item.img} alt={item.title} className="w-full h-64 object-cover" />
-                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <h3 className="text-xl font-bold mb-1">{item.title}</h3>
-                      <p className="text-sm">{item.desc}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-hidden pr-4 md:pr-6 lg:pr-8">
+              {(() => {
+                const cards = recomendaciones.map((item, index) => {
+                  // Add extra right margin to the last card
+                  return (
+                    <div
+                      key={index}
+                      onClick={onNavigateSitio}
+                      className={"coleccion-reco-card relative group cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition stagger-item min-w-0"}
+                      style={{ '--stagger-delay': `${Math.min(index, 10) * 50}ms` }}
+                    >
+                      <img src={item.img} alt={item.title} className="w-full h-64 object-cover" />
+                      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                          <h3 className="text-xl font-bold mb-1">{item.title}</h3>
+                          <p className="text-sm">{item.desc}</p>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 z-20 p-4 text-white bg-gradient-to-t from-black to-transparent group-hover:opacity-0 transition-opacity">
+                        <h3 className="text-lg font-bold">{item.title}</h3>
+                      </div>
                     </div>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 z-20 p-4 text-white bg-gradient-to-t from-black to-transparent group-hover:opacity-0 transition-opacity">
-                    <h3 className="text-lg font-bold">{item.title}</h3>
-                  </div>
-                </div>
-              ))}
+                  );
+                });
+                // Add invisible placeholder cards to fill the last row if needed
+                const cols = 4;
+                const remainder = cards.length % cols;
+                if (remainder !== 0) {
+                  for (let i = 0; i < cols - remainder; i++) {
+                    cards.push(<div key={`placeholder-${i}`} className="invisible" />);
+                  }
+                }
+                return cards;
+              })()}
             </div>
           </div>
         </section>
@@ -281,7 +331,7 @@ export default function ColeccionPageTurista({
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12 px-4">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 text-center md:text-left justify-items-center md:justify-items-start">
           {/* Column 1 */}
           <div>
             <h2 className="text-2xl font-bold mb-2">Conexion</h2>

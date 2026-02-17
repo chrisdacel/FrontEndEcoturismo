@@ -1062,22 +1062,21 @@ export default function SitioDetailPage({
         {/* Comentarios Section */}
         <section className="py-16 px-6 bg-emerald-50/40">
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-3xl font-semibold text-emerald-700">Comentarios</h2>
-                <span className="text-sm text-slate-600">{reviews.length} comentario(s)</span>
+            {/* Cabecera responsive organizada */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-4">
+              <div className="flex flex-col gap-0.5">
+                <h2 className="text-2xl sm:text-3xl font-semibold text-emerald-700">Comentarios</h2>
+                <span className="text-xs sm:text-sm text-slate-600">{reviews.length} comentario(s)</span>
               </div>
-              
-              {/* Filtro de comentarios */}
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-semibold text-slate-700">Ordenar por:</label>
-                <div className="relative" ref={filterMenuRef}>
+              <div className="flex items-center gap-2 mt-2 sm:mt-0 w-full sm:w-auto">
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 whitespace-nowrap">Ordenar por:</label>
+                <div className="relative min-w-[110px] max-w-[150px] w-full sm:w-auto" ref={filterMenuRef}>
                   <button
                     type="button"
                     onClick={() => setFilterMenuOpen((prev) => !prev)}
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
+                    className="inline-flex items-center gap-2 rounded-full bg-white px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50 min-w-[100px] max-w-[140px] w-full sm:w-auto"
                   >
-                    <span>{filterLabels[filterType] || 'Mas recientes'}</span>
+                    <span className="truncate">{filterLabels[filterType] || 'Mas recientes'}</span>
                     <svg
                       className={`h-4 w-4 transition-transform duration-200 ${filterMenuOpen ? 'rotate-180' : ''}`}
                       fill="none"
@@ -1088,7 +1087,7 @@ export default function SitioDetailPage({
                     </svg>
                   </button>
                   {filterMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 max-h-none rounded-xl overflow-visible bg-white/90 text-slate-800 shadow-lg ring-1 ring-slate-200/60 backdrop-blur dropdown-open z-20">
+                    <div className="absolute right-0 mt-2 w-48 sm:w-56 max-h-none rounded-xl overflow-visible bg-white/90 text-slate-800 shadow-lg ring-1 ring-slate-200/60 backdrop-blur dropdown-open z-20">
                       {filterOptions.map((option) => (
                         <button
                           key={option.value}
@@ -1097,7 +1096,7 @@ export default function SitioDetailPage({
                             setFilterType(option.value);
                             setFilterMenuOpen(false);
                           }}
-                          className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                          className="w-full px-4 py-2 text-left text-xs sm:text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
                         >
                           {option.label}
                         </button>
@@ -1122,10 +1121,14 @@ export default function SitioDetailPage({
               </div>
             </div>
 
-            {user && user.role === 'user' ? (
-              <>
-                {!userHasRatedReview ? (
-                  // FORM 1: CON CALIFICACIÓN
+            {(() => {
+              // Si el usuario es operador y es dueño del sitio, mostrar mensaje de restricción
+              if (user && user.role === 'operator' && sitio && sitio.user_id === user.id) {
+                return <p className="mb-8 text-sm text-slate-600">No puedes calificar ni dejar reseña en tus propios sitios.</p>;
+              }
+              // Si el usuario es operador y NO es dueño del sitio, permitir reseña
+              if (user && user.role === 'operator' && sitio && sitio.user_id !== user.id) {
+                return !userHasRatedReview ? (
                   <form onSubmit={handleCreateReview} className="mb-8 space-y-3 bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
                     <div className="bg-emerald-50/60 border border-emerald-200 rounded-lg p-3 mb-2">
                       <p className="text-xs font-semibold text-emerald-700">Deja tu evaluación y comentario</p>
@@ -1167,11 +1170,57 @@ export default function SitioDetailPage({
                       </button>
                     </div>
                   </form>
-                ) : null}
-              </>
-            ) : (
-              <p className="mb-8 text-sm text-slate-600">{user ? 'Solo los turistas pueden comentar y calificar.' : 'Inicia sesión para comentar.'}</p>
-            )}
+                ) : null;
+              }
+              // Turista
+              if (user && user.role === 'user') {
+                return !userHasRatedReview ? (
+                  <form onSubmit={handleCreateReview} className="mb-8 space-y-3 bg-white rounded-lg border border-emerald-100 p-4 shadow-sm">
+                    <div className="bg-emerald-50/60 border border-emerald-200 rounded-lg p-3 mb-2">
+                      <p className="text-xs font-semibold text-emerald-700">Deja tu evaluación y comentario</p>
+                    </div>
+                    <div className="flex gap-4 items-center">
+                      <label className="text-sm font-semibold text-slate-700">Calificación</label>
+                      <StarRating rating={rating} onRatingChange={setRating} size="medium" />
+                      <span className="text-sm text-slate-600">({rating}/5)</span>
+                    </div>
+                    <div className="space-y-1">
+                      <textarea
+                        value={comment}
+                        onChange={handleCommentChange}
+                        required
+                        minLength={10}
+                        maxLength={1000}
+                        placeholder="Comparte tu experiencia..."
+                        className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-slate-800 focus:ring-2 focus:ring-emerald-300"
+                        rows={3}
+                      />
+                      <div className={`text-xs font-medium ${
+                        comment.length > 1000 ? 'text-red-600' : comment.length > 900 ? 'text-amber-600' : 'text-slate-500'
+                      }`}>
+                        {comment.length}/1000 caracteres máximo (mínimo 10)
+                      </div>
+                    </div>
+                    {commentError && (
+                      <Alert type="error" className="mb-2">
+                        {commentError}
+                      </Alert>
+                    )}
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={submitting || !rating || comment.length < 10 || comment.length > 1000}
+                        className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2 text-white font-semibold hover:bg-emerald-700 disabled:opacity-60"
+                      >
+                        {submitting ? 'Enviando...' : 'Publicar evaluación'}
+                      </button>
+                    </div>
+                  </form>
+                ) : null;
+              }
+              // Otros casos
+              return <p className="mb-8 text-sm text-slate-600">{user ? 'Solo los turistas pueden comentar y calificar.' : 'Inicia sesión para comentar.'}</p>;
+            })()}
 
             {actionError && (
               <Alert type="error" className="mb-4">
@@ -1372,7 +1421,9 @@ export default function SitioDetailPage({
               })}
 
               {reviews.length === 0 && (
-                <div className="text-sm text-slate-600">Sé el primero en comentar este sitio.</div>
+                ((!user || user.role !== 'operator') && user?.role !== 'admin' && (!sitio || sitio.user_id !== user?.id) && (
+                  <div className="text-sm text-slate-600">Sé el primero en comentar este sitio.</div>
+                ))
               )}
             </div>
           </div>

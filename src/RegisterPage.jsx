@@ -139,7 +139,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white overflow-x-hidden">
-      <div className="mx-auto flex min-h-screen max-w-7xl items-center px-6 py-12 md:px-10">
+      <div className="mx-auto flex min-h-screen max-w-7xl items-center px-6 py-12 md:px-10 mt-20 md:mt-0">
         {/* Intro izquierda */}
         <div className="hidden flex-1 md:flex md:flex-col md:pr-10">
           <span className="text-emerald-300/80 text-xs tracking-[0.4em]">ECOTURISMO</span>

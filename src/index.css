@@ -1,4 +1,18 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@keyframes smoothZoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+.event-carousel-bg-zoom {
+  animation: smoothZoom 8s cubic-bezier(0.4,0,0.2,1) forwards;
+}
 
 @tailwind base;
 @tailwind components;
@@ -109,12 +123,14 @@ body {
   }
 }
 
-.stagger-item {
-  opacity: 0;
-  transform: scale(0.985);
-  animation: staggerIn 360ms ease both;
-  animation-delay: var(--stagger-delay, 0ms);
-  will-change: transform, opacity;
+
+/* Force cards always visible and remove animation issues */
+.stagger-item, .coleccion-card {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  animation: none !important;
+  transform: none !important;
 }
 
 .scroll-reveal {

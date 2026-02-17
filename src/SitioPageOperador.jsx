@@ -57,7 +57,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
       {/* Main Content */}
       <main className="mt-16">
         {/* Hero Section */}
-        <section className="relative h-[500px] bg-cover bg-center" style={{ backgroundImage: "url('/images/sitios/LA-VIRGINIA-540X370.jpg')" }}>
+        <section className="hero-viewport relative bg-cover bg-center" style={{ backgroundImage: "url('/images/sitios/LA-VIRGINIA-540X370.jpg')" }}>
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
           <div className="relative flex h-full flex-col items-start justify-end px-8 pb-16 text-white md:px-20">
             <h1 className="mb-4 text-4xl font-bold md:text-5xl">Reserva natural parque la Nona</h1>

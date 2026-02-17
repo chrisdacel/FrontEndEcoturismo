@@ -107,8 +107,8 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
                   placeholder="Buscar destino..."
                   className="coleccion-pill-input flex-1 rounded-lg border-2 border-white bg-white/90 px-6 py-3 text-slate-900 outline-none focus:border-[#267E1B]"
                 />
-                <button className="rounded-lg bg-[#267E1B] px-8 py-3 font-semibold transition hover:bg-[#1d5f14]">
-                  Buscar
+                <button className="rounded-full bg-emerald-500 px-5 py-2.5 text-base font-semibold text-white hover:bg-emerald-600 transition md:px-8 md:py-3 md:text-lg">
+                  + Crear Sitio
                 </button>
               </div>
             </div>
@@ -245,7 +245,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
         <section className="bg-gray-50 px-8 py-16 md:px-20">
           <h1 className="mb-12 text-center text-4xl font-bold text-[#267E1B]">Recomendaciones</h1>
 
-          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 pr-4 md:pr-6 lg:pr-8">
             {recomendaciones.map((recomendacion, index) => (
               <button
                 key={recomendacion.id}
@@ -267,7 +267,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
 
       {/* Footer */}
       <footer className="coleccion-footer border-t border-[#267E1B] bg-gray-200 px-6 py-12 md:px-12">
-        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
+        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4 text-center md:text-left justify-items-center md:justify-items-start">
           <div>
             <h2 className="mb-1 text-xl font-bold text-slate-900">Conexion</h2>
             <p className="mb-4 text-sm text-gray-700">EcoRisaralda</p>

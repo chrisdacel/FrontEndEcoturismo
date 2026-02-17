@@ -197,7 +197,13 @@ export default function AdminCommentsPage() {
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
       <div className="mx-auto max-w-7xl px-4 md:px-6 py-10">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            if (window.history.length > 2) {
+              navigate(-1);
+            } else {
+              navigate('/admin');
+            }
+          }}
           className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition mb-4"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,8 +229,9 @@ export default function AdminCommentsPage() {
           <div className="text-sm text-slate-600">Cargando reseñas…</div>
         ) : (
           <>
-            <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-1 items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2">
+            <div className="mb-4 flex flex-col md:flex-row md:items-center md:gap-4 gap-3 w-full max-w-4xl">
+              {/* Search bar */}
+              <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 flex-1 min-w-[250px]">
                 <svg className="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
                 </svg>
@@ -236,39 +243,42 @@ export default function AdminCommentsPage() {
                   className="w-full bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
                 />
               </div>
-              <div className="relative" ref={dateMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setDateMenuOpen((prev) => !prev)}
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
-                >
-                  <span>{dateLabels[dateFilter] || 'Todas las fechas'}</span>
-                  <svg
-                    className={`h-4 w-4 transition-transform duration-200 ${dateMenuOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              {/* Filtros en fila en desktop, columna en móvil */}
+              <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full md:w-auto">
+                <div className="relative w-full md:w-56" ref={dateMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setDateMenuOpen((prev) => !prev)}
+                    className="inline-flex w-full items-center justify-between gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {dateMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 max-h-none rounded-xl overflow-visible bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
-                    {dateOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => {
-                          setDateFilter(option.value);
-                          setDateMenuOpen(false);
-                        }}
-                        className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                    <span className="truncate">{dateLabels[dateFilter] || 'Todas las fechas'}</span>
+                    <svg
+                      className={`h-4 w-4 transition-transform duration-200 ${dateMenuOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {dateMenuOpen && (
+                    <div className="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-20">
+                      {dateOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => {
+                            setDateFilter(option.value);
+                            setDateMenuOpen(false);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="md:hidden space-y-3 mb-4">
