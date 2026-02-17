@@ -330,7 +330,8 @@ export default function Header() {
                     )}
                   </button>
                   {notificationsOpen && (
-                    <div className="absolute right-0 mt-2 w-72 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open">
+                    <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-72 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open animate-fadeInDown
+                      md:left-auto md:right-0 md:translate-x-0">
                       <div className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
                         Notificaciones
                       </div>

@@ -1,3 +1,17 @@
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fadeInDown {
+  animation: fadeInDown 0.32s cubic-bezier(0.4,0,0.2,1);
+}
 
 @import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 

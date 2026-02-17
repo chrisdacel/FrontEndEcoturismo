@@ -252,7 +252,20 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
       )}
 
       <main className="relative z-10">
-        <section className="relative flex items-center overflow-hidden bg-cover bg-center min-h-[80vh]" style={{ backgroundImage: "url(/images/Pagina_inicio/ecoturismo.jpg)" }}>
+        <section
+          className="relative flex items-center overflow-hidden bg-cover bg-center min-h-[80vh]"
+          style={{
+            backgroundImage: "url(/images/Pagina_inicio/ecoturismo.jpg)",
+            minHeight:
+              typeof window !== 'undefined'
+                ? (window.innerWidth === 390 && window.innerHeight === 844
+                    ? '85vh'
+                    : window.innerWidth === 375 && window.innerHeight === 667
+                      ? '110vh'
+                      : undefined)
+                : undefined
+          }}
+        >
           <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent md:from-white md:via-white/60 md:to-black/20 opacity-100" />
           <div className="relative z-10 flex flex-col justify-center items-start px-6 md:px-12 w-full max-w-2xl" style={{minHeight:'60vh'}}>
             <div className="inline-flex items-center gap-3 rounded-full bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
@@ -262,8 +275,11 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
             <div className="mt-4 max-w-2xl space-y-4">
               {user ? (
                 <>
-                  <h1 className="text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
-                    Hola, <span className="align-middle whitespace-nowrap" title={user.name}>{user.name ? (user.name.length > 24 ? user.name.slice(0, 24) + '...' : user.name) : 'usuario'}</span>
+                  <h1 className="text-4xl font-bold leading-tight text-slate-900 md:text-5xl flex flex-wrap items-center gap-2">
+                    <span>Hola,</span>
+                    <span className="whitespace-nowrap md:ml-1 md:mt-0.5 align-middle" title={user.name}>
+                      {user.name ? (user.name.length > 24 ? user.name.slice(0, 24) + '...' : user.name) : 'usuario'}
+                    </span>
                   </h1>
                   <p className="text-lg text-slate-700">
                     Nos alegra tenerte de regreso. Inspírate con nuevos destinos, guarda tus rutas preferidas
@@ -298,7 +314,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
                 type="button"
                 onClick={handleEventClick}
                 disabled={!activeEventPlaceId}
-                className={`w-[90vw] max-w-[220px] min-w-[140px] rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-2 sm:p-2.5 md:p-3 text-right shadow-2xl transition-all duration-500 md:w-auto md:max-w-xs ${activeEventPlaceId ? 'cursor-pointer hover:-translate-y-0.5 hover:bg-white/20' : 'cursor-default'} ${eventCardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+                className={`w-[90vw] max-w-[220px] min-w-[140px] min-h-[92px] md:min-h-[110px] flex flex-col justify-center rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-2 sm:p-2.5 md:p-3 text-right shadow-2xl transition-all duration-500 md:w-auto md:max-w-xs ${activeEventPlaceId ? 'cursor-pointer hover:-translate-y-0.5 hover:bg-white/20' : 'cursor-default'} ${eventCardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
                 style={{ fontSize: '0.91rem', textAlign: 'right' }}
               >
                 <p className="text-xs uppercase tracking-wide text-white font-bold">PRÓXIMO EVENTO</p>
@@ -319,7 +335,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
               <button
                 type="button"
                 onClick={() => navigate('/turista/coleccion#recomendaciones')}
-                className="w-[90vw] max-w-[220px] min-w-[140px] rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-2 sm:p-2.5 md:p-3 text-right shadow-2xl transition hover:-translate-y-0.5 hover:bg-white/20 md:w-auto md:max-w-xs"
+                className="w-[90vw] max-w-[220px] min-w-[140px] min-h-[92px] md:min-h-[110px] flex flex-col justify-center rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-2 sm:p-2.5 md:p-3 text-right shadow-2xl transition hover:-translate-y-0.5 hover:bg-white/20 md:w-auto md:max-w-xs"
                 style={{ fontSize: '0.91rem', textAlign: 'right' }}
               >
                 <p className="text-xs uppercase tracking-wide text-white font-bold">FAVORITOS</p>
