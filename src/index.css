@@ -1,3 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@media (min-width: 641px) and (max-width: 1366px) {
+  .tablet-nav-hide {
+    display: none !important;
+  }
+  .tablet-burger-show {
+    display: inline-flex !important;
+  }
+}
 @keyframes fadeInDown {
   0% {
     opacity: 0;
@@ -12,8 +22,6 @@
 .animate-fadeInDown {
   animation: fadeInDown 0.32s cubic-bezier(0.4,0,0.2,1);
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @keyframes smoothZoom {
   from {

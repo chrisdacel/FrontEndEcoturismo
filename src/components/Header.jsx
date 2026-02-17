@@ -255,7 +255,8 @@ export default function Header() {
         </Link>
 
         {/* Nav centro */}
-        <nav className="hidden md:flex justify-center gap-6 mx-auto">
+        <nav
+          className="hidden xl:flex justify-center gap-6 mx-auto">
           {navLinks.map((link) => (
             <NavLink
               key={link.to}
@@ -276,13 +277,12 @@ export default function Header() {
               setMenuOpen(false);
               setNotificationsOpen(false);
             }}
-            className={`md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 transition ${
+            className={`xl:hidden inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 transition ${
               isScrolled
                 ? "bg-slate-100/60 text-slate-700 ring-slate-200 hover:bg-slate-100"
                 : "bg-white/10 text-emerald-100 ring-white/10 hover:bg-white/20"
             }`}
-            aria-label="Abrir menu"
-          >
+            aria-label="Abrir menu">
             <svg
               className="h-5 w-5"
               viewBox="0 0 24 24"
@@ -553,7 +553,7 @@ export default function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-[60] md:hidden">
+        <div className="fixed inset-0 z-[60] xl:hidden">
           <div
             className="absolute inset-0 bg-slate-900/40"
             onClick={closeMobile}
