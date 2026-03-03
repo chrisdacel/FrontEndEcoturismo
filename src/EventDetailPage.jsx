@@ -54,7 +54,7 @@ export default function EventDetailPage() {
     });
   };
 
-  const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
+  const storageUrl = (path) => (path ? `${import.meta.env.VITE_API_URL}/api/files/${path}` : '');
   const event = eventData?.event;
   const place = eventData?.place;
 

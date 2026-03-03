@@ -1,22 +1,40 @@
-/**
- * Obtener listado de países
- */
-export async function fetchCountries() {
-  try {
-    const { data } = await api.get('/api/countries');
-    return data;
-  } catch (error) {
-    throw error.response?.data || { message: 'Error obteniendo países' };
-  }
-}
 import axios from 'axios';
 
 // Variable para controlar reintentos
 let isRefreshing = false;
 
+function resolveApiOrigin() {
+  const raw = (import.meta.env.VITE_API_URL || '').trim();
+  const origin = raw.replace(/\/+$/, ''); // no trailing slash
+
+  // Dev-friendly fallback: assume backend runs on :8000 on same hostname.
+  if (!origin && typeof window !== 'undefined') {
+    return `${window.location.protocol}//${window.location.hostname}:8000`;
+  }
+
+  return origin;
+}
+
+const API_ORIGIN = resolveApiOrigin();
+
+// If frontend and backend use different hostnames, browser may block cookies (=> CSRF 419).
+if (typeof window !== 'undefined') {
+  try {
+    const apiHostname = new URL(API_ORIGIN).hostname;
+    if (apiHostname && apiHostname !== window.location.hostname) {
+      console.warn(
+        `[auth] Hostname mismatch: frontend=${window.location.hostname}, api=${apiHostname}. ` +
+        `Cookie-based auth (Sanctum) may fail with 419. Align VITE_API_URL to the same hostname.`
+      );
+    }
+  } catch {
+    // ignore invalid URL; axios will surface it later
+  }
+}
+
 // Crear instancia de axios con configuración base
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: `${API_ORIGIN}/`,
   withCredentials: true, // Importante: enviar cookies con cada request
   headers: {
     'Accept': 'application/json',
@@ -56,7 +74,7 @@ api.interceptors.response.use(
       try {
         console.log('CSRF token expirado, obteniendo nuevo token...');
         // Refrescar el CSRF token
-        await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+        await axios.get(`${API_ORIGIN}/sanctum/csrf-cookie`, {
           withCredentials: true
         });
         
@@ -86,12 +104,24 @@ export async function initializeCsrfToken() {
   try {
     // Obtener CSRF cookie para sesión
     console.log('Initializing CSRF token...');
-    await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+    await axios.get(`${API_ORIGIN}/sanctum/csrf-cookie`, {
       withCredentials: true
     });
     console.log('CSRF cookie obtained');
   } catch (error) {
     console.error('Error getting CSRF token:', error);
+  }
+}
+
+/**
+ * Obtener listado de países
+ */
+export async function fetchCountries() {
+  try {
+    const { data } = await api.get('/api/countries');
+    return data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error obteniendo países' };
   }
 }
 

@@ -214,7 +214,7 @@ export default function AdminEventsPage() {
                         <div className="flex flex-col items-start gap-2">
                           {event.image ? (
                             <img
-                              src={event.image.startsWith('http') ? event.image : `http://localhost:8000/api/files/${event.image}`}
+                              src={event.image.startsWith('http') ? event.image : `${import.meta.env.VITE_API_URL}/api/files/${event.image}`}
                               alt={event.title}
                               className="w-32 h-20 rounded-md object-cover border border-slate-200 shadow-sm"
                             />
@@ -353,7 +353,7 @@ export default function AdminEventsPage() {
                       <div className="flex gap-3 items-center">
                         {event.image ? (
                           <img
-                            src={event.image.startsWith('http') ? event.image : `http://localhost:8000/api/files/${event.image}`}
+                            src={event.image.startsWith('http') ? event.image : `${import.meta.env.VITE_API_URL}/api/files/${event.image}`}
                             alt={event.title}
                             className="w-20 h-14 rounded-md object-cover border border-slate-200 shadow-sm"
                           />

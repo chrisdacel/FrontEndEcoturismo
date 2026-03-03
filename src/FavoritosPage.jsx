@@ -71,7 +71,7 @@ export default function FavoritosPage({ onNavigateSobreNosotros, onNavigatePriva
     navigate(`${prefix}/sitio/${id}`);
   };
 
-  const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
+  const storageUrl = (path) => (path ? `${import.meta.env.VITE_API_URL}/api/files/${path}` : '');
 
   if (loading) {
     return (

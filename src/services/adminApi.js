@@ -1,8 +1,23 @@
 import axios from 'axios';
 
+function resolveApiOrigin() {
+  const raw = (import.meta.env.VITE_API_URL || '').trim();
+  const origin = raw.replace(/\/+$/, '');
+
+  if (!origin && typeof window !== 'undefined') {
+    return `${window.location.protocol}//${window.location.hostname}:8000`;
+  }
+
+  return origin;
+}
+
+const API_ORIGIN = resolveApiOrigin();
+
 // Usar la misma instancia de axios con configuración CSRF
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  // OJO: aquí NO agregamos /api porque en los paths ya viene "/api/..."
+  // (Si no, termina quedando /api/api/... y da "route not found")
+  baseURL: `${API_ORIGIN}`,
   withCredentials: true,
   xsrfCookieName: 'XSRF-TOKEN',
   xsrfHeaderName: 'X-XSRF-TOKEN',

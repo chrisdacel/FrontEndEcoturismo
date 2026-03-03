@@ -286,7 +286,7 @@ export default function SitioDetailPage({
     };
   }, [sitio]);
 
-  const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
+  const storageUrl = (path) => (path ? `${import.meta.env.VITE_API_URL}/api/files/${path}` : '');
   const labelList = Array.isArray(sitio?.label)
     ? sitio.label
     : Array.isArray(sitio?.labels)
@@ -1245,7 +1245,7 @@ export default function SitioDetailPage({
                         <div className="flex-shrink-0 relative">
                           {hasUser && rev.user?.image ? (
                             <img 
-                              src={`http://localhost:8000/api/files/${rev.user.image}`}
+                              src={`${import.meta.env.VITE_API_URL}/api/files/${rev.user.image}`}
                               alt={displayName}
                               className="w-10 h-10 rounded-full object-cover border border-emerald-200"
                             />

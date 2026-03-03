@@ -298,11 +298,11 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
         let imageUrl = '';
         // Prioridad: cover > portada > imagen
         if (sitio.cover) {
-          imageUrl = sitio.cover.startsWith('http') ? sitio.cover : `http://localhost:8000/api/files/${sitio.cover}`;
+          imageUrl = sitio.cover.startsWith('http') ? sitio.cover : `${import.meta.env.VITE_API_URL}/api/files/${sitio.cover}`;
         } else if (sitio.portada) {
-          imageUrl = sitio.portada.startsWith('http') ? sitio.portada : `http://localhost:8000/api/files/${sitio.portada}`;
+          imageUrl = sitio.portada.startsWith('http') ? sitio.portada : `${import.meta.env.VITE_API_URL}/api/files/${sitio.portada}`;
         } else if (sitio.imagen) {
-          imageUrl = sitio.imagen.startsWith('http') ? sitio.imagen : `http://localhost:8000/api/files/${sitio.imagen}`;
+          imageUrl = sitio.imagen.startsWith('http') ? sitio.imagen : `${import.meta.env.VITE_API_URL}/api/files/${sitio.imagen}`;
         }
         const popupHtml = `
           <div class="popup-card" style="display:flex;flex-direction:column;gap:6px;cursor:pointer;max-width:220px;align-items:center;">
@@ -363,7 +363,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const recommendedList = isTourist
     ? [...recommendations, ...fallbackRecommendations].slice(0, 8)
     : ((isAdminOrOperator || isGuest) ? randomRecommendations.slice(0, 8) : recomendaciones);
-  const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
+  const storageUrl = (path) => (path ? `${import.meta.env.VITE_API_URL}/api/files/${path}` : '');
 
   return (
     <div className="min-h-screen coleccion-shell text-slate-900 overflow-x-hidden pt-14">
@@ -513,7 +513,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                     )}
                     <div className="h-48 w-full overflow-hidden">
                       <img
-                        src={`http://localhost:8000/api/files/${sitio.cover}`}
+                        src={`${import.meta.env.VITE_API_URL}/api/files/${sitio.cover}`}
                         alt={sitio.name}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                       />

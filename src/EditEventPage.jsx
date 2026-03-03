@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { api } from './services/api';
 import { useAuth } from './context/AuthContext';
 
-const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
+const storageUrl = (path) => (path ? `${import.meta.env.VITE_API_URL}/api/files/${path}` : '');
 
 const toInputValue = (value) => {
   if (!value) return '';

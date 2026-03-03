@@ -195,7 +195,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
     return `${day} ${time}`;
   };
 
-  const storageUrl = (path) => (path ? `http://localhost:8000/api/files/${path}` : '');
+  const storageUrl = (path) => (path ? `${import.meta.env.VITE_API_URL}/api/files/${path}` : '');
 
   const activeEvent = upcomingEvents[eventCardIndex] || null;
   const activeEventPlaceId = activeEvent?.place?.id || activeEvent?.place_id || null;
