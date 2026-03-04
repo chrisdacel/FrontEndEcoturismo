@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import { getCurrentUser, logout as apiLogout, initializeCsrfToken } from '../services/api';
-
+import { api, getCurrentUser, logout as apiLogout, initializeCsrfToken, loadAuthTokenFromStorage } from '../services/api';
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
@@ -12,6 +11,9 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     async function initAuth() {
       try {
+        // Restaurar token Bearer desde localStorage (si existe)
+        loadAuthTokenFromStorage();
+  
         // Obtener CSRF token una sola vez
         await initializeCsrfToken();
         
@@ -21,7 +23,6 @@ export function AuthProvider({ children }) {
           setUser(currentUser);
         }
       } catch (err) {
-        // Si no hay usuario autenticado, es normal que falle
         setError('');
       } finally {
         setLoading(false);
@@ -35,6 +36,8 @@ export function AuthProvider({ children }) {
       // Refresca el token CSRF antes de cerrar sesión para evitar 419
       await initializeCsrfToken();
       await apiLogout();
+      // Asegurar que ya no se envíe el header Authorization
+      delete api.defaults.headers.common['Authorization'];
       setUser(null);
       setError('');
     } catch (err) {

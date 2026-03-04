@@ -3,6 +3,9 @@ import axios from 'axios';
 // Variable para controlar reintentos
 let isRefreshing = false;
 
+// Clave para guardar el token en localStorage
+const AUTH_TOKEN_KEY = 'ecorisaralda_auth_token';
+
 function resolveApiOrigin() {
   const raw = (import.meta.env.VITE_API_URL || '').trim();
   const origin = raw.replace(/\/+$/, ''); // no trailing slash
@@ -42,6 +45,30 @@ const api = axios.create({
     'X-Requested-With': 'XMLHttpRequest',
   }
 });
+
+// ====== Helpers para manejar el token Bearer (Sanctum) ======
+export function setAuthToken(token) {
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(AUTH_TOKEN_KEY, token);
+    }
+  } else {
+    delete api.defaults.headers.common['Authorization'];
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(AUTH_TOKEN_KEY);
+    }
+  }
+}
+
+export function loadAuthTokenFromStorage() {
+  if (typeof window === 'undefined') return null;
+  const token = window.localStorage.getItem(AUTH_TOKEN_KEY);
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+  return token;
+}
 
 // Interceptor de request para agregar CSRF token
 api.interceptors.request.use((config) => {
@@ -93,6 +120,9 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+ // Cargar token desde storage al inicializar el módulo (si existe)
+ loadAuthTokenFromStorage();
 
 // ============ INICIALIZACIÓN ============
 /**
@@ -155,11 +185,17 @@ export async function register(name, email, password, role = 'turist', lastName 
 export async function login(email, password) {
   try {
     console.log('Attempting login with email:', email);
-    const { data } = await api.post('/api/login', { email, password });    
-    
+    const { data } = await api.post('/api/login', { email, password });
+
     console.log('Login response:', data);
-    console.log('Session-based auth established via cookies');
-    
+
+    // Si el backend devuelve un token Sanctum, úsalo como Bearer
+    if (data.token) {
+      setAuthToken(data.token);
+    }
+
+    console.log('Auth established via Sanctum token + cookies');
+
     return data.user;
   } catch (error) {
     console.error('Login error:', error.response?.data || error.message);
@@ -200,6 +236,8 @@ export async function logout() {
     console.log('Logging out...');
     await api.post('/api/logout');
     console.log('Logout successful');
+    // Limpiar token guardado
+    setAuthToken(null);
   } catch (error) {
     console.error('Logout error:', error.response?.data || error.message);
     throw error.response?.data || { message: 'Error al cerrar sesión' };

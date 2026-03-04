@@ -15,6 +15,7 @@ const API_ORIGIN = resolveApiOrigin();
 
 // Usar la misma instancia de axios con configuración CSRF
 const api = axios.create({
+  
   // OJO: aquí NO agregamos /api porque en los paths ya viene "/api/..."
   // (Si no, termina quedando /api/api/... y da "route not found")
   baseURL: `${API_ORIGIN}`,
@@ -26,6 +27,14 @@ const api = axios.create({
     'Content-Type': 'application/json',
   }
 });
+
+// Aplicar token Bearer si existe en localStorage
+if (typeof window !== 'undefined') {
+  const stored = window.localStorage.getItem('ecorisaralda_auth_token');
+  if (stored) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${stored}`;
+  }
+}
 
 // Interceptor para CSRF
 api.interceptors.request.use((config) => {
