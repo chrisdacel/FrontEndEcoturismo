@@ -242,7 +242,7 @@ export default function AdminProfilePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828L18 9.828M16 5l3 3m-1.414-4.414a2 2 0 112.828 2.828L12 14l-4 1 1-4 8.414-8.414z" />
               </svg>
               Cambiar foto
-              <input type="file" accept="image/*" className="hidden" onChange={handleAvatar} disabled={uploadingAvatar} />
+              <input type="file" accept="image/jpeg,image/png,image/jpg,image/gif,image/svg+xml,image/webp" className="hidden" onChange={handleAvatar} disabled={uploadingAvatar} />
             </label>
             <button
               type="button"

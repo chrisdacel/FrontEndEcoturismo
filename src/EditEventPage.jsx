@@ -378,7 +378,7 @@ export default function EditEventPage() {
                     </label>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/png,image/jpg,image/gif,image/svg+xml,image/webp"
                       onChange={handleImageChange}
                       className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus-border-emerald-400 outline-none transition"
                     />

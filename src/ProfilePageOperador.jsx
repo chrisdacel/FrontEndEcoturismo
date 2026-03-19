@@ -245,7 +245,7 @@ export default function ProfilePageOperador() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
               Cambiar foto
-              <input type="file" accept="image/*" className="hidden" onChange={handleAvatar} disabled={uploadingAvatar} />
+              <input type="file" accept="image/jpeg,image/png,image/jpg,image/gif,image/svg+xml,image/webp" className="hidden" onChange={handleAvatar} disabled={uploadingAvatar} />
             </label>
             <button
               type="button"
