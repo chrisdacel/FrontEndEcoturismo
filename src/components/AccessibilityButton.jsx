@@ -98,7 +98,7 @@ const AccessibilityButton = () => {
   };
 
   return (
-    <div ref={menuRef} className={`fixed right-4 z-[9999] transition-all duration-300 ${showScrollTop ? 'bottom-[5.5rem]' : 'bottom-6'}`}>
+    <div id="accessibility-widget" ref={menuRef} className={`fixed right-4 z-[9999] transition-all duration-300 ${showScrollTop ? 'bottom-[5.5rem]' : 'bottom-6'}`}>
       <div className="relative flex items-center">
         {/* Menú Desplegable a la Izquierda */}
         {isOpen && (

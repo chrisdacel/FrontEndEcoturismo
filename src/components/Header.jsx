@@ -52,9 +52,28 @@ export default function Header() {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.style.overflow = mobileOpen ? "hidden" : "";
+    const accessBtn = document.getElementById("accessibility-widget");
+    
+    if (mobileOpen) {
+      root.style.overflow = "hidden";
+      if (accessBtn) {
+        accessBtn.style.opacity = "0";
+        accessBtn.style.pointerEvents = "none";
+      }
+    } else {
+      root.style.overflow = "";
+      if (accessBtn) {
+        accessBtn.style.opacity = "1";
+        accessBtn.style.pointerEvents = "auto";
+      }
+    }
+    
     return () => {
       root.style.overflow = "";
+      if (accessBtn) {
+        accessBtn.style.opacity = "1";
+        accessBtn.style.pointerEvents = "auto";
+      }
     };
   }, [mobileOpen]);
 
@@ -154,15 +173,15 @@ export default function Header() {
     setMobileOpen(false);
   };
 
-  // Siempre fija y visible en móvil/tablet, color adaptativo solo en desktop
+  // Siempre fija y visible, color adaptativo en todos los dispositivos
   const isColeccionPage = location.pathname.includes("/coleccion");
   const isMobileOrTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
-  const isScrolled = isAuthPage ? false : (!isMobileOrTablet && scrollY > 20);
-  const textColor = isMobileOrTablet ? "text-white" : (isScrolled ? "text-slate-900" : "text-white");
-  const secondaryTextColor = isMobileOrTablet ? "text-emerald-100/80" : (isScrolled ? "text-slate-700" : "text-emerald-100/80");
-  const dotColor = isMobileOrTablet ? "bg-emerald-500" : (isScrolled ? "bg-emerald-500" : "bg-emerald-400");
+  const isScrolled = isAuthPage ? false : (scrollY > 20);
+  const textColor = isScrolled ? "text-slate-900" : "text-white";
+  const secondaryTextColor = isScrolled ? "text-slate-700" : "text-emerald-100/80";
+  const dotColor = isScrolled ? "bg-emerald-500" : "bg-emerald-400";
   const baseLink = (isActive) =>
-    `px-3 py-2 text-sm font-medium transition ${isActive ? "text-emerald-500" : isMobileOrTablet ? "text-white hover:text-emerald-500" : isScrolled ? "text-slate-700 hover:text-emerald-500" : "text-emerald-100/80 hover:text-emerald-500"}`;
+    `px-3 py-2 text-sm font-medium transition ${isActive ? "text-emerald-500" : isScrolled ? "text-slate-700 hover:text-emerald-500" : "text-emerald-100/80 hover:text-emerald-500"}`;
 
   const navLinks =
     user?.role === "admin"
@@ -216,22 +235,21 @@ export default function Header() {
   };
   const unreadCount = notifications.filter((item) => !item.read_at).length;
 
-  // Siempre fixed y visible en móvil/tablet, color adaptativo solo en desktop
+  // Siempre fixed y visible en móvil/tablet, color adaptativo en todos los dispositivos
   const headerBg = `fixed top-0 left-0 right-0 z-[9999] w-full transition-all duration-[1200ms] ease-in-out ${
-    isAuthPage
+    isAuthPage || mobileOpen
       ? "bg-transparent"
-      : isMobileOrTablet
-        ? "bg-emerald-950/90 shadow-md"
-        : scrollY <= 20
-          ? "bg-emerald-950/90"
-          : `backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-white/5 ${isColeccionPage ? "" : "ring-1 ring-white/10"}`
+      : scrollY <= 20
+        ? `bg-emerald-950/90 ${isMobileOrTablet ? "shadow-md" : ""}`
+        : `backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-white/5 ${isColeccionPage ? "" : "ring-1 ring-white/10"}`
   }`;
 
   return (
+    <>
     <header className={headerBg}>
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:px-6">
+      <div className="relative z-[70] mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:px-6">
         {/* Logo izquierda */}
-        <Link to="/" className="inline-flex items-center gap-2 flex-shrink-0">
+        <Link to="/" className={`inline-flex items-center gap-2 flex-shrink-0 transition-all duration-500 ease-in-out ${mobileOpen ? '-translate-y-8 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
           <img
             src="/images/Pagina_inicio/nature-svgrepo-com.svg"
             alt="Logo"
@@ -277,30 +295,17 @@ export default function Header() {
               setMenuOpen(false);
               setNotificationsOpen(false);
             }}
-            className={`xl:hidden inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 transition ${
-              isScrolled
-                ? "bg-slate-100/60 text-slate-700 ring-slate-200 hover:bg-slate-100"
-                : "bg-white/10 text-emerald-100 ring-white/10 hover:bg-white/20"
-            }`}
-            aria-label="Abrir menu">
-            <svg
-              className="h-5 w-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
+            className={`xl:hidden relative inline-flex h-10 w-10 items-center justify-center transition-colors focus:outline-none ${mobileOpen ? "text-slate-900" : textColor}`}
+            aria-label="Toggle menu">
+            <div className="relative w-5 h-[12px]">
+              <span className={`absolute left-0 block h-[2px] w-full bg-current rounded-full transition-all duration-300 ease-in-out ${mobileOpen ? 'top-[5px] rotate-45' : 'top-0 rotate-0'}`} />
+              <span className={`absolute left-0 block h-[2px] w-full bg-current rounded-full transition-all duration-300 ease-in-out ${mobileOpen ? 'bottom-[5px] -rotate-45' : 'bottom-0 rotate-0'}`} />
+            </div>
           </button>
           {user ? (
             <div className="flex items-center gap-2" ref={menuRef}>
               {isTourist && (
-                <div className="relative" ref={notificationsRef}>
+                <div className="relative hidden md:block" ref={notificationsRef}>
                   <button
                     type="button"
                     onClick={() => setNotificationsOpen((value) => !value)}
@@ -524,7 +529,7 @@ export default function Header() {
               {/* Preferencias removed */}
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center rounded-full bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
+                className="hidden md:inline-flex items-center rounded-full bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
               >
                 Cerrar sesión
               </button>
@@ -543,7 +548,7 @@ export default function Header() {
               </Link>
               <Link
                 to="/register"
-                className="inline-flex items-center rounded-full bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
+                className="hidden md:inline-flex items-center rounded-full bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
               >
                 Crear cuenta
               </Link>
@@ -551,181 +556,153 @@ export default function Header() {
           )}
         </div>
       </div>
+    </header>
 
-      {mobileOpen && (
-        <div className="fixed inset-0 z-[60] xl:hidden">
-          <div
-            className="absolute inset-0 bg-slate-900/40"
-            onClick={closeMobile}
-            role="button"
-            tabIndex={-1}
-            aria-label="Cerrar menu"
-          />
-          <div className="absolute right-0 top-0 h-full w-72 max-w-[85vw] bg-white text-slate-900 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">
-                  Menu
-                </p>
-                <p className="text-sm font-semibold text-slate-900">
-                  Conexion EcoRisaralda
-                </p>
-              </div>
-              <button
-                type="button"
+      {/* Mobile Menu Full Screen Overlay */}
+      <div 
+        className={`fixed inset-0 z-[60] xl:hidden flex flex-col backdrop-blur-md bg-white/80 supports-[backdrop-filter]:bg-white/80 border-b border-slate-200/50 text-slate-900 overflow-y-auto transition-transform duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform ${
+          mobileOpen ? "translate-y-0" : "-translate-y-full pointer-events-none"
+        }`}
+      >
+        <div className="h-24 flex-shrink-0" /> {/* Spacer for header / X button */}
+
+        <div className="flex flex-col px-8 pb-12">
+          <nav className="flex flex-col gap-6">
+            {navLinks.map((link, idx) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
                 onClick={closeMobile}
-                className="rounded-full p-2 text-slate-600 hover:bg-slate-100"
-                aria-label="Cerrar"
+                style={{ transitionDelay: mobileOpen ? `${150 + idx * 40}ms` : '0ms' }}
+                className={({ isActive }) =>
+                  `text-3xl font-bold tracking-tight transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform will-change-transform ${
+                    mobileOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+                  } ${
+                    isActive ? "text-emerald-500" : "text-slate-800 hover:text-emerald-500"
+                  }`
+                }
               >
-                <svg
-                  className="h-5 w-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
 
-            <nav className="flex flex-col px-3 py-3">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  onClick={closeMobile}
-                  className={({ isActive }) =>
-                    `rounded-lg px-3 py-2 text-sm font-semibold ${isActive ? "bg-emerald-50 text-emerald-700" : "text-slate-700 hover:bg-slate-100"}`
-                  }
+          <div 
+            className={`mt-12 border-t border-slate-200/60 pt-8 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform will-change-transform ${
+              mobileOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+            }`}
+            style={{ transitionDelay: mobileOpen ? `${150 + navLinks.length * 40 + 50}ms` : '0ms' }}
+          >
+            {user ? (
+              <div className="flex flex-col gap-5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMobile();
+                    goProfile();
+                  }}
+                  className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                 >
-                  {link.label}
-                </NavLink>
-              ))}
-            </nav>
-
-            <div className="mt-2 border-t border-slate-200 px-3 py-3">
-              {user ? (
-                <div className="flex flex-col gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeMobile();
-                      goProfile();
-                    }}
-                    className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100"
-                  >
-                    Perfil
-                  </button>
-                  {isTourist && (
+                  Perfil
+                </button>
+                {isTourist && (
+                  <>
                     <button
                       type="button"
                       onClick={goFavoritos}
-                      className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Favoritos
                     </button>
-                  )}
-                  {isTourist && (
                     <button
                       type="button"
                       onClick={goPreferencias}
-                      className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Preferencias
                     </button>
-                  )}
-                  {isTourist && (
                     <button
                       type="button"
                       onClick={goHistorial}
-                      className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Historial
                     </button>
-                  )}
-                  {isTourist && (
                     <button
                       type="button"
                       onClick={goNotifications}
-                      className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Notificaciones
                     </button>
-                  )}
-                  {user.role === "admin" && (
-                    <button
-                      type="button"
-                      onClick={goAdminPanel}
-                      className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100"
-                    >
-                      Panel de Administración
-                    </button>
-                  )}
-                  {user.role === "operator" && (
+                  </>
+                )}
+                {user.role === "admin" && (
+                  <button
+                    type="button"
+                    onClick={goAdminPanel}
+                    className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
+                  >
+                    Panel de Administración
+                  </button>
+                )}
+                {user.role === "operator" && (
+                  <>
                     <button
                       type="button"
                       onClick={goOperatorSites}
-                      className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Gestionar mis sitios
                     </button>
-                  )}
-                  {user.role === "operator" && (
                     <button
                       type="button"
                       onClick={goOperatorEvents}
-                      className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Gestionar mis eventos
                     </button>
-                  )}
-                  {user.role === "operator" && (
                     <button
                       type="button"
                       onClick={goOperatorStats}
-                      className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
-                      Estadisticas
+                      Estadísticas
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeMobile();
-                      handleLogout();
-                    }}
-                    className="rounded-lg bg-emerald-600 px-3 py-2 text-left text-sm font-semibold text-white hover:bg-emerald-700"
-                  >
-                    Cerrar sesion
-                  </button>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <Link
-                    to="/login"
-                    onClick={closeMobile}
-                    className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-                  >
-                    Iniciar sesion
-                  </Link>
-                  <Link
-                    to="/register"
-                    onClick={closeMobile}
-                    className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
-                  >
-                    Crear cuenta
-                  </Link>
-                </div>
-              )}
-            </div>
+                  </>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMobile();
+                    handleLogout();
+                  }}
+                  className="mt-4 inline-flex w-fit items-center rounded-full bg-emerald-500 px-6 py-2.5 text-sm font-bold tracking-wide text-white shadow-md transition hover:bg-emerald-600"
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-6 pt-2">
+                <Link
+                  to="/login"
+                  onClick={closeMobile}
+                  className="text-left text-xl font-medium text-slate-600 hover:text-emerald-500 transition-colors w-fit"
+                >
+                  Iniciar sesión
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={closeMobile}
+                  className="text-left text-xl font-bold text-emerald-600 border-b-2 border-emerald-500 pb-1 hover:text-emerald-500 hover:border-emerald-400 transition-colors w-fit"
+                >
+                  Crear cuenta
+                </Link>
+              </div>
+            )}
           </div>
         </div>
-      )}
-    </header>
+      </div>
+    </>
   );
 }
