@@ -41,7 +41,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
         {/* Hero: igual a PrivacidadPage */}
         <section
           className="relative overflow-hidden bg-cover bg-center min-h-[70vh]"
-          style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.jpg')" }}
+          style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.webp')" }}
         >
           <div className={`absolute inset-0 bg-gradient-to-r from-white via-white/70 to-transparent md:from-white md:via-white/50 md:to-black/10 transition-opacity duration-500 ${heroVisible ? 'opacity-100' : 'opacity-0'}`} />
           <div className={`absolute bottom-8 left-6 md:bottom-12 md:left-12 z-10 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
@@ -68,7 +68,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
                 <p className="text-base md:text-lg text-gray-700 leading-relaxed">Te ayudamos a descubrir destinos ecoturísticos cuidadosamente seleccionados, ofreciéndote toda la información práctica que necesitas: cómo llegar, actividades disponibles, alojamientos sostenibles y recomendaciones locales. Queremos que planifiques tu aventura con confianza y que, al mismo tiempo, contribuyas al cuidado del medio ambiente y al desarrollo de las comunidades anfitrionas.</p>
               </div>
               <div className="w-full md:w-[50%]">
-                <img src="/images/Sobre_Nosotros/fondo ciudad.jpg" alt="Nuestra Misión" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
+                <img src="/images/Sobre_Nosotros/fondo ciudad.webp" alt="Nuestra Misión" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
               </div>
             </div>
           </div>
@@ -88,7 +88,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
                 </ul>
               </div>
               <div className="w-full md:w-[50%]">
-                <img src="/images/Sobre_Nosotros/ecoturismo.jpg" alt="Qué Ofrecemos" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
+                <img src="/images/Sobre_Nosotros/ecoturismo.webp" alt="Qué Ofrecemos" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
                 </ul>
               </div>
               <div className="w-full md:w-[50%]">
-                <img src="/images/Sobre_Nosotros/ecoturismo.jpg" alt="Nuestros Valores" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
+                <img src="/images/Sobre_Nosotros/ecoturismo.webp" alt="Nuestros Valores" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
               </div>
             </div>
           </div>

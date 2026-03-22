@@ -8,17 +8,17 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
   const [searchText, setSearchText] = useState('');
 
   const sitios = [
-    { id: 1, nombre: "Nevado del Tolima", municipio: "Municipio de Santa Isabel", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg" },
-    { id: 2, nombre: "Laguna del Otún", municipio: "Municipio de Pereira", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_02.jpeg" },
-    { id: 3, nombre: "Termales de Santa Rosa", municipio: "Municipio de Santa Rosa de Cabal", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_03.jpeg" },
-    { id: 4, nombre: "Parque Natural Ucumarí", municipio: "Municipio de Pereira", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_04.jpeg" }
+    { id: 1, nombre: "Nevado del Tolima", municipio: "Municipio de Santa Isabel", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_01.webp" },
+    { id: 2, nombre: "Laguna del Otún", municipio: "Municipio de Pereira", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_02.webp" },
+    { id: 3, nombre: "Termales de Santa Rosa", municipio: "Municipio de Santa Rosa de Cabal", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_03.webp" },
+    { id: 4, nombre: "Parque Natural Ucumarí", municipio: "Municipio de Pereira", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_04.webp" }
   ];
 
   const recomendaciones = [
-    { id: 1, nombre: "Cascada del Fraile", descripcion: "Belleza natural impresionante", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg" },
-    { id: 2, nombre: "Reserva Natural Barbas Bremen", descripcion: "Biodiversidad única", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_02.jpeg" },
-    { id: 3, nombre: "Bioparque Ukumarí", descripcion: "Experiencia educativa", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_03.jpeg" },
-    { id: 4, nombre: "Alto del Nudo", descripcion: "Vistas panorámicas", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_04.jpeg" }
+    { id: 1, nombre: "Cascada del Fraile", descripcion: "Belleza natural impresionante", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_01.webp" },
+    { id: 2, nombre: "Reserva Natural Barbas Bremen", descripcion: "Biodiversidad única", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_02.webp" },
+    { id: 3, nombre: "Bioparque Ukumarí", descripcion: "Experiencia educativa", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_03.webp" },
+    { id: 4, nombre: "Alto del Nudo", descripcion: "Vistas panorámicas", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_04.webp" }
   ];
 
   useEffect(() => {
@@ -70,11 +70,11 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
             </div>
 
             <button className="hidden md:block">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.png" alt="Favoritos" className="h-6 w-6" />
+              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             <button className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-8 w-8" />
+              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-8 w-8" />
             </button>
           </div>
         </div>
@@ -94,7 +94,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
       {/* Main Content */}
       <main className="mt-16">
         {/* Hero Section with Search */}
-        <section className="coleccion-hero relative h-[500px] bg-cover bg-center" style={{ backgroundImage: "url('/images/Pagina_inicio/ecoturismo.jpg')" }}>
+        <section className="coleccion-hero relative h-[500px] bg-cover bg-center" style={{ backgroundImage: "url('/images/Pagina_inicio/ecoturismo.webp')" }}>
           <div className="absolute inset-0 bg-black/40"></div>
           <div className="relative flex h-full flex-col items-center justify-center px-8 text-white">
             <h1 className="mb-8 text-center text-4xl font-bold md:text-5xl">Conoce los mejores destinos turísticos en un clic</h1>

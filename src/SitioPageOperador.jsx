@@ -34,11 +34,11 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
             </div>
 
             <button className="hidden md:block">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.png" alt="Favoritos" className="h-6 w-6" />
+              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             <button className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-8 w-8" />
+              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-8 w-8" />
             </button>
           </div>
         </div>
@@ -57,7 +57,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
       {/* Main Content */}
       <main className="mt-16">
         {/* Hero Section */}
-        <section className="hero-viewport relative bg-cover bg-center" style={{ backgroundImage: "url('/images/sitios/LA-VIRGINIA-540X370.jpg')" }}>
+        <section className="hero-viewport relative bg-cover bg-center" style={{ backgroundImage: "url('/images/sitios/LA-VIRGINIA-540X370.webp')" }}>
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
           <div className="relative flex h-full flex-col items-start justify-end px-8 pb-16 text-white md:px-20">
             <h1 className="mb-4 text-4xl font-bold md:text-5xl">Reserva natural parque la Nona</h1>
@@ -95,7 +95,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
             </div>
             <div className="flex justify-center">
               <img
-                src="/images/sitios/Captura de pantalla 2025-04-09 235939.png"
+                src="/images/sitios/Captura de pantalla 2025-04-09 235939.webp"
                 alt="Mapa de localización"
                 className="rounded-lg shadow-lg"
               />
@@ -108,7 +108,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
           <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 md:grid-cols-2">
             <div className="order-2 md:order-1 flex justify-center">
               <img
-                src="/images/sitios/LA-VIRGINIA-540X370.jpg"
+                src="/images/sitios/LA-VIRGINIA-540X370.webp"
                 alt="Vegetación y clima"
                 className="rounded-lg shadow-lg"
               />
@@ -136,7 +136,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
             </div>
             <div className="flex justify-center">
               <img
-                src="/images/sitios/unnamed.jpg"
+                src="/images/sitios/unnamed.webp"
                 alt="Vista de montaña y reserva natural"
                 className="rounded-lg shadow-lg"
               />
@@ -149,7 +149,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
           <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 md:grid-cols-2">
             <div className="order-2 md:order-1 flex justify-center">
               <img
-                src="/images/sitios/Departamento-Risaralda-de-Colombia-10.jpg"
+                src="/images/sitios/Departamento-Risaralda-de-Colombia-10.webp"
                 alt="Flora y fauna del parque"
                 className="rounded-lg shadow-lg"
               />
@@ -177,7 +177,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
             </div>
             <div className="flex justify-center">
               <img
-                src="/images/sitios/maxresdefault.jpg"
+                src="/images/sitios/maxresdefault.webp"
                 alt="Infraestructura del parque"
                 className="rounded-lg shadow-lg"
               />

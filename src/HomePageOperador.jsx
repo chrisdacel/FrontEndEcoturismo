@@ -25,11 +25,11 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
   ];
 
   const eventos = [
-    { id: 1, titulo: "Festival del Bambú", imagen: "/images/Pagina_inicio/fondo ciudad.jpg" },
-    { id: 2, titulo: "Semana Cultural", imagen: "/images/Pagina_inicio/ecoturismo.jpg" },
-    { id: 3, titulo: "Feria Ecológica", imagen: "/images/Pagina_inicio/fondo ciudad.jpg" },
-    { id: 4, titulo: "Caminata Verde", imagen: "/images/Pagina_inicio/ecoturismo.jpg" },
-    { id: 5, titulo: "Expo Naturaleza", imagen: "/images/Pagina_inicio/fondo ciudad.jpg" }
+    { id: 1, titulo: "Festival del Bambú", imagen: "/images/Pagina_inicio/fondo ciudad.webp" },
+    { id: 2, titulo: "Semana Cultural", imagen: "/images/Pagina_inicio/ecoturismo.webp" },
+    { id: 3, titulo: "Feria Ecológica", imagen: "/images/Pagina_inicio/fondo ciudad.webp" },
+    { id: 4, titulo: "Caminata Verde", imagen: "/images/Pagina_inicio/ecoturismo.webp" },
+    { id: 5, titulo: "Expo Naturaleza", imagen: "/images/Pagina_inicio/fondo ciudad.webp" }
   ];
 
   useEffect(() => {
@@ -98,11 +98,11 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
             </div>
 
             <button className="hidden md:block">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.png" alt="Favoritos" className="h-6 w-6" />
+              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             <button className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-8 w-8" />
+              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-8 w-8" />
             </button>
           </div>
         </div>
@@ -132,7 +132,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
       {/* Main Content */}
       <main className="mt-16">
         {/* Hero Section */}
-        <section className="hero-viewport relative bg-cover bg-center" style={{ backgroundImage: "url('/images/Pagina_inicio/ecoturismo.jpg')" }}>
+        <section className="hero-viewport relative bg-cover bg-center" style={{ backgroundImage: "url('/images/Pagina_inicio/ecoturismo.webp')" }}>
           <div className="absolute inset-0 bg-black/40"></div>
           <div className="relative flex h-full flex-col items-start justify-center px-8 text-white md:px-20">
             <h1 className="mb-4 text-4xl font-bold md:text-6xl">Descubre los mejores</h1>
@@ -237,7 +237,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
           <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-3">
             <div className="rounded-lg bg-gray-50 p-8 shadow-md transition hover:shadow-xl">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#267E1B]">
-                <img src="/images/loqueofrecemos/marcadorrr.png" alt="Guardar" className="h-8 w-8" />
+                <img src="/images/loqueofrecemos/marcadorrr.webp" alt="Guardar" className="h-8 w-8" />
               </div>
               <h3 className="mb-3 text-xl font-bold text-[#267E1B]">Guardar sitios favoritos</h3>
               <p className="text-gray-600">Crea tu colección personal de destinos y accede a ellos cuando quieras.</p>
@@ -245,7 +245,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
 
             <div className="rounded-lg bg-gray-50 p-8 shadow-md transition hover:shadow-xl">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#267E1B]">
-                <img src="/images/loqueofrecemos/notificacion.png" alt="Notificaciones" className="h-8 w-8" />
+                <img src="/images/loqueofrecemos/notificacion.webp" alt="Notificaciones" className="h-8 w-8" />
               </div>
               <h3 className="mb-3 text-xl font-bold text-[#267E1B]">Notificaciones</h3>
               <p className="text-gray-600">Recibe alertas sobre eventos y novedades en tus destinos favoritos.</p>
@@ -253,7 +253,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
 
             <div className="rounded-lg bg-gray-50 p-8 shadow-md transition hover:shadow-xl">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#267E1B]">
-                <img src="/images/loqueofrecemos/customer-reviewww.png" alt="Reseñas" className="h-8 w-8" />
+                <img src="/images/loqueofrecemos/customer-reviewww.webp" alt="Reseñas" className="h-8 w-8" />
               </div>
               <h3 className="mb-3 text-xl font-bold text-[#267E1B]">Reseñas</h3>
               <p className="text-gray-600">Comparte tu experiencia y lee opiniones de otros viajeros.</p>

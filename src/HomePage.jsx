@@ -28,30 +28,30 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
 
   // Sitios populares de ejemplo (reemplazar con fetch si es necesario)
   const sitios = [
-    { id: 1, nombre: "Nevado del Tolima", municipio: "Municipio de Santa Isabel", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg" },
-    { id: 2, nombre: "Laguna del Otún", municipio: "Municipio de Pereira", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_02.jpeg" },
-    { id: 3, nombre: "Termales de Santa Rosa", municipio: "Municipio de Santa Rosa de Cabal", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_03.jpeg" },
-    { id: 4, nombre: "Cascada del Amor", municipio: "Municipio de Marsella", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_04.jpeg" },
-    { id: 5, nombre: "Parque Ucumarí", municipio: "Municipio de Pereira", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_05.jpeg" },
+    { id: 1, nombre: "Nevado del Tolima", municipio: "Municipio de Santa Isabel", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_01.webp" },
+    { id: 2, nombre: "Laguna del Otún", municipio: "Municipio de Pereira", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_02.webp" },
+    { id: 3, nombre: "Termales de Santa Rosa", municipio: "Municipio de Santa Rosa de Cabal", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_03.webp" },
+    { id: 4, nombre: "Cascada del Amor", municipio: "Municipio de Marsella", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_04.webp" },
+    { id: 5, nombre: "Parque Ucumarí", municipio: "Municipio de Pereira", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_05.webp" },
   ];
 
   const beneficios = [
     {
       id: 1,
       title: 'Explora destinos únicos y auténticos',
-      image: '/images/Pagina_inicio/marcador.png',
+      image: '/images/Pagina_inicio/marcador.webp',
       desc: 'Descubre lugares ecoturísticos verificados, con información detallada, fotos y consejos locales para todos los viajeros.'
     },
     {
       id: 2,
       title: 'Recibe alertas y eventos en tiempo real',
-      image: '/images/Pagina_inicio/activo.png',
+      image: '/images/Pagina_inicio/activo.webp',
       desc: 'Mantente informado sobre nuevos eventos, actividades y experiencias cerca de ti.'
     },
     {
       id: 3,
       title: 'Comparte y califica tus experiencias',
-      image: '/images/Pagina_inicio/chat-bot.png',
+      image: '/images/Pagina_inicio/chat-bot.webp',
       desc: 'Deja reseñas, comparte recomendaciones y ayuda a otros a vivir mejores aventuras en la naturaleza.'
     },
   ];
@@ -263,7 +263,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
         <section
           className="relative flex items-center overflow-hidden bg-cover bg-center min-h-[80vh]"
           style={{
-            backgroundImage: "url(/images/Pagina_inicio/ecoturismo.jpg)",
+            backgroundImage: "url(/images/Pagina_inicio/ecoturismo.webp)",
             minHeight:
               typeof window !== 'undefined'
                 ? (window.innerWidth === 390 && window.innerHeight === 844

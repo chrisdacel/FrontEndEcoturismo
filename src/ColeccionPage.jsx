@@ -186,31 +186,31 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
       id: 1,
       nombre: 'Santuario Fauna Flora Otún',
       ubicacion: 'Via Pereira- La virginia',
-      imagen: '/images/Pagina_inicio/Santuario-Fauna-Flora-Otun-Quimbaya-Ucumari-13.jpg',
+      imagen: '/images/Pagina_inicio/Santuario-Fauna-Flora-Otun-Quimbaya-Ucumari-13.webp',
     },
     {
       id: 2,
       nombre: 'Parque Nacional Natural Los Nevados',
       ubicacion: 'Municipio de Santa Rosa de Cabal',
-      imagen: '/images/Pagina_inicio/Nevado-del-Tolima-WalterV-1024x683.jpeg',
+      imagen: '/images/Pagina_inicio/Nevado-del-Tolima-WalterV-1024x683.webp',
     },
     {
       id: 3,
       nombre: 'Termales de Santa Rosa',
       ubicacion: 'Santa Rosa de Cabal',
-      imagen: '/images/Pagina_inicio/photo-1532185922611-3410b1898a1c.jpg',
+      imagen: '/images/Pagina_inicio/photo-1532185922611-3410b1898a1c.webp',
     },
     {
       id: 4,
       nombre: 'Valle del Cocora',
       ubicacion: 'Salento, Quindío',
-      imagen: '/images/Pagina_inicio/Nevado-del-Tolima-WalterV-1024x683.jpeg',
+      imagen: '/images/Pagina_inicio/Nevado-del-Tolima-WalterV-1024x683.webp',
     },
     {
       id: 5,
       nombre: 'Guásimo Natural Park',
       ubicacion: 'Circasia',
-      imagen: '/images/Pagina_inicio/guasimo.jpg',
+      imagen: '/images/Pagina_inicio/guasimo.webp',
     },
   ];
 
@@ -218,30 +218,30 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     {
       id: 1,
       nombre: 'Ecoturismo en Risaralda',
-      imagen: '/images/Pagina_inicio/Santuario-Fauna-Flora-Otun-Quimbaya-Ucumari-13.jpg',
+      imagen: '/images/Pagina_inicio/Santuario-Fauna-Flora-Otun-Quimbaya-Ucumari-13.webp',
     },
     {
       id: 2,
       nombre: 'Aventura en la Naturaleza',
-      imagen: '/images/Pagina_inicio/Nevado-del-Tolima-WalterV-1024x683.jpeg',
+      imagen: '/images/Pagina_inicio/Nevado-del-Tolima-WalterV-1024x683.webp',
     },
     {
       id: 3,
       nombre: 'Paisajes Naturales',
-      imagen: '/images/sitios/Departamento-Risaralda-de-Colombia-10.jpg',
+      imagen: '/images/sitios/Departamento-Risaralda-de-Colombia-10.webp',
     },
     {
       id: 4,
       nombre: 'Experiencia Única',
-      imagen: '/images/Pagina_inicio/guasimo.jpg',
+      imagen: '/images/Pagina_inicio/guasimo.webp',
     },
   ];
 
   // Imágenes del hero (ubica las imágenes adjuntas en estas rutas)
   const heroShots = [
-    { id: 'h1', nombre: 'Palmas de cera', imagen: '/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg' },
-    { id: 'h2', nombre: 'Bandera de Colombia', imagen: '/images/Coleccion_sitios_ecoturisticos/paisaje_02.jpeg' },
-    { id: 'h3', nombre: 'Colibrí en juncos', imagen: '/images/Coleccion_sitios_ecoturisticos/paisaje_03.jpeg' },
+    { id: 'h1', nombre: 'Palmas de cera', imagen: '/images/Coleccion_sitios_ecoturisticos/paisaje_01.webp' },
+    { id: 'h2', nombre: 'Bandera de Colombia', imagen: '/images/Coleccion_sitios_ecoturisticos/paisaje_02.webp' },
+    { id: 'h3', nombre: 'Colibrí en juncos', imagen: '/images/Coleccion_sitios_ecoturisticos/paisaje_03.webp' },
   ];
 
   // Scroll to top button

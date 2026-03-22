@@ -19,31 +19,31 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
       id: 'seccion2',
       title: 'Guarda tus sitios favoritos',
       description: 'Guarda tus sitios favoritos y tenlos siempre a un click',
-      image: '/images/loqueofrecemos/marcadorrr.png',
+      image: '/images/loqueofrecemos/marcadorrr.webp',
     },
     {
       id: 'seccion3',
       title: 'Espacio para tu opinión',
       description: 'Comparte tu experiencia y ayuda a otros viajeros',
-      image: '/images/loqueofrecemos/customer-reviewww.png',
+      image: '/images/loqueofrecemos/customer-reviewww.webp',
     },
     {
       id: 'seccion4',
       title: 'Notificaciones personalizadas',
       description: 'Recibe notificaciones a tu medida, con lo que realmente te interesa',
-      image: '/images/loqueofrecemos/notificacion.png',
+      image: '/images/loqueofrecemos/notificacion.webp',
     },
     {
       id: 'seccion5',
       title: 'Mantente al día',
       description: 'No te pierdas los nuevos eventos y actividades ecológicas',
-      image: '/images/loqueofrecemos/calendario (1).png',
+      image: '/images/loqueofrecemos/calendario (1).webp',
     },
     {
       id: 'seccion6',
       title: 'Recomendaciones personalizadas',
       description: 'Descubre experiencias únicas según tus gustos e intereses',
-      image: '/images/loqueofrecemos/medios-de-comunicacion-social (2).png',
+      image: '/images/loqueofrecemos/medios-de-comunicacion-social (2).webp',
     },
   ];
 
@@ -54,7 +54,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
       title: 'Guarda tus sitios favoritos',
       description:
         'Guarda los destinos y lugares que más te inspiran para futuras aventuras. Ten siempre a mano tus sitios favoritos y accede rápidamente cuando planifiques tu próxima escapada.',
-      image: '/images/loqueofrecemos/360_F_543301935_x7GbHP4insZoPIlyiefioUteakwn4ivh.jpg',
+      image: '/images/loqueofrecemos/360_F_543301935_x7GbHP4insZoPIlyiefioUteakwn4ivh.webp',
       cta: 'Regístrate para guardar tus sitios favoritos',
     },
     {
@@ -63,7 +63,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
       title: 'Espacio para tu opinión',
       description:
         'Tu opinión ayuda a otros viajeros. Comparte experiencias, sugerencias y comentarios sobre los destinos que has visitado para enriquecer las aventuras ecológicas de la comunidad.',
-      image: '/images/loqueofrecemos/experiencias-de-team-building-al-aire-libre-portada.jpg',
+      image: '/images/loqueofrecemos/experiencias-de-team-building-al-aire-libre-portada.webp',
       cta: 'Regístrate para dejar tu reseña',
     },
     {
@@ -72,7 +72,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
       title: 'Notificaciones personalizadas',
       description:
         'Recibe alertas adaptadas a tus intereses: nuevos eventos, ofertas especiales y novedades en tus lugares favoritos para que no te pierdas nada.',
-      image: '/images/loqueofrecemos/photo-1560483647-6a049edeef29.jpg',
+      image: '/images/loqueofrecemos/photo-1560483647-6a049edeef29.webp',
       cta: 'Regístrate para personalización',
     },
     {
@@ -81,7 +81,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
       title: 'Mantente al día',
       description:
         'Entérate de festivales, actividades y experiencias en tus destinos preferidos. Mantén tu agenda ecológica actualizada y disfruta cada momento.',
-      image: '/images/loqueofrecemos/calendar-pencil-and-clock-as-tiempo-background-jlwr8f81osug906i.jpg',
+      image: '/images/loqueofrecemos/calendar-pencil-and-clock-as-tiempo-background-jlwr8f81osug906i.webp',
       cta: 'Conoce los nuevos eventos',
     },
     {
@@ -90,7 +90,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
       title: 'Recomendaciones personalizadas',
       description:
         'Descubre actividades, destinos y eventos ajustados a tus gustos. Te ayudamos a planear el viaje perfecto, ya sea aventura, relax o cultura.',
-      image: '/images/loqueofrecemos/contagiarte_de_ritmos_locales_GettyImages-627027011-scaled.jpg',
+      image: '/images/loqueofrecemos/contagiarte_de_ritmos_locales_GettyImages-627027011-scaled.webp',
       cta: 'Regístrate para tu personalización',
     },
   ];
@@ -126,7 +126,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
               className="h-10 w-10 rounded-full bg-white p-2 shadow hover:scale-105 md:hidden"
               aria-label="Buscar"
             >
-              <img src="/images/loqueofrecemos/img_drop_down.png" alt="Buscar" className="h-full w-full" />
+              <img src="/images/loqueofrecemos/img_drop_down.webp" alt="Buscar" className="h-full w-full" />
             </button>
           </div>
         </div>

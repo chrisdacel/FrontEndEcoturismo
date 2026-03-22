@@ -29,7 +29,7 @@ function TerminosCondicionesPage({ onNavigateHome, onNavigateLogin, onNavigateRe
               Iniciar Sesión
             </button>
             <button className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-8 w-8" />
+              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-8 w-8" />
             </button>
           </div>
         </div>

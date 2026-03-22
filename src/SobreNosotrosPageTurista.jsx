@@ -45,7 +45,7 @@ export default function SobreNosotrosPageTurista({
         {/* Hero Section más alta, texto en inferior izquierda */}
         <section
           className="relative overflow-hidden bg-cover bg-center min-h-[80vh]"
-          style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.jpg')" }}
+          style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.webp')" }}
         >
           <div className={`absolute inset-0 bg-gradient-to-r from-white via-white/70 to-transparent md:from-white md:via-white/50 md:to-black/10 transition-opacity duration-500 ${heroVisible ? 'opacity-100' : 'opacity-0'}`} />
           <div className={`absolute bottom-8 left-6 md:bottom-12 md:left-12 z-10 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
@@ -91,7 +91,7 @@ export default function SobreNosotrosPageTurista({
               {/* Image column - 50% width */}
               <div className="w-full md:w-[50%]">
                 <img
-                  src="/images/Sobre_Nosotros/fondo ciudad.jpg"
+                  src="/images/Sobre_Nosotros/fondo ciudad.webp"
                   alt="Nuestra Misión"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg"
                 />
@@ -129,7 +129,7 @@ export default function SobreNosotrosPageTurista({
               {/* Image column - 50% width */}
               <div className="w-full md:w-[50%]">
                 <img
-                  src="/images/Sobre_Nosotros/ecoturismo.jpg"
+                  src="/images/Sobre_Nosotros/ecoturismo.webp"
                   alt="Qué Ofrecemos"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg"
                 />
@@ -167,7 +167,7 @@ export default function SobreNosotrosPageTurista({
               {/* Image column - 50% width */}
               <div className="w-full md:w-[50%]">
                 <img
-                  src="/images/Sobre_Nosotros/ecoturismo.jpg"
+                  src="/images/Sobre_Nosotros/ecoturismo.webp"
                   alt="Nuestros Valores"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg"
                 />

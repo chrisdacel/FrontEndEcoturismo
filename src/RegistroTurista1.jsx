@@ -28,7 +28,7 @@ export default function RegistroTurista1({ onNavigateHome, onNavigateLogin, onNa
           </button>
 
           {/* Mobile Dropdown */}
-          <img src="/images/roles/menu-alt-2-svgrepo-com.png" alt="Menu" className="h-8 w-8 md:hidden" />
+          <img src="/images/roles/menu-alt-2-svgrepo-com.webp" alt="Menu" className="h-8 w-8 md:hidden" />
         </div>
       </header>
 
@@ -60,7 +60,7 @@ export default function RegistroTurista1({ onNavigateHome, onNavigateLogin, onNa
               className="flex items-end"
             >
               <img
-                src="/images/register_turista/view-svgrepo-com.png"
+                src="/images/register_turista/view-svgrepo-com.webp"
                 alt="Ver contraseña"
                 className="h-5 w-5"
               />
@@ -83,7 +83,7 @@ export default function RegistroTurista1({ onNavigateHome, onNavigateLogin, onNa
               className="flex items-end"
             >
               <img
-                src="/images/register_turista/view-svgrepo-com.png"
+                src="/images/register_turista/view-svgrepo-com.webp"
                 alt="Ver contraseña"
                 className="h-5 w-5"
               />

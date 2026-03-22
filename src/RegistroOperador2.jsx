@@ -71,7 +71,7 @@ export default function RegistroOperador2({ onNavigateHome, onNavigateLogin, onN
           </button>
 
           {/* Mobile Dropdown */}
-          <img src="/images/datos_operador/menu-alt-2-svgrepo-com.png" alt="Menu" className="h-8 w-8 md:hidden" />
+          <img src="/images/datos_operador/menu-alt-2-svgrepo-com.webp" alt="Menu" className="h-8 w-8 md:hidden" />
         </div>
       </header>
 

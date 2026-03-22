@@ -42,12 +42,12 @@ export default function SitioPageTurista({
 
             {/* Favorites icon */}
             <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.png" alt="Favoritos" className="h-6 w-6" />
+              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             {/* Dropdown menu */}
             <div className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-6 w-6 cursor-pointer" />
+              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-6 w-6 cursor-pointer" />
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@ export default function SitioPageTurista({
         {/* Hero Section */}
         <section
           className="relative h-96 bg-cover bg-center flex items-center justify-center"
-          style={{ backgroundImage: "url('/images/sitios/LA-VIRGINIA-540X370.jpg')" }}
+          style={{ backgroundImage: "url('/images/sitios/LA-VIRGINIA-540X370.webp')" }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
           <div className="relative z-10 text-center text-white px-4">
@@ -109,7 +109,7 @@ export default function SitioPageTurista({
               </div>
               <div className="order-1 md:order-2">
                 <img
-                  src="/images/sitios/Captura de pantalla 2025-04-09 235939.png"
+                  src="/images/sitios/Captura de pantalla 2025-04-09 235939.webp"
                   alt="Mapa de localización"
                   className="w-full h-80 object-cover rounded-lg shadow-md"
                 />
@@ -124,7 +124,7 @@ export default function SitioPageTurista({
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-1">
                 <img
-                  src="/images/sitios/LA-VIRGINIA-540X370.jpg"
+                  src="/images/sitios/LA-VIRGINIA-540X370.webp"
                   alt="Vegetación y clima"
                   className="w-full h-80 object-cover rounded-lg shadow-md"
                 />
@@ -155,7 +155,7 @@ export default function SitioPageTurista({
               </div>
               <div className="order-1 md:order-2">
                 <img
-                  src="/images/sitios/unnamed.jpg"
+                  src="/images/sitios/unnamed.webp"
                   alt="Vista de montaña y reserva natural"
                   className="w-full h-80 object-cover rounded-lg shadow-md"
                 />
@@ -170,7 +170,7 @@ export default function SitioPageTurista({
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-1">
                 <img
-                  src="/images/sitios/Departamento-Risaralda-de-Colombia-10.jpg"
+                  src="/images/sitios/Departamento-Risaralda-de-Colombia-10.webp"
                   alt="Flora y fauna del parque"
                   className="w-full h-80 object-cover rounded-lg shadow-md"
                 />
@@ -202,7 +202,7 @@ export default function SitioPageTurista({
               </div>
               <div className="order-1 md:order-2">
                 <img
-                  src="/images/sitios/maxresdefault.jpg"
+                  src="/images/sitios/maxresdefault.webp"
                   alt="Infraestructura del parque"
                   className="w-full h-80 object-cover rounded-lg shadow-md"
                 />
@@ -228,7 +228,7 @@ export default function SitioPageTurista({
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-800 mb-4">Calificaciones y opiniones</h2>
-              <img src="/images/sitios/puntuación.png" alt="Puntuación" className="h-16 mx-auto mb-6" />
+              <img src="/images/sitios/puntuación.webp" alt="Puntuación" className="h-16 mx-auto mb-6" />
               <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition">
                 Escribe una reseña
               </button>

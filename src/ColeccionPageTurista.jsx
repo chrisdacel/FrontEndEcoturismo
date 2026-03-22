@@ -35,7 +35,7 @@ export default function ColeccionPageTurista({
         const data = await getAllPlaces();
         // Adaptar los datos a la estructura esperada por el componente
         const adaptados = (Array.isArray(data) ? data : []).map(sitio => ({
-          img: sitio.cover || sitio.portada || sitio.imagen || '/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg',
+          img: sitio.cover || sitio.portada || sitio.imagen || '/images/Coleccion_sitios_ecoturisticos/paisaje_01.webp',
           title: sitio.name || sitio.title || 'Sitio',
           location: sitio.localization || sitio.ubicacion || sitio.location || '',
         }));
@@ -55,10 +55,10 @@ export default function ColeccionPageTurista({
   };
 
   const recomendaciones = [
-    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg', title: 'Reserva La Nona', desc: 'Experiencia única en naturaleza' },
-    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_02.jpeg', title: 'Cascada del Amor', desc: 'Belleza natural incomparable' },
-    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_03.jpeg', title: 'Parque Ucumarí', desc: 'Aventura en la montaña' },
-    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_04.jpeg', title: 'Laguna del Otún', desc: 'Espejo natural de los Andes' }
+    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_01.webp', title: 'Reserva La Nona', desc: 'Experiencia única en naturaleza' },
+    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_02.webp', title: 'Cascada del Amor', desc: 'Belleza natural incomparable' },
+    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_03.webp', title: 'Parque Ucumarí', desc: 'Aventura en la montaña' },
+    { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_04.webp', title: 'Laguna del Otún', desc: 'Espejo natural de los Andes' }
   ];
 
   const handleCarouselNext = (carouselIdx) => {
@@ -122,12 +122,12 @@ export default function ColeccionPageTurista({
 
             {/* Favorites icon */}
             <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.png" alt="Favoritos" className="h-6 w-6" />
+              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             {/* Dropdown menu */}
             <div className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-6 w-6 cursor-pointer" />
+              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-6 w-6 cursor-pointer" />
             </div>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function ColeccionPageTurista({
         {/* Hero Section with Search */}
         <section
           className="coleccion-hero relative h-96 bg-cover bg-center flex items-center justify-center"
-          style={{ backgroundImage: "url('/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg')" }}
+          style={{ backgroundImage: "url('/images/Coleccion_sitios_ecoturisticos/paisaje_01.webp')" }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
           <div className="relative z-10 w-full max-w-2xl px-4">

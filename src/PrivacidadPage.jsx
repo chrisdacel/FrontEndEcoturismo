@@ -18,7 +18,7 @@ function PrivacidadPage({ onNavigateHome, onNavigateLogin, onNavigateRegister })
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900 overflow-x-hidden pt-14">
       {/* Hero: más alto, texto inferior izquierda, overlay con crossfade */}
-      <section className="relative min-h-[70vh] w-full overflow-hidden bg-cover bg-center" style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.jpg')" }}>
+      <section className="relative min-h-[70vh] w-full overflow-hidden bg-cover bg-center" style={{ backgroundImage: "url('/images/Sobre_Nosotros/fondo ciudad.webp')" }}>
         <div className={`absolute inset-0 bg-gradient-to-r from-white via-white/70 to-transparent md:from-white md:via-white/50 md:to-black/10 transition-opacity duration-500 ${heroVisible ? 'opacity-100' : 'opacity-0'}`} />
         <div className={`absolute bottom-8 left-6 md:bottom-12 md:left-12 z-10 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900">Política de Privacidad</h1>

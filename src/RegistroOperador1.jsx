@@ -28,7 +28,7 @@ export default function RegistroOperador1({ onNavigateHome, onNavigateLogin, onN
           </button>
 
           {/* Mobile Dropdown */}
-          <img src="/images/register_operador/menu-alt-2-svgrepo-com.png" alt="Menu" className="h-8 w-8 md:hidden" />
+          <img src="/images/register_operador/menu-alt-2-svgrepo-com.webp" alt="Menu" className="h-8 w-8 md:hidden" />
         </div>
       </header>
 
@@ -60,7 +60,7 @@ export default function RegistroOperador1({ onNavigateHome, onNavigateLogin, onN
               className="flex items-end"
             >
               <img
-                src="/images/register_operador/view-svgrepo-com.png"
+                src="/images/register_operador/view-svgrepo-com.webp"
                 alt="Ver contraseña"
                 className="h-5 w-5"
               />
@@ -83,7 +83,7 @@ export default function RegistroOperador1({ onNavigateHome, onNavigateLogin, onN
               className="flex items-end"
             >
               <img
-                src="/images/register_operador/view-svgrepo-com.png"
+                src="/images/register_operador/view-svgrepo-com.webp"
                 alt="Ver contraseña"
                 className="h-5 w-5"
               />

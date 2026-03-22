@@ -70,7 +70,7 @@ export default function RegistroTurista2({ onNavigateHome, onNavigateLogin, onNa
           </button>
 
           {/* Mobile Dropdown */}
-          <img src="/images/datos_turista/menu-alt-2-svgrepo-com.png" alt="Menu" className="h-8 w-8 md:hidden" />
+          <img src="/images/datos_turista/menu-alt-2-svgrepo-com.webp" alt="Menu" className="h-8 w-8 md:hidden" />
         </div>
       </header>
 

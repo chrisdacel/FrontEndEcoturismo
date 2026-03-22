@@ -44,24 +44,24 @@ export default function HomePageTurista({
   };
 
   const popularesData = [
-    { img: '/images/Pagina_inicio/Paisaje_1.jpg', title: 'Santuario Otún Quimbaya', location: 'Municipio de Santa Rosa de Cabal' },
-    { img: '/images/Pagina_inicio/Paisaje_2.jpg', title: 'Cascadas de Santa Rosa', location: 'Municipio de Santa Rosa de Cabal' },
-    { img: '/images/Pagina_inicio/Paisaje_3.jpg', title: 'Parque Natural La Marcada', location: 'Municipio de Dosquebradas' },
-    { img: '/images/Pagina_inicio/Paisaje_4.jpg', title: 'Termales Santa Rosa', location: 'Municipio de Santa Rosa de Cabal' },
-    { img: '/images/Pagina_inicio/Paisaje_5.jpg', title: 'Laguna del Otún', location: 'Municipio de Pereira' },
-    { img: '/images/Pagina_inicio/Paisaje_6.jpg', title: 'Cascada del Amor', location: 'Municipio de Marsella' },
-    { img: '/images/Pagina_inicio/Paisaje_7.jpg', title: 'Parque Ucumarí', location: 'Municipio de Pereira' },
-    { img: '/images/Pagina_inicio/Paisaje_8.jpg', title: 'Reserva Natural Bremen', location: 'Municipio de Filandia' },
-    { img: '/images/Pagina_inicio/Paisaje_9.jpg', title: 'Nevado del Ruiz', location: 'Municipio de Villa María' },
-    { img: '/images/Pagina_inicio/Paisaje_10.jpg', title: 'Santuario de Flora y Fauna', location: 'Municipio de Apia' }
+    { img: '/images/Pagina_inicio/Paisaje_1.webp', title: 'Santuario Otún Quimbaya', location: 'Municipio de Santa Rosa de Cabal' },
+    { img: '/images/Pagina_inicio/Paisaje_2.webp', title: 'Cascadas de Santa Rosa', location: 'Municipio de Santa Rosa de Cabal' },
+    { img: '/images/Pagina_inicio/Paisaje_3.webp', title: 'Parque Natural La Marcada', location: 'Municipio de Dosquebradas' },
+    { img: '/images/Pagina_inicio/Paisaje_4.webp', title: 'Termales Santa Rosa', location: 'Municipio de Santa Rosa de Cabal' },
+    { img: '/images/Pagina_inicio/Paisaje_5.webp', title: 'Laguna del Otún', location: 'Municipio de Pereira' },
+    { img: '/images/Pagina_inicio/Paisaje_6.webp', title: 'Cascada del Amor', location: 'Municipio de Marsella' },
+    { img: '/images/Pagina_inicio/Paisaje_7.webp', title: 'Parque Ucumarí', location: 'Municipio de Pereira' },
+    { img: '/images/Pagina_inicio/Paisaje_8.webp', title: 'Reserva Natural Bremen', location: 'Municipio de Filandia' },
+    { img: '/images/Pagina_inicio/Paisaje_9.webp', title: 'Nevado del Ruiz', location: 'Municipio de Villa María' },
+    { img: '/images/Pagina_inicio/Paisaje_10.webp', title: 'Santuario de Flora y Fauna', location: 'Municipio de Apia' }
   ];
 
   const eventosData = [
-    { img: '/images/Pagina_inicio/evento_1.jpg', title: 'Festival de Aves' },
-    { img: '/images/Pagina_inicio/evento_2.jpg', title: 'Caminata Ecológica' },
-    { img: '/images/Pagina_inicio/evento_3.jpg', title: 'Día del Medio Ambiente' },
-    { img: '/images/Pagina_inicio/evento_4.jpg', title: 'Tour Nocturno' },
-    { img: '/images/Pagina_inicio/evento_5.jpg', title: 'Avistamiento de Flora' }
+    { img: '/images/Pagina_inicio/evento_1.webp', title: 'Festival de Aves' },
+    { img: '/images/Pagina_inicio/evento_2.webp', title: 'Caminata Ecológica' },
+    { img: '/images/Pagina_inicio/evento_3.webp', title: 'Día del Medio Ambiente' },
+    { img: '/images/Pagina_inicio/evento_4.webp', title: 'Tour Nocturno' },
+    { img: '/images/Pagina_inicio/evento_5.webp', title: 'Avistamiento de Flora' }
   ];
 
   const getVisiblePopulares = () => {
@@ -106,12 +106,12 @@ export default function HomePageTurista({
 
             {/* Favorites icon */}
             <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.png" alt="Favoritos" className="h-6 w-6" />
+              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             {/* Dropdown menu */}
             <div className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.png" alt="Menu" className="h-6 w-6 cursor-pointer" />
+              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-6 w-6 cursor-pointer" />
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@ export default function HomePageTurista({
         {/* Hero Section */}
         <section
           className="hero-viewport relative bg-cover bg-center flex items-center justify-center"
-          style={{ backgroundImage: "url('/images/Pagina_inicio/Paisaje_1.jpg')" }}
+          style={{ backgroundImage: "url('/images/Pagina_inicio/Paisaje_1.webp')" }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
           <div className="relative z-10 text-center text-white px-4">
@@ -270,7 +270,7 @@ export default function HomePageTurista({
               {/* Guardar */}
               <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition">
                 <img
-                  src="/images/loqueofrecemos/marcadorrr.png"
+                  src="/images/loqueofrecemos/marcadorrr.webp"
                   alt="Guardar"
                   className="h-20 w-20 mx-auto mb-4"
                 />
@@ -283,7 +283,7 @@ export default function HomePageTurista({
               {/* Notificaciones */}
               <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition">
                 <img
-                  src="/images/loqueofrecemos/notificacion.png"
+                  src="/images/loqueofrecemos/notificacion.webp"
                   alt="Notificaciones"
                   className="h-20 w-20 mx-auto mb-4"
                 />
@@ -296,7 +296,7 @@ export default function HomePageTurista({
               {/* Reseñas */}
               <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition">
                 <img
-                  src="/images/loqueofrecemos/customer-reviewww.png"
+                  src="/images/loqueofrecemos/customer-reviewww.webp"
                   alt="Reseñas"
                   className="h-20 w-20 mx-auto mb-4"
                 />

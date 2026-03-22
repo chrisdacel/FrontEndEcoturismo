@@ -18,7 +18,7 @@ export default function SitioPage({
         {/* Hero Section */}
         <section
           className="relative min-h-[70vh] bg-cover bg-center flex items-center"
-          style={{ backgroundImage: "url('/images/sitios/mesmerizing-scenery-beautiful-green-mountains-with-cloudy-sky.jpg')" }}
+          style={{ backgroundImage: "url('/images/sitios/mesmerizing-scenery-beautiful-green-mountains-with-cloudy-sky.webp')" }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
           <div className="relative z-10 w-full">
@@ -67,7 +67,7 @@ export default function SitioPage({
               </div>
               <div className="order-1 md:order-2">
                 <img
-                  src="/images/sitios/Captura de pantalla 2025-04-09 235939.png"
+                  src="/images/sitios/Captura de pantalla 2025-04-09 235939.webp"
                   alt="Mapa de localización"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
                 />
@@ -82,7 +82,7 @@ export default function SitioPage({
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-1">
                 <img
-                  src="/images/sitios/LA-VIRGINIA-540X370.jpg"
+                  src="/images/sitios/LA-VIRGINIA-540X370.webp"
                   alt="Vegetación y clima"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
                 />
@@ -111,7 +111,7 @@ export default function SitioPage({
               </div>
               <div className="order-1 md:order-2">
                 <img
-                  src="/images/sitios/unnamed.jpg"
+                  src="/images/sitios/unnamed.webp"
                   alt="Vista de montaña y reserva natural"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
                 />
@@ -126,7 +126,7 @@ export default function SitioPage({
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-1">
                 <img
-                  src="/images/sitios/Departamento-Risaralda-de-Colombia-10.jpg"
+                  src="/images/sitios/Departamento-Risaralda-de-Colombia-10.webp"
                   alt="Flora y fauna del parque"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
                 />
@@ -157,7 +157,7 @@ export default function SitioPage({
               </div>
               <div className="order-1 md:order-2">
                 <img
-                  src="/images/sitios/maxresdefault.jpg"
+                  src="/images/sitios/maxresdefault.webp"
                   alt="Infraestructura del parque"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
                 />
