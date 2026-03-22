@@ -364,3 +364,38 @@ body {
   border: none;
   border-radius: 9999px;
 }
+
+/* Clases dinámicas de Accesibilidad */
+html.text-large {
+  font-size: 105% !important; /* Tailwind usa rem, con base en el root */
+}
+
+/* Modificamos Alto Contraste para que se apoye también visualmente */
+html.high-contrast {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+html.high-contrast img,
+html.high-contrast video,
+html.high-contrast svg {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Reducir Animaciones */
+html.reduce-motion,
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Fuente Legible */
+html.readable-font,
+html.readable-font * {
+  font-family: Arial, Helvetica, sans-serif !important;
+  letter-spacing: 0.03em !important;
+  word-spacing: 0.05em !important;
+}

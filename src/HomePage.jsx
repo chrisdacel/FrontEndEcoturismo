@@ -18,6 +18,14 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
   const [loadingNextEvent, setLoadingNextEvent] = useState(false);
   const [recommendedCount, setRecommendedCount] = useState(0);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Sitios populares de ejemplo (reemplazar con fetch si es necesario)
   const sitios = [
     { id: 1, nombre: "Nevado del Tolima", municipio: "Municipio de Santa Isabel", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_01.jpeg" },

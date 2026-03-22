@@ -122,7 +122,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-5 right-5 z-50 rounded-full bg-white shadow-lg transition hover:scale-110 md:right-0"
+          className="fixed bottom-6 right-6 z-40 rounded-full bg-white shadow-lg transition hover:scale-110"
           title="Volver arriba"
         >
           <img src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Arriba" className="h-12 w-12" />

@@ -1,4 +1,4 @@
-﻿import PreguntasFrecuentesPage from './PreguntasFrecuentesPage';
+import PreguntasFrecuentesPage from './PreguntasFrecuentesPage';
 import AdminEventsPage from './AdminEventsPage';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -46,6 +46,7 @@ import AdminOperatorRoute from './components/AdminOperatorRoute';
 import SitioPage from './SitioPage';
 import SitioDetailPage from './SitioDetailPage';
 import CreateSitioPage from './CreateSitioPageLeaflet'; // Versión con Leaflet (OpenStreetMap)
+import AccessibilityButton from './components/AccessibilityButton'; // Botón de accesibilidad global
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -717,6 +718,7 @@ function App() {
         <PageTransition>
           <AppRoutes />
         </PageTransition>
+        <AccessibilityButton />
       </div>
     </AuthProvider>
   );
