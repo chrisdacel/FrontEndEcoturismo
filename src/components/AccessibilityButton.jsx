@@ -100,8 +100,7 @@ const AccessibilityButton = () => {
   const isAuthPage = 
     location.pathname === "/login" || 
     location.pathname === "/seleccionar-rol" || 
-    location.pathname.includes("/registro") ||
-    location.pathname.includes("/admin");
+    location.pathname.includes("/registro");
 
   const positionClass = showScrollTop
     ? (isAuthPage ? 'bottom-6 xl:bottom-[5.5rem]' : 'bottom-[5.5rem]')
