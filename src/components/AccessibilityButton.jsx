@@ -49,8 +49,12 @@ const AccessibilityButton = () => {
     if (textSize === 'normal') {
       document.documentElement.classList.add('text-large');
       setTextSize('large');
-    } else {
+    } else if (textSize === 'large') {
       document.documentElement.classList.remove('text-large');
+      document.documentElement.classList.add('text-xlarge');
+      setTextSize('xlarge');
+    } else {
+      document.documentElement.classList.remove('text-xlarge');
       setTextSize('normal');
     }
   };
@@ -86,7 +90,7 @@ const AccessibilityButton = () => {
   };
 
   const resetAll = () => {
-    document.documentElement.classList.remove('text-large', 'high-contrast', 'reduce-motion', 'readable-font');
+    document.documentElement.classList.remove('text-large', 'text-xlarge', 'high-contrast', 'reduce-motion', 'readable-font');
     setTextSize('normal');
     setContrast('normal');
     setReduceMotion(false);
@@ -107,7 +111,7 @@ const AccessibilityButton = () => {
                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
                </svg>
-               {textSize === 'normal' ? 'Aumentar Texto' : 'Texto Normal'}
+               {textSize === 'normal' ? 'Aumentar Texto' : textSize === 'large' ? 'Aumentar Más el Texto' : 'Texto Normal'}
              </button>
              
              <button onClick={toggleContrast} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors flex items-center gap-3">
