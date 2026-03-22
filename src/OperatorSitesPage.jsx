@@ -250,21 +250,21 @@ export default function OperatorSitesPage() {
               )}
             </div>
 
-            <div className="hidden md:block overflow-x-auto bg-white">
+            <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200">
               <table className="min-w-full text-sm">
-              <thead className="bg-slate-50">
+              <thead className="bg-white">
                 <tr>
-                  <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Nombre</th>
-                  <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Slogan</th>
-                  <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Estado</th>
-                  <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Aprobacion</th>
-                  <th className="px-6 py-3 text-left text-slate-700 uppercase tracking-wider text-xs">Acciones</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Nombre</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Slogan</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Estado</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Aprobacion</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {currentPlaces.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4">
                       <div className="flex flex-col items-start gap-2">
                         {p.cover ? (
                           <img
@@ -287,20 +287,26 @@ export default function OperatorSitesPage() {
                         </button>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-slate-700">{p.slogan || '—'}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-slate-700">
+                    <td className="px-4 py-4 text-slate-700">{p.slogan || '—'}</td>
+                    <td className="px-4 py-4 text-slate-700">
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        p.opening_status === 'open' || p.estado_apertura === 'open' ? 'bg-emerald-100 text-emerald-800' :
+                        p.opening_status === 'closed_temporarily' || p.estado_apertura === 'closed_temporarily' ? 'bg-amber-100 text-amber-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
                         {statusLabels[p.opening_status || p.estado_apertura] || '—'}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-slate-700">
+                    <td className="px-4 py-4 text-slate-700">
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        p.approval_status === 'approved' ? 'bg-emerald-100 text-emerald-800' :
+                        p.approval_status === 'rejected' ? 'bg-rose-100 text-rose-800' :
+                        'bg-slate-100 text-slate-800'
+                      }`}>
                         {approvalLabels[p.approval_status] || 'Pendiente'}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4">
                       <div className="flex items-center gap-1">
                         <button
                           className="p-1.5 rounded text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
