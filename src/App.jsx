@@ -48,6 +48,16 @@ import SitioDetailPage from './SitioDetailPage';
 import CreateSitioPage from './CreateSitioPageLeaflet'; // Versión con Leaflet (OpenStreetMap)
 import AccessibilityButton from './components/AccessibilityButton'; // Botón de accesibilidad global
 
+const GuestRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (user) {
+    if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+    if (user.role === 'operator') return <Navigate to="/operador/home" replace />;
+    return <Navigate to="/turista/home" replace />;
+  }
+  return children;
+};
+
 function AppRoutes() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -79,36 +89,46 @@ function AppRoutes() {
       <Route
         path="/login"
         element={
-          <LoginPage
-            onNavigateHome={() => navigate('/')}
-            onNavigateRegister={() => navigate('/register')}
-            onNavigateForgot={() => navigate('/forgot-password')}
-          />
+          <GuestRoute>
+            <LoginPage
+              onNavigateHome={() => navigate('/')}
+              onNavigateRegister={() => navigate('/register')}
+              onNavigateForgot={() => navigate('/forgot-password')}
+            />
+          </GuestRoute>
         }
       />
       <Route
         path="/register"
         element={
-          <RegisterPage
-            onNavigateHome={() => navigate('/')}
-            onNavigatePreferences={() => navigate('/preferencias')}
-            onNavigateLogin={() => navigate('/login')}
-            onNavigateConfirm={() => navigate('/confirmar-cuenta')}
-          />
+          <GuestRoute>
+            <RegisterPage
+              onNavigateHome={() => navigate('/')}
+              onNavigatePreferences={() => navigate('/preferencias')}
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateConfirm={() => navigate('/confirmar-cuenta')}
+            />
+          </GuestRoute>
         }
       />
       <Route
         path="/forgot-password"
         element={
-          <ForgotPasswordPage
-            onNavigateLogin={() => navigate('/login')}
-            onNavigateRegister={() => navigate('/register')}
-          />
+          <GuestRoute>
+            <ForgotPasswordPage
+              onNavigateLogin={() => navigate('/login')}
+              onNavigateRegister={() => navigate('/register')}
+            />
+          </GuestRoute>
         }
       />
       <Route
         path="/reset-password"
-        element={<ResetPasswordPage onNavigateLogin={() => navigate('/login')} />}
+        element={
+          <GuestRoute>
+            <ResetPasswordPage onNavigateLogin={() => navigate('/login')} />
+          </GuestRoute>
+        }
       />
       <Route
         path="/confirmar-cuenta"
