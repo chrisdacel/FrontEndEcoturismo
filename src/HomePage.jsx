@@ -274,13 +274,13 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
                 : undefined
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent md:from-white md:via-white/60 md:to-black/20 opacity-100" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-white/50 md:from-white md:via-white/60 md:to-black/20 opacity-100" />
           <div className="relative z-10 flex flex-col justify-center items-start px-6 md:px-12 w-full max-w-2xl" style={{minHeight:'60vh'}}>
             <div className="inline-flex items-center gap-3 rounded-full bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               {user ? 'Bienvenido' : 'Ecoturismo'}
             </div>
-            <div className="mt-4 max-w-2xl space-y-4">
+            <div className="mt-4 max-w-2xl space-y-4 drop-shadow-[0_0_12px_rgba(255,255,255,1)] sm:drop-shadow-none">
               {user ? (
                 <>
                   <h1 className="text-4xl font-bold leading-tight text-slate-900 md:text-5xl flex flex-wrap items-center gap-2">
