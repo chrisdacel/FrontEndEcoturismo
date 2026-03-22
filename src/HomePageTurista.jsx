@@ -79,7 +79,7 @@ export default function HomePageTurista({
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-12 w-12" />
+            <img loading="lazy" src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-12 w-12" />
             <div className="flex flex-col leading-tight">
               <h3 className="text-lg font-bold text-gray-800">Conexion</h3>
               <h5 className="text-sm text-gray-600">EcoRisaralda</h5>
@@ -94,24 +94,24 @@ export default function HomePageTurista({
               onClick={() => setSearchOpen(!searchOpen)}
               className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
             >
-              <img src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-5 w-5" />
+              <img loading="lazy" src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-5 w-5" />
               <span className="text-sm text-gray-700">Buscar</span>
             </button>
 
             {/* User display */}
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50">
-              <img src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-6 w-6" />
+              <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-6 w-6" />
               <span className="text-sm font-medium text-gray-800">{userName}</span>
             </div>
 
             {/* Favorites icon */}
             <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
+              <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             {/* Dropdown menu */}
             <div className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-6 w-6 cursor-pointer" />
+              <img loading="lazy" src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-6 w-6 cursor-pointer" />
             </div>
           </div>
         </div>
@@ -134,7 +134,7 @@ export default function HomePageTurista({
           onClick={scrollToTop}
           className="fixed bottom-6 right-6 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition z-40"
         >
-          <img src="/images/Pagina_inicio/arrow-up2.svg" alt="Arriba" className="h-6 w-6" />
+          <img loading="lazy" src="/images/Pagina_inicio/arrow-up2.svg" alt="Arriba" className="h-6 w-6" />
         </button>
       )}
 
@@ -195,7 +195,7 @@ export default function HomePageTurista({
                     {getVisiblePopulares().map((item, index) => (
                       <div key={index} className="flex-shrink-0 w-1/3">
                         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                          <img src={item.img} alt={item.title} className="w-full h-48 object-cover" />
+                          <img loading="lazy" src={item.img} alt={item.title} className="w-full h-48 object-cover" />
                           <div className="p-4">
                             <h4 className="font-semibold text-gray-800 mb-1">{item.title}</h4>
                             <p className="text-sm text-gray-600">{item.location}</p>
@@ -219,7 +219,7 @@ export default function HomePageTurista({
                           index === eventosIndex ? 'opacity-100' : 'opacity-0'
                         }`}
                       >
-                        <img src={evento.img} alt={evento.title} className="w-full h-full object-cover" />
+                        <img loading="lazy" src={evento.img} alt={evento.title} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex items-end">
                           <h4 className="text-white text-2xl font-bold p-6">{evento.title}</h4>
                         </div>
@@ -269,7 +269,7 @@ export default function HomePageTurista({
             <div className="grid md:grid-cols-3 gap-8 mb-12">
               {/* Guardar */}
               <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition">
-                <img
+                <img loading="lazy"
                   src="/images/loqueofrecemos/marcadorrr.webp"
                   alt="Guardar"
                   className="h-20 w-20 mx-auto mb-4"
@@ -282,7 +282,7 @@ export default function HomePageTurista({
 
               {/* Notificaciones */}
               <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition">
-                <img
+                <img loading="lazy"
                   src="/images/loqueofrecemos/notificacion.webp"
                   alt="Notificaciones"
                   className="h-20 w-20 mx-auto mb-4"
@@ -295,7 +295,7 @@ export default function HomePageTurista({
 
               {/* Reseñas */}
               <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition">
-                <img
+                <img loading="lazy"
                   src="/images/loqueofrecemos/customer-reviewww.webp"
                   alt="Reseñas"
                   className="h-20 w-20 mx-auto mb-4"

@@ -40,7 +40,7 @@ function QueOfrecemosPage({ onNavigateRegister }) {
           <section className="mb-20 grid gap-12 md:grid-cols-3">
             {features.map((feature) => (
               <div key={feature.id} className="flex flex-col gap-3">
-                <img src={feature.image} alt={feature.title} className="h-28 w-28 brand-icon" />
+                <img loading="lazy" src={feature.image} alt={feature.title} className="h-28 w-28 brand-icon" />
                 <p className="text-lg font-semibold text-slate-900">{feature.title}</p>
                 <p className="text-sm text-gray-600 leading-relaxed">{feature.description}</p>
                 <a href={`#${feature.id}`} className="text-sm font-semibold text-slate-700 underline decoration-emerald-500 decoration-2 underline-offset-4 hover:text-emerald-600">Más información</a>
@@ -52,7 +52,7 @@ function QueOfrecemosPage({ onNavigateRegister }) {
             {sections.map((section) => (
               <div key={section.id} id={section.id} className="flex flex-col gap-6">
                 <h2 className="text-2xl font-bold text-[#267E1B] md:text-3xl">{section.intro}</h2>
-                <img src={section.image} alt={section.title} className="h-[380px] w-full rounded-lg object-cover shadow-md" />
+                <img loading="lazy" src={section.image} alt={section.title} className="h-[380px] w-full rounded-lg object-cover shadow-md" />
                 <h3 className="text-2xl font-semibold text-slate-900">{section.title}</h3>
                 <p className="text-base text-gray-700 leading-relaxed">{section.description}</p>
                 {!user && (

@@ -95,7 +95,7 @@ export default function EventDetailPage() {
               <p className="mt-1 text-sm text-slate-600">{formatDate(event.starts_at)}</p>
             )}
             {event.image && (
-              <img
+              <img loading="lazy"
                 src={storageUrl(event.image)}
                 alt={event.title}
                 className="mt-4 h-64 w-full rounded-2xl object-cover"

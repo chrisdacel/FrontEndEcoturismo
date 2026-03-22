@@ -6,7 +6,7 @@ function RolesPage({ onNavigateHome, onNavigateLogin, onNavigateRegistroOp, onNa
         <div className="flex items-center justify-between px-6 py-4 md:px-12">
           {/* Logo */}
           <button onClick={onNavigateHome} className="flex items-center gap-2 hover:opacity-80">
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
+            <img loading="lazy" src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
             <div>
               <h3 className="text-sm font-bold text-slate-900">Conexion</h3>
               <p className="text-xs text-slate-600">EcoRisaralda</p>
@@ -16,7 +16,7 @@ function RolesPage({ onNavigateHome, onNavigateLogin, onNavigateRegistroOp, onNa
           {/* Center - Buscador */}
           <div className="hidden gap-4 md:flex">
             <button className="flex items-center gap-2 text-slate-700 hover:text-[#267E1B]">
-              <img src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-5 w-5" />
+              <img loading="lazy" src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-5 w-5" />
               <span className="text-sm">Buscar</span>
             </button>
           </div>
@@ -32,7 +32,7 @@ function RolesPage({ onNavigateHome, onNavigateLogin, onNavigateRegistroOp, onNa
 
             {/* Dropdown mobile */}
             <button className="md:hidden">
-              <img src="/images/roles/menu-alt-2-svgrepo-com.webp" alt="Menu" className="h-8 w-8" />
+              <img loading="lazy" src="/images/roles/menu-alt-2-svgrepo-com.webp" alt="Menu" className="h-8 w-8" />
             </button>
           </div>
         </div>
@@ -45,7 +45,7 @@ function RolesPage({ onNavigateHome, onNavigateLogin, onNavigateRegistroOp, onNa
           className="group flex flex-col items-center justify-center text-center transition-transform duration-300 hover:scale-105"
         >
           <div className="mb-4">
-            <img src="/images/roles/apreton-de-manos.webp" alt="Operario" className="h-56 w-56 object-cover" />
+            <img loading="lazy" src="/images/roles/apreton-de-manos.webp" alt="Operario" className="h-56 w-56 object-cover" />
           </div>
           <h1 className="mb-4 text-4xl font-bold text-[#267E1B] drop-shadow-lg">Operario</h1>
           <p className="w-72 rounded-lg border border-slate-500 bg-white px-3 py-2 text-sm text-slate-700 shadow-md transition-all duration-300 group-hover:block">
@@ -63,7 +63,7 @@ function RolesPage({ onNavigateHome, onNavigateLogin, onNavigateRegistroOp, onNa
           className="group flex flex-col items-center justify-center text-center transition-transform duration-300 hover:scale-105"
         >
           <div className="mb-4">
-            <img src="/images/roles/caminante.webp" alt="Turista" className="h-56 w-56 object-cover" />
+            <img loading="lazy" src="/images/roles/caminante.webp" alt="Turista" className="h-56 w-56 object-cover" />
           </div>
           <h1 className="mb-4 text-4xl font-bold text-[#267E1B] drop-shadow-lg">Turista</h1>
           <p className="w-72 rounded-lg border border-slate-500 bg-white px-3 py-2 text-sm text-slate-700 shadow-md transition-all duration-300 group-hover:block">

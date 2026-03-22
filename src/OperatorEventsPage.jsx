@@ -201,7 +201,7 @@ export default function OperatorEventsPage() {
                 <div key={`${event.placeId}-${event.id}`} className="rounded-xl border border-slate-200 bg-white p-4">
                   <div className="flex items-start gap-3">
                     {event.image ? (
-                      <img
+                      <img loading="lazy"
                         src={storageUrl(event.image)}
                         alt={event.title || 'Evento'}
                         className="h-16 w-24 rounded-md object-cover border border-slate-200"
@@ -265,7 +265,7 @@ export default function OperatorEventsPage() {
                       <td className="px-4 py-4">
                         <div className="flex flex-col items-start gap-2">
                           {event.image ? (
-                            <img
+                            <img loading="lazy"
                               src={storageUrl(event.image)}
                               alt={event.title || 'Evento'}
                               className="w-32 h-20 rounded-md object-cover border border-slate-200 shadow-sm"

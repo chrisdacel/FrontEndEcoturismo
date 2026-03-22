@@ -250,7 +250,7 @@ export default function Header() {
       <div className="relative z-[70] mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:px-6">
         {/* Logo izquierda */}
         <Link to="/" className={`inline-flex items-center gap-2 flex-shrink-0 transition-all duration-500 ease-in-out ${mobileOpen ? '-translate-y-8 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
-          <img
+          <img loading="lazy"
             src="/images/Pagina_inicio/nature-svgrepo-com.svg"
             alt="Logo"
             className="h-6 w-6"
@@ -299,7 +299,7 @@ export default function Header() {
               className={`xl:hidden inline-flex items-center justify-center rounded-full w-8 h-8 ring-1 transition-all duration-300 focus:outline-none ${mobileOpen ? 'opacity-0 scale-75 pointer-events-none' : isScrolled ? 'ring-slate-300 opacity-100 scale-100' : 'ring-white/30 opacity-100 scale-100'}`}
             >
               {user.avatar_url ? (
-                <img src={user.avatar_url} alt="Avatar" className="w-full h-full rounded-full object-cover" />
+                <img loading="lazy" src={user.avatar_url} alt="Avatar" className="w-full h-full rounded-full object-cover" />
               ) : (
                 <div className="w-full h-full bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-white rounded-full">
                   {user.name?.charAt(0).toUpperCase() || "U"}
@@ -438,7 +438,7 @@ export default function Header() {
                   }`}
                 >
                   {user?.avatar_url ? (
-                    <img
+                    <img loading="lazy"
                       src={user.avatar_url}
                       alt="Avatar"
                       className="h-6 w-6 rounded-full object-cover ring-1 ring-white/20"

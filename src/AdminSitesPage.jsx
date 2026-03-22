@@ -333,7 +333,7 @@ export default function AdminSitesPage() {
                 <div key={p.id} className="rounded-xl border border-slate-200 bg-white p-4">
                   <div className="flex items-start gap-3">
                     {p.cover ? (
-                      <img
+                      <img loading="lazy"
                         src={`${import.meta.env.VITE_API_URL}/api/files/${p.cover}`}
                         alt={p.nombre || p.name}
                         className="h-16 w-24 rounded-md object-cover border border-slate-200"
@@ -527,7 +527,7 @@ export default function AdminSitesPage() {
                     <td className="px-6 py-4">
                       <div className="flex flex-col items-start gap-2">
                         {p.cover ? (
-                          <img
+                          <img loading="lazy"
                             src={`${import.meta.env.VITE_API_URL}/api/files/${p.cover}`}
                             alt={p.nombre || p.name}
                             className="w-32 h-20 rounded-md object-cover border border-slate-200 shadow-sm"

@@ -311,7 +311,7 @@ export default function CreateSitioPage() {
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   />
                   {imagePreviews.portada && (
-                    <img src={imagePreviews.portada} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                    <img loading="lazy" src={imagePreviews.portada} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
                   )}
                 </div>
               </div>
@@ -423,7 +423,7 @@ export default function CreateSitioPage() {
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   />
                   {imagePreviews.clima_img && (
-                    <img src={imagePreviews.clima_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                    <img loading="lazy" src={imagePreviews.clima_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
                   )}
                 </div>
               </div>
@@ -460,7 +460,7 @@ export default function CreateSitioPage() {
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   />
                   {imagePreviews.caracteristicas_img && (
-                    <img src={imagePreviews.caracteristicas_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                    <img loading="lazy" src={imagePreviews.caracteristicas_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
                   )}
                 </div>
               </div>
@@ -497,7 +497,7 @@ export default function CreateSitioPage() {
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   />
                   {imagePreviews.flora_img && (
-                    <img src={imagePreviews.flora_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                    <img loading="lazy" src={imagePreviews.flora_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
                   )}
                 </div>
               </div>
@@ -534,7 +534,7 @@ export default function CreateSitioPage() {
                     className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                   />
                   {imagePreviews.infraestructura_img && (
-                    <img src={imagePreviews.infraestructura_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                    <img loading="lazy" src={imagePreviews.infraestructura_img} alt="Preview" className="mt-2 h-32 w-auto rounded-lg object-cover" />
                   )}
                 </div>
               </div>

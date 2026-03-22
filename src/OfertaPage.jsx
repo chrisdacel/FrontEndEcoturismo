@@ -101,7 +101,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
       <header className="fixed top-0 z-50 w-full bg-white shadow-sm">
         <div className="flex items-center justify-between px-6 py-4 md:px-12">
           <button onClick={onNavigateHome} className="flex items-center gap-2 hover:opacity-80">
-            <img src="/images/loqueofrecemos/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
+            <img loading="lazy" src="/images/loqueofrecemos/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
             <div>
               <h3 className="text-sm font-bold">Conexion</h3>
               <p className="text-xs text-slate-600">EcoRisaralda</p>
@@ -126,7 +126,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
               className="h-10 w-10 rounded-full bg-white p-2 shadow hover:scale-105 md:hidden"
               aria-label="Buscar"
             >
-              <img src="/images/loqueofrecemos/img_drop_down.webp" alt="Buscar" className="h-full w-full" />
+              <img loading="lazy" src="/images/loqueofrecemos/img_drop_down.webp" alt="Buscar" className="h-full w-full" />
             </button>
           </div>
         </div>
@@ -148,7 +148,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
           className="fixed bottom-5 right-5 z-[9999] rounded-full bg-white p-2 shadow-lg transition hover:scale-110"
           aria-label="Subir"
         >
-          <img src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Subir" className="h-8 w-8" />
+          <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Subir" className="h-8 w-8" />
         </button>
       )}
 
@@ -163,7 +163,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
           <section className="mb-20 grid gap-12 md:grid-cols-3">
             {features.map((feature) => (
               <div key={feature.id} className="flex flex-col gap-3">
-                <img src={feature.image} alt={feature.title} className="h-28 w-28 brand-icon" />
+                <img loading="lazy" src={feature.image} alt={feature.title} className="h-28 w-28 brand-icon" />
                 <p className="text-lg font-semibold text-slate-900">{feature.title}</p>
                 <p className="text-sm text-gray-600 leading-relaxed">{feature.description}</p>
                 <a
@@ -181,7 +181,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
             {sections.map((section) => (
               <div key={section.id} id={section.id} className="flex flex-col gap-6">
                 <h2 className="text-2xl font-bold text-[#267E1B] md:text-3xl">{section.intro}</h2>
-                <img
+                <img loading="lazy"
                   src={section.image}
                   alt={section.title}
                   className="h-[380px] w-full rounded-lg object-cover shadow-md"

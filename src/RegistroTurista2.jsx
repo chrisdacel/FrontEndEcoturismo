@@ -52,7 +52,7 @@ export default function RegistroTurista2({ onNavigateHome, onNavigateLogin, onNa
       <header className="fixed top-0 z-50 w-full bg-white shadow-sm">
         <div className="flex items-center justify-between px-6 py-4 md:px-12">
           <button onClick={onNavigateHome} className="flex items-center gap-2 hover:opacity-80">
-            <img src="/images/datos_turista/nature-svgrepo-com.svg" alt="Logo" className="h-10 w-10" />
+            <img loading="lazy" src="/images/datos_turista/nature-svgrepo-com.svg" alt="Logo" className="h-10 w-10" />
             <div>
               <div className="flex gap-1 leading-none">
                 <h3 className="text-lg font-semibold">Conexion</h3>
@@ -70,7 +70,7 @@ export default function RegistroTurista2({ onNavigateHome, onNavigateLogin, onNa
           </button>
 
           {/* Mobile Dropdown */}
-          <img src="/images/datos_turista/menu-alt-2-svgrepo-com.webp" alt="Menu" className="h-8 w-8 md:hidden" />
+          <img loading="lazy" src="/images/datos_turista/menu-alt-2-svgrepo-com.webp" alt="Menu" className="h-8 w-8 md:hidden" />
         </div>
       </header>
 

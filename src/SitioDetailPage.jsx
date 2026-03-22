@@ -858,7 +858,7 @@ export default function SitioDetailPage({
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-1">
-                <img
+                <img loading="lazy"
                   src={storageUrl(sitio.Weather_img)}
                   alt="Vegetación y clima"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
@@ -885,7 +885,7 @@ export default function SitioDetailPage({
                 </p>
               </div>
               <div className="order-1 md:order-2">
-                <img
+                <img loading="lazy"
                   src={storageUrl(sitio.features_img)}
                   alt="Vista de montaña y reserva natural"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
@@ -900,7 +900,7 @@ export default function SitioDetailPage({
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-1">
-                <img
+                <img loading="lazy"
                   src={storageUrl(sitio.flora_img)}
                   alt="Flora y fauna del parque"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
@@ -927,7 +927,7 @@ export default function SitioDetailPage({
                 </p>
               </div>
               <div className="order-1 md:order-2">
-                <img
+                <img loading="lazy"
                   src={storageUrl(sitio.estructure_img)}
                   alt="Infraestructura del parque"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
@@ -1020,7 +1020,7 @@ export default function SitioDetailPage({
                     </p>
                   </div>
                   {eventData.image && (
-                    <img
+                    <img loading="lazy"
                       src={storageUrl(eventData.image)}
                       alt={eventData.title || 'Evento'}
                       className="h-40 w-full max-w-sm rounded-2xl object-cover shadow-md"
@@ -1254,7 +1254,7 @@ export default function SitioDetailPage({
                         {/* Avatar del usuario */}
                         <div className="flex-shrink-0 relative">
                           {hasUser && rev.user?.image ? (
-                            <img 
+                            <img loading="lazy" 
                               src={`${import.meta.env.VITE_API_URL}/api/files/${rev.user.image}`}
                               alt={displayName}
                               className="w-10 h-10 rounded-full object-cover border border-emerald-200"

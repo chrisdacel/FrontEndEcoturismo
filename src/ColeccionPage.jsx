@@ -316,7 +316,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
         const popupHtml = `
           <div class="popup-card" style="display:flex;flex-direction:column;gap:6px;cursor:pointer;max-width:220px;align-items:center;">
             <strong style="font-size:14px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;display:block;">${sitio.name || 'Sitio'}</strong>
-            ${imageUrl ? `<img src='${imageUrl}' alt='${sitio.name || 'Sitio'}' style='width:100%;max-width:180px;max-height:110px;object-fit:cover;border-radius:10px;margin:4px 0;'/>` : ''}
+            ${imageUrl ? `<img loading="lazy" src='${imageUrl}' alt='${sitio.name || 'Sitio'}' style='width:100%;max-width:180px;max-height:110px;object-fit:cover;border-radius:10px;margin:4px 0;'/>` : ''}
             <span style="font-size:12px;color:#059669;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:center;">${labelsText}</span>
           </div>
         `;
@@ -396,7 +396,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
               <div className="flex w-full gap-4 md:gap-3 lg:gap-5 justify-center">
                 {heroShots.map((shot, idx) => (
                   <div key={shot.id} className="flex items-end">
-                    <img
+                    <img loading="lazy"
                       src={shot.imagen}
                       alt={shot.nombre}
                       className={`object-cover rounded-[22px] shadow-lg w-[140px] h-[320px] md:w-[110px] md:h-[260px] lg:w-[200px] lg:h-[440px] ${idx === 1 ? 'h-[340px] md:h-[290px] lg:h-[470px]' : ''}`}
@@ -521,7 +521,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                       </button>
                     )}
                     <div className="h-48 w-full overflow-hidden">
-                      <img
+                      <img loading="lazy"
                         src={`${import.meta.env.VITE_API_URL}/api/files/${sitio.cover}`}
                         alt={sitio.name}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
@@ -592,7 +592,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                     }}
                   >
                     {/* Imagen */}
-                    <img
+                    <img loading="lazy"
                       src={rec.imagen || storageUrl(rec.cover)}
                       alt={rec.nombre || rec.name}
                       className="absolute inset-0 h-full w-full object-cover rounded-[26px] origin-center transform transition-transform duration-700 ease-out group-hover:scale-105"

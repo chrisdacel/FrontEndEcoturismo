@@ -348,7 +348,7 @@ export default function CreateEventPage() {
                     />
                     <p className={"mt-2 text-xs " + (imageError ? "text-rose-600" : "text-slate-500")}>Límite de imagen: 2MB.{imageError ? ` ${imageError}` : ''}</p>
                     {imagePreview && (
-                      <img src={imagePreview} alt="Evento" className="mt-2 h-32 w-auto rounded-lg object-cover" />
+                      <img loading="lazy" src={imagePreview} alt="Evento" className="mt-2 h-32 w-auto rounded-lg object-cover" />
                     )}
                   </div>
                 </div>

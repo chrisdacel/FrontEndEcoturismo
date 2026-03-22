@@ -96,7 +96,7 @@ function SobreNosotrosPageOperador({ userName = "Jane Mar", onNavigateHome, onNa
               </ul>
             </div>
             <div className="flex w-full items-center justify-center md:w-[50%]">
-              <img src="/images/Sobre_Nosotros/ecoturismo.webp" alt="Ecoturismo" className="h-[15rem] w-full md:h-auto md:w-[90%] rounded-lg border border-emerald-100 shadow-lg" />
+              <img loading="lazy" src="/images/Sobre_Nosotros/ecoturismo.webp" alt="Ecoturismo" className="h-[15rem] w-full md:h-auto md:w-[90%] rounded-lg border border-emerald-100 shadow-lg" />
             </div>
           </div>
 
@@ -112,7 +112,7 @@ function SobreNosotrosPageOperador({ userName = "Jane Mar", onNavigateHome, onNa
               </ul>
             </div>
             <div className="flex w-full items-center justify-center md:w-[50%]">
-              <img src="/images/Sobre_Nosotros/ecoturismo.webp" alt="Ecoturismo valores" className="h-[15rem] w-full md:h-auto md:w-[90%] rounded-lg border border-emerald-100 shadow-lg" />
+              <img loading="lazy" src="/images/Sobre_Nosotros/ecoturismo.webp" alt="Ecoturismo valores" className="h-[15rem] w-full md:h-auto md:w-[90%] rounded-lg border border-emerald-100 shadow-lg" />
             </div>
           </div>
         </section>

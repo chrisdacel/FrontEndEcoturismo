@@ -104,7 +104,7 @@ export default function ColeccionPageTurista({
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={onNavigateHome}>
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-12 w-12" />
+            <img loading="lazy" src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-12 w-12" />
             <div className="flex flex-col leading-tight">
               <h3 className="text-lg font-bold text-gray-800">Conexion</h3>
               <h5 className="text-sm text-gray-600">EcoRisaralda</h5>
@@ -116,18 +116,18 @@ export default function ColeccionPageTurista({
           <div className="flex items-center gap-4">
             {/* User display */}
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50">
-              <img src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-6 w-6" />
+              <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-6 w-6" />
               <span className="text-sm font-medium text-gray-800">{userName}</span>
             </div>
 
             {/* Favorites icon */}
             <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
+              <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             {/* Dropdown menu */}
             <div className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-6 w-6 cursor-pointer" />
+              <img loading="lazy" src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-6 w-6 cursor-pointer" />
             </div>
           </div>
         </div>
@@ -197,7 +197,7 @@ export default function ColeccionPageTurista({
                       className="coleccion-card bg-white rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition stagger-item"
                       style={{ '--stagger-delay': `${index * 40}ms` }}
                     >
-                      <img src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
+                      <img loading="lazy" src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
                       <div className="p-4">
                         <h3 className="font-semibold text-gray-800 mb-1" style={{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{sitio.title}</h3>
                         <p className="text-sm text-gray-600">{sitio.location}</p>
@@ -235,7 +235,7 @@ export default function ColeccionPageTurista({
                       className="coleccion-card bg-white rounded-lg overflow-hidden cursor-pointer hover:shadow-xl transition stagger-item"
                       style={{ '--stagger-delay': `${index * 40}ms` }}
                     >
-                      <img src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
+                      <img loading="lazy" src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
                       <div className="p-4">
                         <h3 className="font-semibold text-gray-800 mb-1">{sitio.title}</h3>
                         <p className="text-sm text-gray-600">{sitio.location}</p>
@@ -273,7 +273,7 @@ export default function ColeccionPageTurista({
                       className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition stagger-item"
                       style={{ '--stagger-delay': `${index * 40}ms` }}
                     >
-                      <img src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
+                      <img loading="lazy" src={sitio.img} alt={sitio.title} className="w-full h-48 object-cover" />
                       <div className="p-4">
                         <h3 className="font-semibold text-gray-800 mb-1">{sitio.title}</h3>
                         <p className="text-sm text-gray-600">{sitio.location}</p>
@@ -301,7 +301,7 @@ export default function ColeccionPageTurista({
                       className={"coleccion-reco-card relative group cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition stagger-item min-w-0"}
                       style={{ '--stagger-delay': `${Math.min(index, 10) * 50}ms` }}
                     >
-                      <img src={item.img} alt={item.title} className="w-full h-64 object-cover" />
+                      <img loading="lazy" src={item.img} alt={item.title} className="w-full h-64 object-cover" />
                       <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                           <h3 className="text-xl font-bold mb-1">{item.title}</h3>

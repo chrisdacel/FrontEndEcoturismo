@@ -225,7 +225,7 @@ export default function AdminProfilePage() {
           <div className="bg-white rounded-lg p-6 ring-1 ring-slate-200 flex flex-col items-center gap-4">
             <div className="relative h-28 w-28 rounded-full bg-slate-100 ring-2 ring-emerald-400/40 overflow-hidden">
               {avatarUrl ? (
-                <img src={avatarUrl} alt="avatar" className="h-full w-full object-cover" />
+                <img loading="lazy" src={avatarUrl} alt="avatar" className="h-full w-full object-cover" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-slate-600">
                   {profile.name?.[0] || 'A'}

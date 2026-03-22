@@ -507,7 +507,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
               {beneficios.map((beneficio) => (
                 <div key={beneficio.id} className="flex min-h-64 w-full flex-col gap-4 rounded-lg border border-emerald-100 bg-emerald-50/30 p-6 text-center shadow-sm shadow-emerald-100/50">
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-emerald-100/50">
-                    <img src={beneficio.image} alt={beneficio.title} className="h-10 w-10" />
+                    <img loading="lazy" src={beneficio.image} alt={beneficio.title} className="h-10 w-10" />
                   </div>
                   <p className="text-base font-semibold text-slate-900 leading-snug">{beneficio.title}</p>
                   <p className="text-sm text-slate-600 leading-relaxed">{beneficio.desc}</p>

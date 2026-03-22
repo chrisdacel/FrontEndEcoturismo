@@ -223,7 +223,7 @@ export default function AdminEventsPage() {
                       <td className="px-6 py-4">
                         <div className="flex flex-col items-start gap-2">
                           {event.image ? (
-                            <img
+                            <img loading="lazy"
                               src={event.image.startsWith('http') ? event.image : `${import.meta.env.VITE_API_URL}/api/files/${event.image}`}
                               alt={event.title}
                               className="w-32 h-20 rounded-md object-cover border border-slate-200 shadow-sm"
@@ -362,7 +362,7 @@ export default function AdminEventsPage() {
                     <li key={event.id} className="rounded-xl border border-slate-200 bg-white shadow p-4 flex flex-col gap-2">
                       <div className="flex gap-3 items-center">
                         {event.image ? (
-                          <img
+                          <img loading="lazy"
                             src={event.image.startsWith('http') ? event.image : `${import.meta.env.VITE_API_URL}/api/files/${event.image}`}
                             alt={event.title}
                             className="w-20 h-14 rounded-md object-cover border border-slate-200 shadow-sm"

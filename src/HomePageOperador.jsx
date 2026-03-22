@@ -75,7 +75,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
       <header className="fixed top-0 z-50 w-full bg-white shadow-md">
         <div className="flex items-center justify-between px-6 py-4 md:px-12">
           <div className="flex items-center gap-2">
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
+            <img loading="lazy" src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
             <div>
               <h3 className="text-sm font-bold">Conexion</h3>
               <p className="text-xs text-slate-600">EcoRisaralda</p>
@@ -88,21 +88,21 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
               onClick={() => setSearchOpen(!searchOpen)}
               className="flex items-center gap-2 hover:opacity-80"
             >
-              <img src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-6 w-6" />
+              <img loading="lazy" src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-6 w-6" />
               <span className="hidden md:inline text-sm">Buscar</span>
             </button>
 
             <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100">
-              <img src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="Usuario" className="h-6 w-6" />
+              <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="Usuario" className="h-6 w-6" />
               <span className="text-sm font-medium">{userName}</span>
             </div>
 
             <button className="hidden md:block">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
+              <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             <button className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-8 w-8" />
+              <img loading="lazy" src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-8 w-8" />
             </button>
           </div>
         </div>
@@ -125,7 +125,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
           className="fixed bottom-6 right-6 z-40 rounded-full bg-white shadow-lg transition hover:scale-110"
           title="Volver arriba"
         >
-          <img src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Arriba" className="h-12 w-12" />
+          <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Arriba" className="h-12 w-12" />
         </button>
       )}
 
@@ -237,7 +237,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
           <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-3">
             <div className="rounded-lg bg-gray-50 p-8 shadow-md transition hover:shadow-xl">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#267E1B]">
-                <img src="/images/loqueofrecemos/marcadorrr.webp" alt="Guardar" className="h-8 w-8" />
+                <img loading="lazy" src="/images/loqueofrecemos/marcadorrr.webp" alt="Guardar" className="h-8 w-8" />
               </div>
               <h3 className="mb-3 text-xl font-bold text-[#267E1B]">Guardar sitios favoritos</h3>
               <p className="text-gray-600">Crea tu colección personal de destinos y accede a ellos cuando quieras.</p>
@@ -245,7 +245,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
 
             <div className="rounded-lg bg-gray-50 p-8 shadow-md transition hover:shadow-xl">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#267E1B]">
-                <img src="/images/loqueofrecemos/notificacion.webp" alt="Notificaciones" className="h-8 w-8" />
+                <img loading="lazy" src="/images/loqueofrecemos/notificacion.webp" alt="Notificaciones" className="h-8 w-8" />
               </div>
               <h3 className="mb-3 text-xl font-bold text-[#267E1B]">Notificaciones</h3>
               <p className="text-gray-600">Recibe alertas sobre eventos y novedades en tus destinos favoritos.</p>
@@ -253,7 +253,7 @@ function HomePageOperador({ userName = "Jane Mar", onNavigateColeccion, onNaviga
 
             <div className="rounded-lg bg-gray-50 p-8 shadow-md transition hover:shadow-xl">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#267E1B]">
-                <img src="/images/loqueofrecemos/customer-reviewww.webp" alt="Reseñas" className="h-8 w-8" />
+                <img loading="lazy" src="/images/loqueofrecemos/customer-reviewww.webp" alt="Reseñas" className="h-8 w-8" />
               </div>
               <h3 className="mb-3 text-xl font-bold text-[#267E1B]">Reseñas</h3>
               <p className="text-gray-600">Comparte tu experiencia y lee opiniones de otros viajeros.</p>

@@ -68,7 +68,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
                 <p className="text-base md:text-lg text-gray-700 leading-relaxed">Te ayudamos a descubrir destinos ecoturísticos cuidadosamente seleccionados, ofreciéndote toda la información práctica que necesitas: cómo llegar, actividades disponibles, alojamientos sostenibles y recomendaciones locales. Queremos que planifiques tu aventura con confianza y que, al mismo tiempo, contribuyas al cuidado del medio ambiente y al desarrollo de las comunidades anfitrionas.</p>
               </div>
               <div className="w-full md:w-[50%]">
-                <img src="/images/Sobre_Nosotros/fondo ciudad.webp" alt="Nuestra Misión" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
+                <img loading="lazy" src="/images/Sobre_Nosotros/fondo ciudad.webp" alt="Nuestra Misión" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
               </div>
             </div>
           </div>
@@ -88,7 +88,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
                 </ul>
               </div>
               <div className="w-full md:w-[50%]">
-                <img src="/images/Sobre_Nosotros/ecoturismo.webp" alt="Qué Ofrecemos" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
+                <img loading="lazy" src="/images/Sobre_Nosotros/ecoturismo.webp" alt="Qué Ofrecemos" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
                 </ul>
               </div>
               <div className="w-full md:w-[50%]">
-                <img src="/images/Sobre_Nosotros/ecoturismo.webp" alt="Nuestros Valores" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
+                <img loading="lazy" src="/images/Sobre_Nosotros/ecoturismo.webp" alt="Nuestros Valores" className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg" />
               </div>
             </div>
           </div>

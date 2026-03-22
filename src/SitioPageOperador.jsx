@@ -11,7 +11,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
       <header className="fixed top-0 z-50 w-full bg-white shadow-md">
         <div className="flex items-center justify-between px-6 py-4 md:px-12">
           <button onClick={onNavigateHome} className="flex items-center gap-2 hover:opacity-80">
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
+            <img loading="lazy" src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
             <div>
               <h3 className="text-sm font-bold">Conexion</h3>
               <p className="text-xs text-slate-600">EcoRisaralda</p>
@@ -24,21 +24,21 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
               onClick={() => setSearchOpen(!searchOpen)}
               className="flex items-center gap-2 hover:opacity-80"
             >
-              <img src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-6 w-6" />
+              <img loading="lazy" src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-6 w-6" />
               <span className="hidden md:inline text-sm">Buscar</span>
             </button>
 
             <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100">
-              <img src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="Usuario" className="h-6 w-6" />
+              <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="Usuario" className="h-6 w-6" />
               <span className="text-sm font-medium">{userName}</span>
             </div>
 
             <button className="hidden md:block">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
+              <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             <button className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-8 w-8" />
+              <img loading="lazy" src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-8 w-8" />
             </button>
           </div>
         </div>
@@ -94,7 +94,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
               </p>
             </div>
             <div className="flex justify-center">
-              <img
+              <img loading="lazy"
                 src="/images/sitios/Captura de pantalla 2025-04-09 235939.webp"
                 alt="Mapa de localización"
                 className="rounded-lg shadow-lg"
@@ -107,7 +107,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
         <section className="bg-white px-8 py-16 md:px-20">
           <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 md:grid-cols-2">
             <div className="order-2 md:order-1 flex justify-center">
-              <img
+              <img loading="lazy"
                 src="/images/sitios/LA-VIRGINIA-540X370.webp"
                 alt="Vegetación y clima"
                 className="rounded-lg shadow-lg"
@@ -135,7 +135,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
               </p>
             </div>
             <div className="flex justify-center">
-              <img
+              <img loading="lazy"
                 src="/images/sitios/unnamed.webp"
                 alt="Vista de montaña y reserva natural"
                 className="rounded-lg shadow-lg"
@@ -148,7 +148,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
         <section className="bg-white px-8 py-16 md:px-20">
           <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 md:grid-cols-2">
             <div className="order-2 md:order-1 flex justify-center">
-              <img
+              <img loading="lazy"
                 src="/images/sitios/Departamento-Risaralda-de-Colombia-10.webp"
                 alt="Flora y fauna del parque"
                 className="rounded-lg shadow-lg"
@@ -176,7 +176,7 @@ function SitioPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSo
               </p>
             </div>
             <div className="flex justify-center">
-              <img
+              <img loading="lazy"
                 src="/images/sitios/maxresdefault.webp"
                 alt="Infraestructura del parque"
                 className="rounded-lg shadow-lg"

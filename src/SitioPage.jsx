@@ -66,7 +66,7 @@ export default function SitioPage({
                 </p>
               </div>
               <div className="order-1 md:order-2">
-                <img
+                <img loading="lazy"
                   src="/images/sitios/Captura de pantalla 2025-04-09 235939.webp"
                   alt="Mapa de localización"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
@@ -81,7 +81,7 @@ export default function SitioPage({
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-1">
-                <img
+                <img loading="lazy"
                   src="/images/sitios/LA-VIRGINIA-540X370.webp"
                   alt="Vegetación y clima"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
@@ -110,7 +110,7 @@ export default function SitioPage({
                 </p>
               </div>
               <div className="order-1 md:order-2">
-                <img
+                <img loading="lazy"
                   src="/images/sitios/unnamed.webp"
                   alt="Vista de montaña y reserva natural"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
@@ -125,7 +125,7 @@ export default function SitioPage({
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-1">
-                <img
+                <img loading="lazy"
                   src="/images/sitios/Departamento-Risaralda-de-Colombia-10.webp"
                   alt="Flora y fauna del parque"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"
@@ -156,7 +156,7 @@ export default function SitioPage({
                 </p>
               </div>
               <div className="order-1 md:order-2">
-                <img
+                <img loading="lazy"
                   src="/images/sitios/maxresdefault.webp"
                   alt="Infraestructura del parque"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-sm shadow-emerald-100/50"

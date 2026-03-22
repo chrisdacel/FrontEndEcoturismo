@@ -152,7 +152,7 @@ export default function FavoritosPage({ onNavigateSobreNosotros, onNavigatePriva
                 >
                   {/* Imagen */}
                   <div className="relative h-48 overflow-hidden">
-                    <img
+                    <img loading="lazy"
                       src={storageUrl(fav.cover) || fav.img}
                       alt={fav.name || fav.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"

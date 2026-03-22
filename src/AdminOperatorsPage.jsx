@@ -197,7 +197,7 @@ export default function AdminOperatorsPage() {
         <td className="px-6 py-6 text-sm font-medium text-slate-900">
           <div className="flex flex-col items-start gap-2">
             {event.image ? (
-              <img
+              <img loading="lazy"
                 src={storageUrl(event.image)}
                 alt={event.title || event.name || event.nombre || 'Evento'}
                 className="w-32 h-20 rounded-md object-cover border border-slate-200 shadow-sm"
@@ -430,7 +430,7 @@ export default function AdminOperatorsPage() {
               return (
                 <div key={event.id} className="rounded-xl border border-slate-200 bg-white p-4">
                   {event.image ? (
-                    <img
+                    <img loading="lazy"
                       src={storageUrl(event.image)}
                       alt={event.title || event.name || event.nombre || 'Evento'}
                       className="mb-3 h-32 w-full rounded-lg object-cover"

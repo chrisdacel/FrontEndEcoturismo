@@ -1,52 +1,55 @@
-import PreguntasFrecuentesPage from './PreguntasFrecuentesPage';
-import AdminEventsPage from './AdminEventsPage';
-import { useEffect } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import HomePage from './HomePage';
-import LoginPage from './LoginPage';
-import RegisterPage from './RegisterPage';
-import ForgotPasswordPage from './ForgotPasswordPage';
-import ResetPasswordPage from './ResetPasswordPage';
-import ConfirmAccountPage from './ConfirmAccountPage';
-import EmailVerifiedPage from './EmailVerifiedPage';
-import RolesPage from './RolesPage';
-import RegistroOperador1 from './RegistroOperador1';
-import RegistroOperador2 from './RegistroOperador2';
-import RegistroTurista1 from './RegistroTurista1';
-import RegistroTurista2 from './RegistroTurista2';
-import ColeccionPage from './ColeccionPage';
-import QueOfrecemosPage from './QueOfrecemosPage';
-import PrivacidadPage from './PrivacidadPage';
-import SobreNosotrosPage from './SobreNosotrosPage';
-import AdminDashboardPage from './AdminDashboardPage';
-import AdminUsersPage from './AdminUsersPage';
-import AdminOperatorsPage from './AdminOperatorsPage';
-import AdminProfilePage from './AdminProfilePage';
-import AdminSitesPage from './AdminSitesPage';
-import AdminCommentsPage from './AdminCommentsPage';
-import AdminLabelsPage from './AdminLabelsPage';
-import ProfilePageOperador from './ProfilePageOperador';
-import ProfilePageTurista from './ProfilePageTurista';
-import FavoritosPage from './FavoritosPage';
-import PreferencesPage from './PreferencesPage';
-import HistorialPage from './HistorialPage';
-import NotificationsPage from './NotificationsPage';
-import OperatorSitesPage from './OperatorSitesPage';
-import OperatorStatsPage from './OperatorStatsPage';
-import OperatorEventsPage from './OperatorEventsPage';
-import OperatorCommentsPage from './OperatorCommentsPage';
-import EditEventPage from './EditEventPage';
-import CreateEventPage from './CreateEventPage';
-import EventDetailPage from './EventDetailPage';
+
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import AdminOperatorRoute from './components/AdminOperatorRoute';
-import SitioPage from './SitioPage';
-import SitioDetailPage from './SitioDetailPage';
-import CreateSitioPage from './CreateSitioPageLeaflet'; // Versión con Leaflet (OpenStreetMap)
-import AccessibilityButton from './components/AccessibilityButton'; // Botón de accesibilidad global
+import AccessibilityButton from './components/AccessibilityButton';
+
+// Lazy loaded pages
+const PreguntasFrecuentesPage = lazy(() => import('./PreguntasFrecuentesPage'));
+const AdminEventsPage = lazy(() => import('./AdminEventsPage'));
+const HomePage = lazy(() => import('./HomePage'));
+const LoginPage = lazy(() => import('./LoginPage'));
+const RegisterPage = lazy(() => import('./RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('./ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./ResetPasswordPage'));
+const ConfirmAccountPage = lazy(() => import('./ConfirmAccountPage'));
+const EmailVerifiedPage = lazy(() => import('./EmailVerifiedPage'));
+const RolesPage = lazy(() => import('./RolesPage'));
+const RegistroOperador1 = lazy(() => import('./RegistroOperador1'));
+const RegistroOperador2 = lazy(() => import('./RegistroOperador2'));
+const RegistroTurista1 = lazy(() => import('./RegistroTurista1'));
+const RegistroTurista2 = lazy(() => import('./RegistroTurista2'));
+const ColeccionPage = lazy(() => import('./ColeccionPage'));
+const QueOfrecemosPage = lazy(() => import('./QueOfrecemosPage'));
+const PrivacidadPage = lazy(() => import('./PrivacidadPage'));
+const SobreNosotrosPage = lazy(() => import('./SobreNosotrosPage'));
+const AdminDashboardPage = lazy(() => import('./AdminDashboardPage'));
+const AdminUsersPage = lazy(() => import('./AdminUsersPage'));
+const AdminOperatorsPage = lazy(() => import('./AdminOperatorsPage'));
+const AdminProfilePage = lazy(() => import('./AdminProfilePage'));
+const AdminSitesPage = lazy(() => import('./AdminSitesPage'));
+const AdminCommentsPage = lazy(() => import('./AdminCommentsPage'));
+const AdminLabelsPage = lazy(() => import('./AdminLabelsPage'));
+const ProfilePageOperador = lazy(() => import('./ProfilePageOperador'));
+const ProfilePageTurista = lazy(() => import('./ProfilePageTurista'));
+const FavoritosPage = lazy(() => import('./FavoritosPage'));
+const PreferencesPage = lazy(() => import('./PreferencesPage'));
+const HistorialPage = lazy(() => import('./HistorialPage'));
+const NotificationsPage = lazy(() => import('./NotificationsPage'));
+const OperatorSitesPage = lazy(() => import('./OperatorSitesPage'));
+const OperatorStatsPage = lazy(() => import('./OperatorStatsPage'));
+const OperatorEventsPage = lazy(() => import('./OperatorEventsPage'));
+const OperatorCommentsPage = lazy(() => import('./OperatorCommentsPage'));
+const EditEventPage = lazy(() => import('./EditEventPage'));
+const CreateEventPage = lazy(() => import('./CreateEventPage'));
+const EventDetailPage = lazy(() => import('./EventDetailPage'));
+const SitioPage = lazy(() => import('./SitioPage'));
+const SitioDetailPage = lazy(() => import('./SitioDetailPage'));
+const CreateSitioPage = lazy(() => import('./CreateSitioPageLeaflet'));
 
 const GuestRoute = ({ children }) => {
   const { user } = useAuth();
@@ -58,11 +61,19 @@ const GuestRoute = ({ children }) => {
   return children;
 };
 
+// Loading fallback para suspense
+const PageLoader = () => (
+  <div className="flex min-h-screen items-center justify-center bg-white">
+    <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600"></div>
+  </div>
+);
+
 function AppRoutes() {
   const { user } = useAuth();
   const navigate = useNavigate();
   return (
-    <Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
       <Route
         path="/admin/events"
         element={<AdminEventsPage />}
@@ -672,6 +683,7 @@ function AppRoutes() {
       <Route path="/preguntas-frecuentes" element={<PreguntasFrecuentesPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
   );
 }
 

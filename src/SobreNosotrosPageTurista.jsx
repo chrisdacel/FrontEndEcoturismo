@@ -37,7 +37,7 @@ export default function SobreNosotrosPageTurista({
           onClick={scrollToTop}
           className="fixed bottom-8 right-8 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition z-[9999]"
         >
-          <img src="/images/Pagina_inicio/arrow-up2.svg" alt="Arriba" className="h-6 w-6" />
+          <img loading="lazy" src="/images/Pagina_inicio/arrow-up2.svg" alt="Arriba" className="h-6 w-6" />
         </button>
       )}
 
@@ -90,7 +90,7 @@ export default function SobreNosotrosPageTurista({
               </div>
               {/* Image column - 50% width */}
               <div className="w-full md:w-[50%]">
-                <img
+                <img loading="lazy"
                   src="/images/Sobre_Nosotros/fondo ciudad.webp"
                   alt="Nuestra Misión"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg"
@@ -128,7 +128,7 @@ export default function SobreNosotrosPageTurista({
               </div>
               {/* Image column - 50% width */}
               <div className="w-full md:w-[50%]">
-                <img
+                <img loading="lazy"
                   src="/images/Sobre_Nosotros/ecoturismo.webp"
                   alt="Qué Ofrecemos"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg"
@@ -166,7 +166,7 @@ export default function SobreNosotrosPageTurista({
               </div>
               {/* Image column - 50% width */}
               <div className="w-full md:w-[50%]">
-                <img
+                <img loading="lazy"
                   src="/images/Sobre_Nosotros/ecoturismo.webp"
                   alt="Nuestros Valores"
                   className="w-full h-80 object-cover rounded-lg border border-emerald-100 shadow-lg"

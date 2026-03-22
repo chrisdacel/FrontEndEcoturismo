@@ -8,7 +8,7 @@ function TerminosCondicionesPage({ onNavigateHome, onNavigateLogin, onNavigateRe
       <header className="fixed top-0 z-50 w-full bg-white shadow-sm">
         <div className="flex items-center justify-between px-6 py-4 md:px-12">
           <button onClick={onNavigateHome} className="flex items-center gap-2 hover:opacity-80">
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
+            <img loading="lazy" src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-8 w-8" />
             <div>
               <h3 className="text-sm font-bold">Conexion</h3>
               <p className="text-xs text-slate-600">EcoRisaralda</p>
@@ -29,7 +29,7 @@ function TerminosCondicionesPage({ onNavigateHome, onNavigateLogin, onNavigateRe
               Iniciar Sesión
             </button>
             <button className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-8 w-8" />
+              <img loading="lazy" src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-8 w-8" />
             </button>
           </div>
         </div>

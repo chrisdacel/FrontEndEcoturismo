@@ -15,7 +15,7 @@ export default function SitioPageTurista({
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between pt-14">
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={onNavigateHome}>
-            <img src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-12 w-12" />
+            <img loading="lazy" src="/images/Pagina_inicio/nature-svgrepo-com.svg" alt="Logo" className="h-12 w-12" />
             <div className="flex flex-col leading-tight">
               <h3 className="text-lg font-bold text-gray-800">Conexion</h3>
               <h5 className="text-sm text-gray-600">EcoRisaralda</h5>
@@ -30,24 +30,24 @@ export default function SitioPageTurista({
               onClick={() => setSearchOpen(!searchOpen)}
               className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
             >
-              <img src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-5 w-5" />
+              <img loading="lazy" src="/images/roles/search-svgrepo-com.svg" alt="Buscar" className="h-5 w-5" />
               <span className="text-sm text-gray-700">Buscar</span>
             </button>
 
             {/* User display */}
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50">
-              <img src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-6 w-6" />
+              <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-6 w-6" />
               <span className="text-sm font-medium text-gray-800">{userName}</span>
             </div>
 
             {/* Favorites icon */}
             <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-              <img src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
+              <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/favourites.webp" alt="Favoritos" className="h-6 w-6" />
             </button>
 
             {/* Dropdown menu */}
             <div className="md:hidden">
-              <img src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-6 w-6 cursor-pointer" />
+              <img loading="lazy" src="/images/Pagina_inicio/img_drop_down.webp" alt="Menu" className="h-6 w-6 cursor-pointer" />
             </div>
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function SitioPageTurista({
                 </p>
               </div>
               <div className="order-1 md:order-2">
-                <img
+                <img loading="lazy"
                   src="/images/sitios/Captura de pantalla 2025-04-09 235939.webp"
                   alt="Mapa de localización"
                   className="w-full h-80 object-cover rounded-lg shadow-md"
@@ -123,7 +123,7 @@ export default function SitioPageTurista({
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-1">
-                <img
+                <img loading="lazy"
                   src="/images/sitios/LA-VIRGINIA-540X370.webp"
                   alt="Vegetación y clima"
                   className="w-full h-80 object-cover rounded-lg shadow-md"
@@ -154,7 +154,7 @@ export default function SitioPageTurista({
                 </p>
               </div>
               <div className="order-1 md:order-2">
-                <img
+                <img loading="lazy"
                   src="/images/sitios/unnamed.webp"
                   alt="Vista de montaña y reserva natural"
                   className="w-full h-80 object-cover rounded-lg shadow-md"
@@ -169,7 +169,7 @@ export default function SitioPageTurista({
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-1">
-                <img
+                <img loading="lazy"
                   src="/images/sitios/Departamento-Risaralda-de-Colombia-10.webp"
                   alt="Flora y fauna del parque"
                   className="w-full h-80 object-cover rounded-lg shadow-md"
@@ -201,7 +201,7 @@ export default function SitioPageTurista({
                 </p>
               </div>
               <div className="order-1 md:order-2">
-                <img
+                <img loading="lazy"
                   src="/images/sitios/maxresdefault.webp"
                   alt="Infraestructura del parque"
                   className="w-full h-80 object-cover rounded-lg shadow-md"
@@ -228,7 +228,7 @@ export default function SitioPageTurista({
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-800 mb-4">Calificaciones y opiniones</h2>
-              <img src="/images/sitios/puntuación.webp" alt="Puntuación" className="h-16 mx-auto mb-6" />
+              <img loading="lazy" src="/images/sitios/puntuación.webp" alt="Puntuación" className="h-16 mx-auto mb-6" />
               <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition">
                 Escribe una reseña
               </button>
@@ -238,7 +238,7 @@ export default function SitioPageTurista({
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex items-start gap-4">
-                  <img src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-12 w-12 rounded-full bg-gray-200 p-2" />
+                  <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-12 w-12 rounded-full bg-gray-200 p-2" />
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold text-gray-800">María González</h4>
@@ -254,7 +254,7 @@ export default function SitioPageTurista({
 
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex items-start gap-4">
-                  <img src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-12 w-12 rounded-full bg-gray-200 p-2" />
+                  <img loading="lazy" src="/images/Coleccion_sitios_ecoturisticos/user.svg" alt="User" className="h-12 w-12 rounded-full bg-gray-200 p-2" />
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold text-gray-800">Carlos Ramírez</h4>
