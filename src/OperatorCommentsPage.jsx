@@ -3,6 +3,7 @@ import { getOperatorReviews, restrictReviewAsOperator, unrestrictReviewAsOperato
 import { useNavigate } from 'react-router-dom';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
+import Pagination from './components/Pagination';
 
 export default function OperatorCommentsPage() {
   const [reviews, setReviews] = useState([]);
@@ -15,6 +16,11 @@ export default function OperatorCommentsPage() {
   const dateMenuRef = useRef(null);
   const navigate = useNavigate();
   const [confirmState, setConfirmState] = useState({ open: false });
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, dateFilter]);
 
   const loadReviews = async () => {
     setLoading(true);
@@ -164,6 +170,10 @@ export default function OperatorCommentsPage() {
     return matchesSearch && matchesDate;
   });
 
+  const ITEMS_PER_PAGE = 20;
+  const totalPages = Math.ceil(filteredReviews.length / ITEMS_PER_PAGE);
+  const currentReviews = filteredReviews.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
       <div className="mx-auto max-w-7xl px-4 md:px-6 py-10">
@@ -286,7 +296,7 @@ export default function OperatorCommentsPage() {
               </div>
             </div>
             <div className="md:hidden space-y-3 mb-4">
-              {filteredReviews.map((r) => (
+              {currentReviews.map((r) => (
                 <div key={r.id} className="rounded-xl border border-slate-200 bg-white p-4">
                   <p className="text-sm font-semibold text-slate-900">{r.place?.name || '—'}</p>
                   <p className="mt-1 text-xs text-slate-600">{r.user ? (r.user?.name || 'Usuario') : '[usuario no encontrado]'}</p>
@@ -355,7 +365,7 @@ export default function OperatorCommentsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {filteredReviews.map((r) => (
+                {currentReviews.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3 text-slate-800">{r.place?.name || '—'}</td>
                     <td className="px-4 py-3 text-slate-800">{r.user ? (r.user?.name || 'Usuario') : '[usuario no encontrado]'}</td>
@@ -413,6 +423,15 @@ export default function OperatorCommentsPage() {
               </tbody>
             </table>
           </div>
+          {filteredReviews.length > 0 && (
+            <div className="mt-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
           </>
         )}
       </div>

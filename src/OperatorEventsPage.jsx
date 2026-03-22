@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api, fetchUserPlaces } from './services/api';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
+import Pagination from './components/Pagination';
 
 export default function OperatorEventsPage() {
   const [events, setEvents] = useState([]);
@@ -14,6 +15,11 @@ export default function OperatorEventsPage() {
   const statusMenuRef = useRef(null);
   const navigate = useNavigate();
   const [confirmState, setConfirmState] = useState({ open: false });
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
   const loadEvents = async () => {
     setLoading(true);
@@ -107,6 +113,10 @@ export default function OperatorEventsPage() {
     return matchesSearch && matchesStatus;
   });
 
+  const ITEMS_PER_PAGE = 20;
+  const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+  const currentEvents = filteredEvents.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
       <div className="mx-auto max-w-7xl px-4 md:px-6 py-10">
@@ -187,7 +197,7 @@ export default function OperatorEventsPage() {
               </div>
             </div>
             <div className="md:hidden space-y-3 mb-4">
-              {filteredEvents.map((event) => (
+              {currentEvents.map((event) => (
                 <div key={`${event.placeId}-${event.id}`} className="rounded-xl border border-slate-200 bg-white p-4">
                   <div className="flex items-start gap-3">
                     {event.image ? (
@@ -250,7 +260,7 @@ export default function OperatorEventsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {filteredEvents.map((event) => (
+                  {currentEvents.map((event) => (
                     <tr key={`${event.placeId}-${event.id}`} className="hover:bg-slate-50">
                       <td className="px-6 py-4">
                         <div className="flex flex-col items-start gap-2">
@@ -316,6 +326,15 @@ export default function OperatorEventsPage() {
                 </tbody>
               </table>
             </div>
+            {filteredEvents.length > 0 && (
+              <div className="mt-4">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
           </>
         )}
       </div>

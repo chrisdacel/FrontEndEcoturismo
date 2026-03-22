@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchUserHistory, fetchUserReviews } from './services/api';
 import Alert from './components/Alert';
+import Pagination from './components/Pagination';
 
 export default function HistorialPage() {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ export default function HistorialPage() {
   const [reviews, setReviews] = useState([]);
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState({});
+  const [currentPageHistory, setCurrentPageHistory] = useState(1);
+  const [currentPageReviews, setCurrentPageReviews] = useState(1);
 
   useEffect(() => {
     const load = async () => {
@@ -30,6 +33,13 @@ export default function HistorialPage() {
     };
     load();
   }, []);
+
+  const ITEMS_PER_PAGE = 20;
+  const totalHistoryPages = Math.ceil(history.length / ITEMS_PER_PAGE);
+  const currentHistory = history.slice((currentPageHistory - 1) * ITEMS_PER_PAGE, currentPageHistory * ITEMS_PER_PAGE);
+
+  const totalReviewsPages = Math.ceil(reviews.length / ITEMS_PER_PAGE);
+  const currentReviews = reviews.slice((currentPageReviews - 1) * ITEMS_PER_PAGE, currentPageReviews * ITEMS_PER_PAGE);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
@@ -62,7 +72,7 @@ export default function HistorialPage() {
             <div className="mb-10">
               <h2 className="text-xl font-semibold text-slate-900 mb-3">Sitios visitados recientemente</h2>
               <div className="md:hidden space-y-3">
-                {history.map((item) => {
+                {currentHistory.map((item) => {
                   const placeName = item.place?.name || item.place_name || '—';
                   const placeLocalization = item.place?.localization || item.place_localization || '—';
                   const key = item.id || `${item.place_id || placeName}-${item.visited_at || ''}`;
@@ -92,7 +102,7 @@ export default function HistorialPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {history.map((item) => {
+                    {currentHistory.map((item) => {
                       const placeName = item.place?.name || item.place_name || '—';
                       const placeLocalization = item.place?.localization || item.place_localization || '—';
                       const key = item.id || `${item.place_id || placeName}-${item.visited_at || ''}`;
@@ -113,12 +123,19 @@ export default function HistorialPage() {
                   </tbody>
                 </table>
               </div>
+              {history.length > 0 && (
+                <Pagination
+                  currentPage={currentPageHistory}
+                  totalPages={totalHistoryPages}
+                  onPageChange={setCurrentPageHistory}
+                />
+              )}
             </div>
 
             <div>
               <h2 className="text-xl font-semibold text-slate-900 mb-3">Comentarios realizados</h2>
               <div className="md:hidden space-y-3">
-                {reviews.map((rev) => {
+                {currentReviews.map((rev) => {
                   const isLong = rev.comment && rev.comment.length > 40;
                   const showFull = expanded[rev.id];
                   return (
@@ -171,7 +188,7 @@ export default function HistorialPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {reviews.map((rev) => (
+                    {currentReviews.map((rev) => (
                       <tr key={rev.id} className="hover:bg-slate-50">
                         <td className="px-4 py-3 text-slate-800 break-words max-w-xs">{rev.place?.name || '—'}</td>
                         <td className="px-4 py-3 text-slate-700 break-words max-w-xs">
@@ -218,6 +235,13 @@ export default function HistorialPage() {
                   </tbody>
                 </table>
               </div>
+              {reviews.length > 0 && (
+                <Pagination
+                  currentPage={currentPageReviews}
+                  totalPages={totalReviewsPages}
+                  onPageChange={setCurrentPageReviews}
+                />
+              )}
             </div>
           </>
         )}

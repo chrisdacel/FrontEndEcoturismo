@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
+import Pagination from './components/Pagination';
 
 export default function FavoritosPage({ onNavigateSobreNosotros, onNavigatePrivacidad }) {
   const { user } = useAuth();
@@ -16,6 +17,7 @@ export default function FavoritosPage({ onNavigateSobreNosotros, onNavigatePriva
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [confirmState, setConfirmState] = useState({ open: false });
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     loadFavorites();
@@ -81,6 +83,10 @@ export default function FavoritosPage({ onNavigateSobreNosotros, onNavigatePriva
     );
   }
 
+  const ITEMS_PER_PAGE = 20;
+  const totalPages = Math.ceil(favoritos.length / ITEMS_PER_PAGE);
+  const currentFavoritos = favoritos.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
     <div className="relative min-h-screen bg-white overflow-x-hidden pt-14">
       
@@ -138,7 +144,7 @@ export default function FavoritosPage({ onNavigateSobreNosotros, onNavigatePriva
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {favoritos.map((fav, index) => (
+              {currentFavoritos.map((fav, index) => (
                 <div
                   key={fav.id}
                   className="group relative bg-white rounded-2xl overflow-hidden ring-1 ring-slate-200 hover:ring-emerald-500 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 stagger-item"
@@ -202,6 +208,13 @@ export default function FavoritosPage({ onNavigateSobreNosotros, onNavigatePriva
                 </div>
               ))}
             </div>
+          )}
+          {favoritos.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           )}
         </div>
       </section>

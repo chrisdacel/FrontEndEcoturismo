@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { fetchOperatorStats } from './services/api';
 import Alert from './components/Alert';
+import Pagination from './components/Pagination';
 
 function OperatorStatsPage() {
   const { user } = useAuth();
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   const recentComments = stats.recent_comments || [];
   const formatDate = (value) => {
     if (!value) return '';
@@ -141,26 +143,46 @@ function OperatorStatsPage() {
           <div className="bg-white rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-slate-900">Comentarios recientes</h3>
-              <span className="text-xs text-slate-400">Ultimos 6</span>
+              <span className="text-xs text-slate-400">Ultimos {recentComments.length}</span>
             </div>
-            <div className="space-y-3 text-sm text-slate-700">
-              {recentComments.length > 0 ? (
-                recentComments.map((comment, index) => (
-                  <div key={`comment-${index}`} className="rounded-lg bg-slate-50 p-3">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
-                      {comment.place_name || 'Sitio'}
-                    </p>
-                    <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
-                      <span className="font-semibold text-slate-700">{comment.user_name || 'Usuario'}</span>
-                      <span>{formatDate(comment.created_at)}</span>
-                    </div>
-                    <p className="mt-2 text-sm text-slate-700">{comment.comment || ''}</p>
+
+            {(() => {
+              const ITEMS_PER_PAGE = 20;
+              const totalPages = Math.ceil(recentComments.length / ITEMS_PER_PAGE);
+              const currentComments = recentComments.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+              return (
+                <>
+                  <div className="space-y-3 text-sm text-slate-700">
+                    {recentComments.length > 0 ? (
+                      currentComments.map((comment, index) => (
+                        <div key={`comment-${index}`} className="rounded-lg bg-slate-50 p-3">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                            {comment.place_name || 'Sitio'}
+                          </p>
+                          <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                            <span className="font-semibold text-slate-700">{comment.user_name || 'Usuario'}</span>
+                            <span>{formatDate(comment.created_at)}</span>
+                          </div>
+                          <p className="mt-2 text-sm text-slate-700">{comment.comment || ''}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-slate-500">Sin comentarios recientes.</p>
+                    )}
                   </div>
-                ))
-              ) : (
-                <p className="text-slate-500">Sin comentarios recientes.</p>
-              )}
-            </div>
+                  {recentComments.length > 0 && (
+                    <div className="mt-4">
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                      />
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
       </section>

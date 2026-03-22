@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Alert from './components/Alert';
 import { fetchNotifications, archiveAllNotifications, archiveNotification } from './services/api';
+import Pagination from './components/Pagination';
 
 export default function NotificationsPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     let active = true;
@@ -76,6 +78,10 @@ export default function NotificationsPage() {
     };
   };
 
+  const ITEMS_PER_PAGE = 20;
+  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
+  const currentItems = items.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
       <div className="mx-auto max-w-5xl px-4 md:px-6 py-10">
@@ -117,7 +123,7 @@ export default function NotificationsPage() {
           </div>
         ) : (
           <div className="grid gap-4">
-            {items.map((item) => {
+            {currentItems.map((item) => {
               const target = getTarget(item);
               const isRead = Boolean(item.read_at);
               return (
@@ -163,6 +169,13 @@ export default function NotificationsPage() {
               );
             })}
           </div>
+        )}
+        {items.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         )}
       </div>
     </div>

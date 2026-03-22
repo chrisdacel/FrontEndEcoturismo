@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchUserPlaces, api } from './services/api';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
+import Pagination from './components/Pagination';
 
 export default function OperatorSitesPage() {
   const [places, setPlaces] = useState([]);
@@ -14,6 +15,11 @@ export default function OperatorSitesPage() {
   const statusMenuRef = useRef(null);
   const navigate = useNavigate();
   const [confirmState, setConfirmState] = useState({ open: false });
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
   const loadPlaces = async () => {
     setLoading(true);
@@ -94,6 +100,10 @@ export default function OperatorSitesPage() {
     const matchesStatus = statusFilter === 'all' || (place?.opening_status || place?.estado_apertura) === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const ITEMS_PER_PAGE = 20;
+  const totalPages = Math.ceil(filteredPlaces.length / ITEMS_PER_PAGE);
+  const currentPlaces = filteredPlaces.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
@@ -189,7 +199,7 @@ export default function OperatorSitesPage() {
               </div>
             </div>
             <div className="md:hidden space-y-3 mb-4">
-              {filteredPlaces.map((p) => (
+              {currentPlaces.map((p) => (
                 <div key={p.id} className="rounded-xl border border-slate-200 bg-white p-4">
                   <div className="flex items-start gap-3">
                     {p.cover ? (
@@ -252,7 +262,7 @@ export default function OperatorSitesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {filteredPlaces.map((p) => (
+                {currentPlaces.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4">
                       <div className="flex flex-col items-start gap-2">
@@ -322,6 +332,15 @@ export default function OperatorSitesPage() {
               </tbody>
             </table>
           </div>
+          {filteredPlaces.length > 0 && (
+            <div className="mt-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
           </>
         )}
       </div>
