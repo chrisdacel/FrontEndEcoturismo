@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ScrollToTopFab from './ScrollToTopFab';
 
 /**
  * Componente de protección de rutas ADMIN
@@ -30,5 +31,10 @@ export default function AdminRoute({ children }) {
   }
 
   // Usuario es admin: renderizar contenido
-  return children;
+  return (
+    <>
+      {children}
+      <ScrollToTopFab />
+    </>
+  );
 }
