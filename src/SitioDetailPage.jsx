@@ -251,7 +251,17 @@ export default function SitioDetailPage({
   useEffect(() => {
     if (sitio && sitio.lat && sitio.lng && mapRef.current && !mapInstanceRef.current) {
       // Inicializar mapa
-      mapInstanceRef.current = L.map(mapRef.current).setView([sitio.lat, sitio.lng], 13);
+      mapInstanceRef.current = L.map(mapRef.current, {
+        scrollWheelZoom: false // Desactivado por defecto
+      }).setView([sitio.lat, sitio.lng], 13);
+
+      // Activar zoom de scroll solo tras hacer clic; desactivarlo al sacar el mouse
+      mapInstanceRef.current.on('click', () => {
+        mapInstanceRef.current.scrollWheelZoom.enable();
+      });
+      mapInstanceRef.current.on('mouseout', () => {
+        mapInstanceRef.current.scrollWheelZoom.disable();
+      });
 
       // Agregar capa de tiles
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

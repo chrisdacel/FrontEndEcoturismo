@@ -258,7 +258,16 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     if (isGuest) return;
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const map = L.map(mapContainerRef.current).setView([4.8087, -75.6906], 9);
+    const map = L.map(mapContainerRef.current, {
+      scrollWheelZoom: false // Desactivado hasta que se haga clic
+    }).setView([4.8087, -75.6906], 9);
+
+    map.on('click', () => {
+      map.scrollWheelZoom.enable();
+    });
+    map.on('mouseout', () => {
+      map.scrollWheelZoom.disable();
+    });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap',

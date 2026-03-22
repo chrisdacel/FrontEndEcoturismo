@@ -213,7 +213,17 @@ export default function CreateSitioPageLeaflet() {
     if (!mapContainerRef.current || mapRef.current) return;
 
     // Crear mapa centrado en Risaralda
-    const map = L.map(mapContainerRef.current).setView([4.8087, -75.6906], 10);
+    const map = L.map(mapContainerRef.current, {
+      scrollWheelZoom: false // Desactivado por defecto
+    }).setView([4.8087, -75.6906], 10);
+
+    // Activar zoom de scroll solo tras hacer clic; desactivarlo al sacar el mouse
+    map.on('click', () => {
+      map.scrollWheelZoom.enable();
+    });
+    map.on('mouseout', () => {
+      map.scrollWheelZoom.disable();
+    });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
