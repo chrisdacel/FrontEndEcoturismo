@@ -287,7 +287,27 @@ export default function Header() {
         </nav>
 
         {/* Botones derecha */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-3 md:gap-2 flex-shrink-0">
+          {/* Avatar exclusivo para móvil */}
+          {user && (
+            <button
+              type="button"
+              onClick={() => {
+                closeMobile();
+                goProfile();
+              }}
+              className={`xl:hidden inline-flex items-center justify-center rounded-full w-8 h-8 ring-1 transition-all focus:outline-none ${mobileOpen ? 'ring-slate-300' : isScrolled ? 'ring-slate-300' : 'ring-white/30'}`}
+            >
+              {user.avatar_url ? (
+                <img src={user.avatar_url} alt="Avatar" className="w-full h-full rounded-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-white rounded-full">
+                  {user.name?.charAt(0).toUpperCase() || "U"}
+                </div>
+              )}
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => {
@@ -609,28 +629,28 @@ export default function Header() {
                   <>
                     <button
                       type="button"
-                      onClick={goFavoritos}
+                      onClick={() => { closeMobile(); goFavoritos(); }}
                       className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Favoritos
                     </button>
                     <button
                       type="button"
-                      onClick={goPreferencias}
+                      onClick={() => { closeMobile(); goPreferencias(); }}
                       className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Preferencias
                     </button>
                     <button
                       type="button"
-                      onClick={goHistorial}
+                      onClick={() => { closeMobile(); goHistorial(); }}
                       className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Historial
                     </button>
                     <button
                       type="button"
-                      onClick={goNotifications}
+                      onClick={() => { closeMobile(); goNotifications(); }}
                       className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Notificaciones
@@ -640,7 +660,7 @@ export default function Header() {
                 {user.role === "admin" && (
                   <button
                     type="button"
-                    onClick={goAdminPanel}
+                    onClick={() => { closeMobile(); goAdminPanel(); }}
                     className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                   >
                     Panel de Administración
@@ -650,21 +670,21 @@ export default function Header() {
                   <>
                     <button
                       type="button"
-                      onClick={goOperatorSites}
+                      onClick={() => { closeMobile(); goOperatorSites(); }}
                       className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Gestionar mis sitios
                     </button>
                     <button
                       type="button"
-                      onClick={goOperatorEvents}
+                      onClick={() => { closeMobile(); goOperatorEvents(); }}
                       className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Gestionar mis eventos
                     </button>
                     <button
                       type="button"
-                      onClick={goOperatorStats}
+                      onClick={() => { closeMobile(); goOperatorStats(); }}
                       className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Estadísticas
@@ -677,7 +697,7 @@ export default function Header() {
                     closeMobile();
                     handleLogout();
                   }}
-                  className="mt-4 inline-flex w-fit items-center rounded-full bg-emerald-500 px-6 py-2.5 text-sm font-bold tracking-wide text-white shadow-md transition hover:bg-emerald-600"
+                  className="text-left text-xl font-bold text-emerald-600 border-b-2 border-emerald-500 pb-1 mt-4 hover:text-emerald-500 hover:border-emerald-400 transition-colors w-fit"
                 >
                   Cerrar sesión
                 </button>
