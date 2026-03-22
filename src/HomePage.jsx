@@ -443,7 +443,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
 
                   <div className={`relative flex h-full flex-col items-start justify-start gap-2 px-8 pb-8 pt-4 transition-all duration-[900ms] transform ${fadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}> 
                     <p className="text-xs uppercase tracking-[0.2em] text-white/80">Próximo evento</p>
-                    <h3 className="text-3xl font-bold text-white">
+                    <h3 className="text-2xl md:text-3xl font-bold text-white line-clamp-2 max-w-full break-all sm:break-words">
                       {upcomingEvents[eventosIndex]?.title || 'Evento ecoturistico'}
                     </h3>
                     <p className="text-white/90">Recibe alertas y guarda en tu agenda.</p>
