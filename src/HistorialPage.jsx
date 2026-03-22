@@ -174,7 +174,6 @@ export default function HistorialPage() {
                     {reviews.map((rev) => (
                       <tr key={rev.id} className="hover:bg-slate-50">
                         <td className="px-4 py-3 text-slate-800 break-words max-w-xs">{rev.place?.name || '—'}</td>
-                        <td className="px-4 py-3 text-slate-700 break-words max-w-xs">{rev.rating} / 5</td>
                         <td className="px-4 py-3 text-slate-700 break-words max-w-xs">
                           {Array.from({length: 5}, (_, i) => (
                             <span key={i} style={{color: i < rev.rating ? '#FFD700' : '#E5E7EB'}}>&#9733;</span>
