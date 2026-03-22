@@ -347,11 +347,11 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
                 {/* Mobile Pill Version */}
                 <div className="md:hidden flex items-center justify-center">
                   {loadingNextEvent ? (
-                    <p className="text-sm font-bold text-slate-800">Cargando...</p>
+                    <p className="text-sm font-medium text-slate-700">Cargando...</p>
                   ) : activeEvent ? (
-                    <p className="text-sm font-bold text-slate-800 line-clamp-1 max-w-[220px]">{activeEvent.title || 'Evento ecoturistico'}</p>
+                    <p className="text-sm font-medium text-slate-700 line-clamp-1 max-w-[220px]">{activeEvent.title || 'Evento ecoturistico'}</p>
                   ) : (
-                    <p className="text-sm font-bold text-slate-800">Sin próximos eventos</p>
+                    <p className="text-sm font-medium text-slate-700">Sin próximos eventos</p>
                   )}
                 </div>
               </button>
@@ -375,7 +375,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
                 </div>
                 {/* Mobile Pill Version */}
                 <div className="md:hidden flex items-center justify-center">
-                  <p className="text-sm font-bold text-slate-800">
+                  <p className="text-sm font-medium text-slate-700">
                     {recommendedCount} {recommendedCount === 1 ? 'nuevo sitio' : 'nuevos sitios'}
                   </p>
                 </div>
