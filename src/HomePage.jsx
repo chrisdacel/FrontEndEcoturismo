@@ -316,7 +316,7 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
           </div>
           
           {/* Cards flotantes a la derecha */}
-          <div className="absolute bottom-4 right-2 z-40 flex flex-col items-end gap-2 md:bottom-8 md:right-8 md:flex-row">
+          <div className="absolute bottom-4 right-2 z-40 flex flex-row items-center justify-end gap-2 md:bottom-8 md:right-8 md:items-end md:gap-3">
             {user && (
               <button
                 type="button"
@@ -349,9 +349,9 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
                   {loadingNextEvent ? (
                     <p className="text-sm font-medium text-slate-700">Cargando...</p>
                   ) : activeEvent ? (
-                    <p className="text-sm font-medium text-slate-700 line-clamp-1 max-w-[220px]">{activeEvent.title || 'Evento ecoturistico'}</p>
+                    <p className="text-sm font-medium text-slate-700 line-clamp-1 max-w-[130px] sm:max-w-[180px]">{activeEvent.title || 'Evento ecoturistico'}</p>
                   ) : (
-                    <p className="text-sm font-medium text-slate-700">Sin próximos eventos</p>
+                    <p className="text-sm font-medium text-slate-700">Sin eventos</p>
                   )}
                 </div>
               </button>
