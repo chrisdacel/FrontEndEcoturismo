@@ -212,7 +212,7 @@ export default function FavoritosPage({ onNavigateSobreNosotros, onNavigatePriva
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 rounded-full bg-emerald-500 p-3 text-white shadow-2xl transition hover:bg-emerald-600 hover:scale-110"
+          className="fixed bottom-6 right-6 z-[9999] rounded-full bg-emerald-500 p-3 text-white shadow-2xl transition hover:bg-emerald-600 hover:scale-110"
           aria-label="Volver arriba"
         >
           <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -145,7 +145,7 @@ function OfertaPage({ onNavigateHome, onNavigateLogin, onNavigateRegister, onNav
       {showScrollTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-5 right-5 z-50 rounded-full bg-white p-2 shadow-lg transition hover:scale-110"
+          className="fixed bottom-5 right-5 z-[9999] rounded-full bg-white p-2 shadow-lg transition hover:scale-110"
           aria-label="Subir"
         >
           <img src="/images/Coleccion_sitios_ecoturisticos/arrow-up2.svg" alt="Subir" className="h-8 w-8" />
