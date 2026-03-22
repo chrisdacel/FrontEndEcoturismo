@@ -282,9 +282,9 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-emerald-100">Fecha de nacimiento</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 min-w-0">
+                <div className="min-w-0">
+                  <label className="block text-sm font-medium text-emerald-100 truncate">Fecha de nacimiento</label>
                   <input
                     type="date"
                     value={birthDate}
@@ -298,7 +298,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                       }
                     }}
                     required
-                    className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
+                    className="mt-1 w-full min-w-0 appearance-none rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
                   />
                   {ageError && (
                     <p className="mt-1 text-xs text-red-300">{ageError}</p>
