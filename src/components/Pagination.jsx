@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
+  const containerRef = useRef(null);
+
   if (totalPages <= 1) return null;
 
   const getPageNumbers = () => {
@@ -29,10 +31,32 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
     return pages;
   };
 
+  const handlePageClick = (page) => {
+    if (!containerRef.current) {
+      onPageChange(page);
+      return;
+    }
+    
+    // Guardamos la posición exacta del contenedor respecto a la ventana
+    const oldBottom = containerRef.current.getBoundingClientRect().bottom;
+    
+    onPageChange(page);
+    
+    // Despues del re-renderizado de React, ajustamos el scroll para que el 
+    // componente de paginación se quede exactamente donde estaba en la pantalla.
+    requestAnimationFrame(() => {
+      if (containerRef.current) {
+        const newBottom = containerRef.current.getBoundingClientRect().bottom;
+        window.scrollBy(0, newBottom - oldBottom);
+      }
+    });
+  };
+
   return (
-    <div className="mt-8 mb-4 flex items-center justify-center gap-1 sm:gap-2">
+    <div ref={containerRef} className="mt-8 mb-4 flex items-center justify-center gap-1 sm:gap-2">
       <button
-        onClick={() => onPageChange(currentPage - 1)}
+        type="button"
+        onClick={() => handlePageClick(currentPage - 1)}
         disabled={currentPage === 1}
         className="flex items-center gap-1 px-2 py-2 text-sm font-medium text-slate-600 transition hover:text-emerald-600 disabled:opacity-50 disabled:pointer-events-none"
       >
@@ -49,7 +73,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
           ) : (
             <button
               key={page}
-              onClick={() => onPageChange(page)}
+              type="button"
+              onClick={() => handlePageClick(page)}
               className={`min-w-[36px] h-9 sm:min-w-[40px] sm:h-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
                 currentPage === page
                   ? 'bg-emerald-50 text-emerald-700 border border-emerald-500 pointer-events-none'
@@ -63,7 +88,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
       </div>
 
       <button
-        onClick={() => onPageChange(currentPage + 1)}
+        type="button"
+        onClick={() => handlePageClick(currentPage + 1)}
         disabled={currentPage === totalPages}
         className="flex items-center gap-1 px-2 py-2 text-sm font-medium text-slate-600 transition hover:text-emerald-600 disabled:opacity-50 disabled:pointer-events-none"
       >
