@@ -107,7 +107,7 @@ const AccessibilityButton = () => {
     : 'bottom-6';
 
   return (
-    <div id="accessibility-widget" ref={menuRef} className={`fixed right-4 z-[9999] transition-all duration-300 ${positionClass}`}>
+    <div id="accessibility-widget" ref={menuRef} className={`fixed right-6 z-[9999] transition-all duration-300 ${positionClass}`}>
       <div className="relative flex items-center">
         {/* Menú Desplegable a la Izquierda */}
         {isOpen && (

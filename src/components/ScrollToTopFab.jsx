@@ -21,10 +21,11 @@ export default function ScrollToTopFab() {
   return (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-6 right-4 bg-emerald-500 text-white p-3 rounded-full shadow-lg shadow-emerald-500/40 hover:bg-emerald-600 hover:scale-110 transition-all z-40 animate-fadeInUp flex items-center justify-center"
+      className="fixed bottom-6 right-6 z-[9999] rounded-full bg-emerald-500 px-3 py-3 text-white shadow-lg shadow-emerald-500/40 transition hover:scale-110 hover:bg-emerald-600 animate-fadeInUp"
       aria-label="Volver arriba"
+      style={{ fontSize: '1.2rem', paddingLeft: '14px', paddingRight: '14px' }}
     >
-      <img src="/images/Pagina_inicio/arrow-up2.svg" alt="Arriba" className="h-6 w-6" />
+      ↑
     </button>
   );
 }
