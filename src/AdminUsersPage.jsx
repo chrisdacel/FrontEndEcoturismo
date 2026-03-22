@@ -246,29 +246,29 @@ export default function AdminUsersPage() {
           </Alert>
         )}
 
-        <div className="bg-white rounded-lg p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2">
-                <svg className="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
-                </svg>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Buscar por nombre o email"
-                  className="w-full bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
-                />
-              </div>
-            </div>
-            <div ref={roleMenuRef} className="relative">
+        <div className="mb-4 flex flex-col md:flex-row md:items-center md:gap-4 gap-3 w-full max-w-4xl">
+          {/* Search bar */}
+          <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 flex-1 min-w-[250px]">
+            <svg className="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
+            </svg>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por nombre o email"
+              className="w-full bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
+            />
+          </div>
+          {/* Filtros en fila en desktop, columna en móvil */}
+          <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full md:w-auto">
+            <div className="relative w-full md:w-56" ref={roleMenuRef}>
               <button
                 type="button"
                 onClick={() => setRoleMenuOpen((prev) => !prev)}
                 className="inline-flex w-full items-center justify-between gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
               >
-                <span>{roleLabels[filterRole] || 'Todos los roles'}</span>
+                <span className="truncate">{roleLabels[filterRole] || 'Todos los roles'}</span>
                 <svg
                   className={`h-4 w-4 transition-transform duration-200 ${roleMenuOpen ? 'rotate-180' : ''}`}
                   fill="none"
@@ -297,13 +297,13 @@ export default function AdminUsersPage() {
                 </div>
               )}
             </div>
-            <div ref={statusMenuRef} className="relative">
+            <div className="relative w-full md:w-56" ref={statusMenuRef}>
               <button
                 type="button"
                 onClick={() => setStatusMenuOpen((prev) => !prev)}
                 className="inline-flex w-full items-center justify-between gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50"
               >
-                <span>{statusLabels[filterStatus] || 'Todos los estados'}</span>
+                <span className="truncate">{statusLabels[filterStatus] || 'Todos los estados'}</span>
                 <svg
                   className={`h-4 w-4 transition-transform duration-200 ${statusMenuOpen ? 'rotate-180' : ''}`}
                   fill="none"
@@ -332,7 +332,6 @@ export default function AdminUsersPage() {
                 </div>
               )}
             </div>
-            <div className="hidden md:block" />
           </div>
         </div>
 
