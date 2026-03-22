@@ -111,21 +111,24 @@ export default function AdminLabelsPage() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
-      <section className="relative pt-24 pb-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <button
-              onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition mb-4"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Volver
-            </button>
-            <h1 className="text-3xl font-bold">Gestionar etiquetas</h1>
-            <p className="text-slate-600">Crea, edita o elimina etiquetas para clasificar los sitios.</p>
+      <div className="mx-auto max-w-7xl px-4 md:px-6 py-10">
+        <div className="mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition mb-4"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Volver
+          </button>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900">Gestionar etiquetas</h1>
+              <p className="text-sm text-slate-600">Crea, edita o elimina etiquetas para clasificar los sitios.</p>
+            </div>
           </div>
+        </div>
 
           {error && (
             <Alert type="error" className="mb-4">
@@ -243,7 +246,6 @@ export default function AdminLabelsPage() {
             </div>
           )}
         </div>
-      </section>
       <ConfirmDialog
         open={confirmState.open}
         title={confirmState.title}
