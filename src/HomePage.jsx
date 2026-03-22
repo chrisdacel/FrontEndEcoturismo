@@ -316,41 +316,69 @@ function HomePage({ onNavigateLogin, onNavigateRegister, onNavigateColeccion, on
           </div>
           
           {/* Cards flotantes a la derecha */}
-          <div className="absolute bottom-4 right-2 z-40 flex flex-col items-end gap-2 sm:gap-3 md:bottom-8 md:right-8 md:flex-row">
+          <div className="absolute bottom-4 right-2 z-40 flex flex-col items-end gap-2 md:bottom-8 md:right-8 md:flex-row">
             {user && (
               <button
                 type="button"
                 onClick={handleEventClick}
                 disabled={!activeEventPlaceId}
-                className={`w-[90vw] max-w-[220px] min-w-[140px] min-h-[92px] md:min-h-[110px] flex flex-col justify-center rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-2 sm:p-2.5 md:p-3 text-right shadow-2xl transition-all duration-500 md:w-auto md:max-w-xs ${activeEventPlaceId ? 'cursor-pointer hover:-translate-y-0.5 hover:bg-white/20' : 'cursor-default'} ${eventCardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
-                style={{ fontSize: '0.91rem', textAlign: 'right' }}
+                className={`flex flex-col border border-white/30 bg-white/15 backdrop-blur-lg shadow-2xl transition-all duration-500 
+                  px-4 py-2 rounded-full w-auto min-h-0 justify-center items-center text-center /* Mobile pill */
+                  md:w-auto md:max-w-xs md:min-w-[140px] md:min-h-[110px] md:rounded-lg md:p-3 md:items-end md:text-right /* Desktop card */
+                  ${activeEventPlaceId ? 'cursor-pointer hover:-translate-y-0.5 hover:bg-white/20' : 'cursor-default'} 
+                  ${eventCardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+                style={{ fontSize: '0.91rem' }}
               >
-                <p className="text-xs uppercase tracking-wide text-white font-bold">PRÓXIMO EVENTO</p>
-                {loadingNextEvent ? (
-                  <p className="mt-1 text-xs text-white/90">Cargando evento...</p>
-                ) : activeEvent ? (
-                  <>
-                    <p className="mt-1 text-base font-bold text-white line-clamp-1">{activeEvent.title || 'Evento ecoturistico'}</p>
-                    <p className="text-xs text-white/90 line-clamp-1">{activeEvent.place?.name || 'Sitio ecoturistico'}</p>
-                    <p className="text-xs text-white">{formatEventDate(activeEvent.starts_at)}</p>
-                  </>
-                ) : (
-                  <p className="mt-1 text-xs text-white/90">No hay eventos proximos, mantente atento.</p>
-                )}
+                {/* Desktop Version */}
+                <div className="hidden md:flex md:flex-col md:items-end">
+                  <p className="text-xs uppercase tracking-wide text-white font-bold">PRÓXIMO EVENTO</p>
+                  {loadingNextEvent ? (
+                    <p className="mt-1 text-xs text-white/90">Cargando evento...</p>
+                  ) : activeEvent ? (
+                    <>
+                      <p className="mt-1 text-base font-bold text-white line-clamp-1">{activeEvent.title || 'Evento ecoturistico'}</p>
+                      <p className="text-xs text-white/90 line-clamp-1">{activeEvent.place?.name || 'Sitio ecoturistico'}</p>
+                      <p className="text-xs text-white">{formatEventDate(activeEvent.starts_at)}</p>
+                    </>
+                  ) : (
+                    <p className="mt-1 text-xs text-white/90">No hay eventos proximos, mantente atento.</p>
+                  )}
+                </div>
+                {/* Mobile Pill Version */}
+                <div className="md:hidden flex items-center justify-center">
+                  {loadingNextEvent ? (
+                    <p className="text-sm font-semibold text-white">Cargando...</p>
+                  ) : activeEvent ? (
+                    <p className="text-sm font-semibold text-white line-clamp-1 max-w-[220px]">{activeEvent.title || 'Evento ecoturistico'}</p>
+                  ) : (
+                    <p className="text-sm font-semibold text-white">Sin próximos eventos</p>
+                  )}
+                </div>
               </button>
             )}
             {user?.role === 'user' && (
               <button
                 type="button"
                 onClick={() => navigate('/turista/coleccion#recomendaciones')}
-                className="w-[90vw] max-w-[220px] min-w-[140px] min-h-[92px] md:min-h-[110px] flex flex-col justify-center rounded-lg border border-white/30 bg-white/15 backdrop-blur-lg p-2 sm:p-2.5 md:p-3 text-right shadow-2xl transition hover:-translate-y-0.5 hover:bg-white/20 md:w-auto md:max-w-xs"
-                style={{ fontSize: '0.91rem', textAlign: 'right' }}
+                className="flex flex-col border border-white/30 bg-white/15 backdrop-blur-lg shadow-2xl transition hover:-translate-y-0.5 hover:bg-white/20
+                  px-4 py-2 rounded-full w-auto min-h-0 justify-center items-center text-center /* Mobile pill */
+                  md:w-auto md:max-w-xs md:min-w-[140px] md:min-h-[110px] md:rounded-lg md:p-3 md:items-end md:text-right /* Desktop card */"
+                style={{ fontSize: '0.91rem' }}
               >
-                <p className="text-xs uppercase tracking-wide text-white font-bold">FAVORITOS</p>
-                <p className="mt-1 text-base font-bold text-white">
-                  {recommendedCount} {recommendedCount === 1 ? 'nuevo sitio' : 'nuevos sitios'}
-                </p>
-                <p className="text-xs text-white">Listos para explorar</p>
+                {/* Desktop Version */}
+                <div className="hidden md:flex md:flex-col md:items-end">
+                  <p className="text-xs uppercase tracking-wide text-white font-bold">FAVORITOS</p>
+                  <p className="mt-1 text-base font-bold text-white">
+                    {recommendedCount} {recommendedCount === 1 ? 'nuevo sitio' : 'nuevos sitios'}
+                  </p>
+                  <p className="text-xs text-white">Listos para explorar</p>
+                </div>
+                {/* Mobile Pill Version */}
+                <div className="md:hidden flex items-center justify-center">
+                  <p className="text-sm font-semibold text-white">
+                    {recommendedCount} {recommendedCount === 1 ? 'nuevo sitio' : 'nuevos sitios'}
+                  </p>
+                </div>
               </button>
             )}
           </div>
