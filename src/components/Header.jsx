@@ -296,7 +296,7 @@ export default function Header() {
                 closeMobile();
                 goProfile();
               }}
-              className={`xl:hidden inline-flex items-center justify-center rounded-full w-8 h-8 ring-1 transition-all focus:outline-none ${mobileOpen ? 'ring-slate-300' : isScrolled ? 'ring-slate-300' : 'ring-white/30'}`}
+              className={`xl:hidden inline-flex items-center justify-center rounded-full w-8 h-8 ring-1 transition-all duration-300 focus:outline-none ${mobileOpen ? 'opacity-0 scale-75 pointer-events-none' : isScrolled ? 'ring-slate-300 opacity-100 scale-100' : 'ring-white/30 opacity-100 scale-100'}`}
             >
               {user.avatar_url ? (
                 <img src={user.avatar_url} alt="Avatar" className="w-full h-full rounded-full object-cover" />
