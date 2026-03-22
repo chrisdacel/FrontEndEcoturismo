@@ -285,26 +285,24 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 min-w-0">
                 <div className="min-w-0">
                   <label className="block text-sm font-medium text-emerald-100 truncate">Fecha de nacimiento</label>
-                  <input
-                    type={birthDate ? "date" : "text"}
-                    onFocus={(e) => (e.target.type = "date")}
-                    onBlur={(e) => {
-                      if (!e.target.value) e.target.type = "text";
-                    }}
-                    placeholder="dd/mm/aaaa"
-                    value={birthDate}
-                    onChange={(e) => {
-                      setBirthDate(e.target.value);
-                      const age = calculateAge(e.target.value);
-                      if (age !== null && age < 16) {
-                        setAgeError('Debes ser mayor de 16 años para registrarte');
-                      } else {
-                        setAgeError('');
-                      }
-                    }}
-                    required
-                    className="mt-1 block w-full min-w-0 overflow-hidden rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
-                  />
+                  <div className="mt-1 flex w-full min-w-0 items-center overflow-hidden rounded-lg border border-white/10 bg-white/10 focus-within:ring-2 focus-within:ring-emerald-400/60 transition-all">
+                    <input
+                      type="date"
+                      value={birthDate}
+                      onChange={(e) => {
+                        setBirthDate(e.target.value);
+                        const age = calculateAge(e.target.value);
+                        if (age !== null && age < 16) {
+                          setAgeError('Debes ser mayor de 16 años para registrarte');
+                        } else {
+                          setAgeError('');
+                        }
+                      }}
+                      required
+                      style={{ color: birthDate ? 'white' : 'rgba(209, 250, 229, 0.6)' }}
+                      className="w-full flex-1 bg-transparent px-3 py-2 outline-none"
+                    />
+                  </div>
                   {ageError && (
                     <p className="mt-1 text-xs text-red-300">{ageError}</p>
                   )}
