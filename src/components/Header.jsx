@@ -237,10 +237,10 @@ export default function Header() {
 
   // Siempre fixed y visible en móvil/tablet, color adaptativo en todos los dispositivos
   const headerBg = `fixed top-0 left-0 right-0 z-[9999] w-full transition-all duration-[1200ms] ease-in-out ${
-    isAuthPage || mobileOpen
+    mobileOpen
       ? "bg-transparent"
       : scrollY <= 20
-        ? `bg-emerald-950/90 ${isMobileOrTablet ? "shadow-md" : ""}`
+        ? (isAuthPage ? "bg-transparent" : `bg-emerald-950/90 ${isMobileOrTablet ? "shadow-md" : ""}`)
         : `backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-white/5 ${isColeccionPage ? "" : "ring-1 ring-white/10"}`
   }`;
 
