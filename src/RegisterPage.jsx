@@ -286,7 +286,12 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                 <div className="min-w-0">
                   <label className="block text-sm font-medium text-emerald-100 truncate">Fecha de nacimiento</label>
                   <input
-                    type="date"
+                    type={birthDate ? "date" : "text"}
+                    onFocus={(e) => (e.target.type = "date")}
+                    onBlur={(e) => {
+                      if (!e.target.value) e.target.type = "text";
+                    }}
+                    placeholder="dd/mm/aaaa"
                     value={birthDate}
                     onChange={(e) => {
                       setBirthDate(e.target.value);
@@ -298,7 +303,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                       }
                     }}
                     required
-                    className="mt-1 w-full min-w-0 rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
+                    className="mt-1 block w-full min-w-0 overflow-hidden rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
                   />
                   {ageError && (
                     <p className="mt-1 text-xs text-red-300">{ageError}</p>
