@@ -106,7 +106,7 @@ export default function OperatorSitesPage() {
   const currentPlaces = filteredPlaces.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
       <div className="mx-auto max-w-7xl px-4 md:px-6 py-10">
         <div className="mb-6">
           <button
