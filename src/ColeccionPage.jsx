@@ -389,17 +389,17 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
 
       <main className="pt-0">
         {/* Sección 1: Hero con trío de imágenes y buscador */}
-        <section className="relative w-full py-16 md:py-20 coleccion-hero">
-          <div className="relative z-10 flex flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-between md:gap-10 md:px-12">
+        <section className="relative w-full py-16 md:py-12 lg:py-20 coleccion-hero">
+          <div className="relative z-10 flex flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-between md:gap-8 lg:gap-10 md:px-12">
             {/* Izquierda: trío de imágenes verticales */}
-            <div className="w-full max-w-3xl md:max-w-2xl flex justify-center">
-              <div className="flex w-full max-w-2xl gap-4 md:gap-5">
+            <div className="w-full md:w-[45%] lg:w-auto flex justify-center">
+              <div className="flex w-full gap-4 md:gap-3 lg:gap-5 justify-center">
                 {heroShots.map((shot, idx) => (
                   <div key={shot.id} className="flex items-end">
                     <img
                       src={shot.imagen}
                       alt={shot.nombre}
-                      className={`object-cover rounded-[22px] shadow-lg w-[140px] h-[320px] md:w-[170px] md:h-[380px] lg:w-[200px] lg:h-[440px] ${idx === 1 ? 'h-[340px] md:h-[410px] lg:h-[470px]' : ''}`}
+                      className={`object-cover rounded-[22px] shadow-lg w-[140px] h-[320px] md:w-[110px] md:h-[260px] lg:w-[200px] lg:h-[440px] ${idx === 1 ? 'h-[340px] md:h-[290px] lg:h-[470px]' : ''}`}
                     />
                   </div>
                 ))}
@@ -407,10 +407,10 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
             </div>
 
             {/* Derecha: Título y Buscador */}
-            <div className="relative z-10 flex-1 max-w-xl md:max-w-lg lg:max-w-xl flex flex-col items-center md:items-start gap-6 md:gap-8">
+            <div className="relative z-10 flex-1 w-full md:w-[55%] flex flex-col items-center md:items-start gap-6 md:gap-6 lg:gap-8">
               <div className="text-center md:text-left space-y-2">
-                <h1 className="text-4xl md:text-5xl font-bold text-slate-900">Explora y conecta con la naturaleza</h1>
-                <p className="text-slate-700">Busca sitios, actividades y experiencias sostenibles.</p>
+                <h1 className="text-4xl md:text-3xl lg:text-5xl font-bold text-slate-900 leading-tight">Explora y conecta con la naturaleza</h1>
+                <p className="text-slate-700 md:text-sm lg:text-base">Busca sitios, actividades y experiencias sostenibles.</p>
               </div>
               <div className="flex w-full max-w-md items-center gap-2">
                 <input
@@ -419,9 +419,9 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                   onChange={(e) => setSearchText(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Buscar destinos..."
-                  className="w-full rounded-lg border border-emerald-200 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-300"
+                  className="w-full rounded-lg border border-emerald-200 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-300 md:text-sm lg:text-base"
                 />
-                <button onClick={handleSearch} className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 transition">Buscar</button>
+                <button onClick={handleSearch} className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 transition md:text-sm lg:text-base">Buscar</button>
               </div>
             </div>
           </div>

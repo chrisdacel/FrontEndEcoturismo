@@ -17,14 +17,14 @@ export default function Footer({ onNavigateSobreNosotros, onNavigatePrivacidad, 
   };
   return (
     <footer className="border-t border-emerald-100 bg-emerald-50/50 py-12 px-6 text-slate-700">
-      <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 text-center md:text-left justify-items-center md:justify-items-start">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 lg:grid-cols-4 gap-8 md:gap-4 lg:gap-8 text-center lg:text-left justify-items-center lg:justify-items-start">
         {/* Columna 1 */}
-        <div>
+        <div className="md:col-span-2 lg:col-span-1">
           <h2 className="text-2xl font-bold mb-2 text-slate-900">Conexión</h2>
           <p className="text-slate-700 mb-4">EcoRisaralda</p>
         </div>
         {/* Columna 2 */}
-        <div>
+        <div className="md:col-span-3 lg:col-span-1">
           <h4 className="mb-4 font-bold text-slate-900">Información</h4>
           <ul className="space-y-2 text-sm text-slate-700">
             <li>
@@ -39,27 +39,27 @@ export default function Footer({ onNavigateSobreNosotros, onNavigatePrivacidad, 
           </ul>
         </div>
         {/* Columna 3 */}
-        <div>
+        <div className="md:col-span-3 lg:col-span-1">
           <h4 className="mb-4 font-bold text-slate-900">Navegación rápida</h4>
           <ul className="space-y-2 text-sm text-slate-700">
             <li>
-              <button onClick={handleNavigateInicio} className="text-left transition-colors duration-200 hover:text-emerald-700 focus:text-emerald-700">Inicio</button>
+              <button onClick={handleNavigateInicio} className="transition-colors duration-200 hover:text-emerald-700 focus:text-emerald-700">Inicio</button>
             </li>
             <li>
-              <button onClick={onNavigateColeccion} className="text-left transition-colors duration-200 hover:text-emerald-700 focus:text-emerald-700">Colección</button>
+              <button onClick={onNavigateColeccion} className="transition-colors duration-200 hover:text-emerald-700 focus:text-emerald-700">Colección</button>
             </li>
             <li>
-              <button onClick={handleLoginOrLogout} className="text-left transition-colors duration-200 hover:text-emerald-700 focus:text-emerald-700">
+              <button onClick={handleLoginOrLogout} className="transition-colors duration-200 hover:text-emerald-700 focus:text-emerald-700">
                 {user ? 'Cerrar sesión' : 'Iniciar sesión'}
               </button>
             </li>
           </ul>
         </div>
         {/* Columna 4 */}
-        <div>
+        <div className="md:col-span-4 lg:col-span-1">
           <h4 className="mb-4 font-bold text-slate-900">Contacto</h4>
           <ul className="space-y-2 text-sm text-slate-700">
-            <li>conexion@ecorisaralda.co.com</li>
+            <li><a href="mailto:conexion@ecorisaralda.co.com" className="transition-colors duration-200 hover:text-emerald-700 focus:text-emerald-700 break-all lg:break-normal">conexion@ecorisaralda.co.com</a></li>
             <li>+57 314 635 5214</li>
             <li><button onClick={() => window.location.href = '/preguntas-frecuentes'} className="transition-colors duration-200 hover:text-emerald-700 focus:text-emerald-700">Preguntas Frecuentes (FAQ)</button></li>
           </ul>

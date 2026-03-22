@@ -34,12 +34,12 @@ function LoginPage({ onNavigateHome, onNavigateRegister, onNavigateForgot, onNav
     <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white overflow-x-hidden">
       <div className="mx-auto flex min-h-screen max-w-7xl items-center px-6 py-12 md:px-10">
         {/* Lado izquierdo: mensaje/branding */}
-        <div className="hidden flex-1 md:flex md:flex-col md:pr-10">
+        <div className="hidden flex-1 md:flex md:flex-col md:pr-4 lg:pr-10">
           <span className="text-emerald-300/80 text-xs tracking-[0.4em]">ECOTURISMO</span>
-          <h1 className="mt-6 text-5xl leading-tight font-semibold">
+          <h1 className="mt-4 lg:mt-6 text-3xl lg:text-5xl leading-tight font-semibold">
             Explora destinos sostenibles y conecta con la naturaleza.
           </h1>
-          <p className="mt-4 max-w-xl text-emerald-100/80">
+          <p className="mt-3 lg:mt-4 max-w-xl text-sm lg:text-base text-emerald-100/80">
             Accede con tu cuenta para descubrir rutas verdes, alojamientos responsables y experiencias locales.
           </p>
         </div>

@@ -51,7 +51,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
         </section>
 
         {/* Intro */}
-        <section className="py-12 px-4 bg-white">
+        <section className="py-12 px-6 md:px-12 bg-white">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-base md:text-lg text-slate-700 leading-relaxed mb-2">En Conexión EcoRisaralda somos un equipo de apasionados por la naturaleza y el turismo responsable.</p>
             <p className="text-base md:text-lg text-slate-700 leading-relaxed mb-2">Nacimos con la misión de acercarte los rincones más auténticos y sostenibles del mundo, aquellos que</p>
@@ -60,7 +60,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
         </section>
 
         {/* Nuestra Misión */}
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-6 md:px-12 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row gap-12 items-center">
               <div className="w-full md:w-[45%]">
@@ -75,7 +75,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
         </section>
 
         {/* ¿Qué Ofrecemos? */}
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-6 md:px-12 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row gap-12 items-center">
               <div className="w-full md:w-[45%]">
@@ -95,7 +95,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
         </section>
 
         {/* Nuestros Valores */}
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-6 md:px-12 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row gap-12 items-center">
               <div className="w-full md:w-[45%]">
@@ -115,7 +115,7 @@ function SobreNosotrosPage({ onNavigateHome, onNavigateLogin, onNavigateRegister
         </section>
 
         {/* Closing */}
-        <section className="py-12 px-4 bg-white">
+        <section className="py-12 px-6 md:px-12 bg-white">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-base md:text-lg text-slate-700 leading-relaxed mb-2">Únete a nosotros y conviértete en un viajero consciente. Descubre, respeta y disfruta de la naturaleza — ¡tu</p>
             <p className="text-base md:text-lg text-slate-700 leading-relaxed">próxima gran aventura te espera!</p>

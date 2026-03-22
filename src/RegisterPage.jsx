@@ -141,18 +141,18 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
     <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white overflow-x-hidden">
       <div className="mx-auto flex min-h-screen max-w-7xl items-center px-6 py-12 md:px-10 mt-20 md:mt-0">
         {/* Intro izquierda */}
-        <div className="hidden flex-1 md:flex md:flex-col md:pr-10">
+        <div className="hidden flex-1 md:flex md:flex-col md:pr-4 lg:pr-10">
           <span className="text-emerald-300/80 text-xs tracking-[0.4em]">ECOTURISMO</span>
-          <h1 className="mt-6 text-5xl leading-tight font-semibold">
+          <h1 className="mt-4 lg:mt-6 text-3xl lg:text-5xl leading-tight font-semibold">
             Crea tu cuenta para explorar experiencias responsables.
           </h1>
-          <p className="mt-4 max-w-xl text-emerald-100/80">
+          <p className="mt-3 lg:mt-4 max-w-xl text-sm lg:text-base text-emerald-100/80">
             Elige tu rol para disfrutar de contenido personalizado: como Turista descubre destinos; como Operador, publica y gestiona tus sitios.
           </p>
         </div>
 
         {/* Formulario derecha */}
-        <div className="w-full md:w-[520px]">
+        <div className="w-full md:w-[440px] lg:w-[520px]">
           <div className="rounded-lg bg-white/10 backdrop-blur-md ring-1 ring-white/10 p-6 md:p-8 shadow-xl">
             <div className="mb-6">
               <h2 className="text-2xl font-semibold">Crear cuenta</h2>

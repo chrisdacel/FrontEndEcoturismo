@@ -55,7 +55,7 @@ export default function SobreNosotrosPageTurista({
         </section>
 
         {/* Description Intro */}
-        <section className="py-12 px-4 bg-white">
+        <section className="py-12 px-6 md:px-12 bg-white">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-base md:text-lg text-slate-700 leading-relaxed mb-2">
               En Conexión EcoRisaralda somos un equipo de apasionados por la naturaleza y el turismo responsable.
@@ -70,7 +70,7 @@ export default function SobreNosotrosPageTurista({
         </section>
 
         {/* Row 1 - Nuestra Misión */}
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-6 md:px-12 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row gap-12 items-center">
               {/* Text column - 45% width */}
@@ -101,7 +101,7 @@ export default function SobreNosotrosPageTurista({
         </section>
 
         {/* Row 2 - ¿Qué Ofrecemos? */}
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-6 md:px-12 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row gap-12 items-center">
               {/* Text column - 45% width */}
@@ -139,7 +139,7 @@ export default function SobreNosotrosPageTurista({
         </section>
 
         {/* Row 3 - Nuestros Valores */}
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-6 md:px-12 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row gap-12 items-center">
               {/* Text column - 45% width */}

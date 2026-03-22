@@ -288,7 +288,7 @@ export default function Header() {
 
         {/* Botones derecha */}
         <div className="flex items-center gap-3 md:gap-2 flex-shrink-0">
-          {/* Avatar exclusivo para móvil */}
+          {/* Avatar exclusivo para móvil y tablet */}
           {user && (
             <button
               type="button"
@@ -322,10 +322,11 @@ export default function Header() {
               <span className={`absolute left-0 block h-[2px] w-full bg-current rounded-full transition-all duration-300 ease-in-out ${mobileOpen ? 'bottom-[5px] -rotate-45' : 'bottom-0 rotate-0'}`} />
             </div>
           </button>
+
           {user ? (
             <div className="flex items-center gap-2" ref={menuRef}>
               {isTourist && (
-                <div className="relative hidden md:block" ref={notificationsRef}>
+                <div className="relative hidden xl:block" ref={notificationsRef}>
                   <button
                     type="button"
                     onClick={() => setNotificationsOpen((value) => !value)}
@@ -430,7 +431,7 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen((v) => !v)}
-                  className={`hidden md:inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold ring-1 transition ${
+                  className={`hidden xl:inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold ring-1 transition ${
                     isScrolled
                       ? "bg-slate-100/50 text-slate-700 ring-slate-200 hover:bg-slate-100"
                       : "bg-white/10 text-emerald-100 ring-white/10 hover:bg-white/20"
@@ -549,7 +550,7 @@ export default function Header() {
               {/* Preferencias removed */}
               <button
                 onClick={handleLogout}
-                className="hidden md:inline-flex items-center rounded-full bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
+                className="hidden xl:inline-flex items-center rounded-full bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
               >
                 Cerrar sesión
               </button>
@@ -558,7 +559,7 @@ export default function Header() {
             <>
               <Link
                 to="/login"
-                className={`hidden md:inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold ring-1 transition ${
+                className={`hidden xl:inline-flex items-center rounded-full px-3 py-2 text-sm font-semibold ring-1 transition ${
                   isScrolled
                     ? "bg-slate-100/50 text-slate-700 ring-slate-200 hover:bg-slate-100"
                     : "bg-white/10 text-emerald-100 ring-white/10 hover:bg-white/20"
@@ -568,7 +569,7 @@ export default function Header() {
               </Link>
               <Link
                 to="/register"
-                className="hidden md:inline-flex items-center rounded-full bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
+                className="hidden xl:inline-flex items-center rounded-full bg-emerald-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
               >
                 Crear cuenta
               </Link>
@@ -586,8 +587,8 @@ export default function Header() {
       >
         <div className="h-24 flex-shrink-0" /> {/* Spacer for header / X button */}
 
-        <div className="flex flex-col px-8 pb-12">
-          <nav className="flex flex-col gap-6">
+        <div className="flex flex-col px-8 pb-12 items-center">
+          <nav className="flex flex-col items-center gap-6 text-center">
             {navLinks.map((link, idx) => (
               <NavLink
                 key={link.to}
@@ -608,20 +609,20 @@ export default function Header() {
           </nav>
 
           <div 
-            className={`mt-12 border-t border-slate-200/60 pt-8 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform will-change-transform ${
+            className={`mt-12 w-full border-t border-slate-200/60 pt-8 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform will-change-transform ${
               mobileOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
             }`}
             style={{ transitionDelay: mobileOpen ? `${150 + navLinks.length * 40 + 50}ms` : '0ms' }}
           >
             {user ? (
-              <div className="flex flex-col gap-5">
+              <div className="flex flex-col items-center gap-5 text-center">
                 <button
                   type="button"
                   onClick={() => {
                     closeMobile();
                     goProfile();
                   }}
-                  className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
+                  className="text-center text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                 >
                   Perfil
                 </button>
@@ -630,28 +631,28 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={() => { closeMobile(); goFavoritos(); }}
-                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
+                      className="text-center text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Favoritos
                     </button>
                     <button
                       type="button"
                       onClick={() => { closeMobile(); goPreferencias(); }}
-                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
+                      className="text-center text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Preferencias
                     </button>
                     <button
                       type="button"
                       onClick={() => { closeMobile(); goHistorial(); }}
-                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
+                      className="text-center text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Historial
                     </button>
                     <button
                       type="button"
                       onClick={() => { closeMobile(); goNotifications(); }}
-                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
+                      className="text-center text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Notificaciones
                     </button>
@@ -661,7 +662,7 @@ export default function Header() {
                   <button
                     type="button"
                     onClick={() => { closeMobile(); goAdminPanel(); }}
-                    className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
+                    className="text-center text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                   >
                     Panel de Administración
                   </button>
@@ -671,21 +672,21 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={() => { closeMobile(); goOperatorSites(); }}
-                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
+                      className="text-center text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Gestionar mis sitios
                     </button>
                     <button
                       type="button"
                       onClick={() => { closeMobile(); goOperatorEvents(); }}
-                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
+                      className="text-center text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Gestionar mis eventos
                     </button>
                     <button
                       type="button"
                       onClick={() => { closeMobile(); goOperatorStats(); }}
-                      className="text-left text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
+                      className="text-center text-lg font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                     >
                       Estadísticas
                     </button>
@@ -697,24 +698,24 @@ export default function Header() {
                     closeMobile();
                     handleLogout();
                   }}
-                  className="text-left text-xl font-bold text-emerald-600 border-b-2 border-emerald-500 pb-1 mt-4 hover:text-emerald-500 hover:border-emerald-400 transition-colors w-fit"
+                  className="text-center text-xl font-bold text-emerald-600 border-b-2 border-emerald-500 pb-1 mt-4 hover:text-emerald-500 hover:border-emerald-400 transition-colors"
                 >
                   Cerrar sesión
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-6 pt-2">
+              <div className="flex flex-col items-center gap-6 pt-2 text-center">
                 <Link
                   to="/login"
                   onClick={closeMobile}
-                  className="text-left text-xl font-medium text-slate-600 hover:text-emerald-500 transition-colors w-fit"
+                  className="text-center text-xl font-medium text-slate-600 hover:text-emerald-500 transition-colors"
                 >
                   Iniciar sesión
                 </Link>
                 <Link
                   to="/register"
                   onClick={closeMobile}
-                  className="text-left text-xl font-bold text-emerald-600 border-b-2 border-emerald-500 pb-1 hover:text-emerald-500 hover:border-emerald-400 transition-colors w-fit"
+                  className="text-center text-xl font-bold text-emerald-600 border-b-2 border-emerald-500 pb-1 hover:text-emerald-500 hover:border-emerald-400 transition-colors"
                 >
                   Crear cuenta
                 </Link>
