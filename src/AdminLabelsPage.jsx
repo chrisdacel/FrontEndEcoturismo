@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createAdminPreference, deleteAdminPreference, getAdminPreferences, updateAdminPreference } from './services/adminApi';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
+import Pagination from './components/Pagination';
 
 const defaultForm = { name: '', color: '' };
 
@@ -16,6 +17,7 @@ export default function AdminLabelsPage() {
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [confirmState, setConfirmState] = useState({ open: false });
+  const [currentPage, setCurrentPage] = useState(1);
 
   const load = async () => {
     try {
@@ -108,6 +110,10 @@ export default function AdminLabelsPage() {
       },
     });
   };
+
+  const ITEMS_PER_PAGE = 20;
+  const totalPages = Math.ceil(labels.length / ITEMS_PER_PAGE);
+  const currentLabels = labels.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
@@ -206,7 +212,7 @@ export default function AdminLabelsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {labels.map((label) => (
+                  {currentLabels.map((label) => (
                     <tr key={label.id} className="hover:bg-slate-50">
                       <td className="px-2 py-2 text-slate-800 break-words max-w-[120px] md:px-6 md:max-w-none">{label.name}</td>
                       <td className="px-2 py-2 md:px-6">
@@ -244,6 +250,13 @@ export default function AdminLabelsPage() {
                 </tbody>
               </table>
             </div>
+          )}
+          {labels.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           )}
         </div>
       <ConfirmDialog

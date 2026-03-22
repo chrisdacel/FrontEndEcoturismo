@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllUsers, updateUser } from './services/adminApi';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
+import Pagination from './components/Pagination';
 
 export default function AdminUsersPage() {
   const navigate = useNavigate();
@@ -20,6 +21,11 @@ export default function AdminUsersPage() {
   const roleMenuRef = useRef(null);
   const statusMenuRef = useRef(null);
   const [confirmState, setConfirmState] = useState({ open: false });
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterRole, filterStatus]);
 
   useEffect(() => {
     loadUsers();
@@ -192,6 +198,10 @@ export default function AdminUsersPage() {
     return matchesSearch;
   });
 
+  const ITEMS_PER_PAGE = 20;
+  const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+  const currentUsers = filteredUsers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
@@ -327,7 +337,7 @@ export default function AdminUsersPage() {
         </div>
 
         <div className="md:hidden space-y-3 mb-4">
-          {filteredUsers.map((u) => (
+          {currentUsers.map((u) => (
             <div key={u.id} className="rounded-xl border border-slate-200 bg-white p-4">
               <p className="text-sm font-semibold text-slate-900">{u.name} {u.last_name || ''}</p>
               <p className="mt-1 text-xs text-slate-600">{u.email}</p>
@@ -416,7 +426,7 @@ export default function AdminUsersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {filteredUsers.map((u) => (
+              {currentUsers.map((u) => (
                 <tr key={u.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 text-sm text-slate-900">{u.name} {u.last_name || ''}</td>
                   <td className="px-4 py-3 text-sm text-slate-600">{u.status === 'inactive' ? '[email inactivo]' : u.email}</td>
@@ -501,6 +511,11 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
       <ConfirmDialog
         open={confirmState.open}

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchUserPlaces, api } from './services/api';
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
+import Pagination from './components/Pagination';
 
 export default function AdminSitesPage() {
   const [places, setPlaces] = useState([]);
@@ -24,6 +25,11 @@ export default function AdminSitesPage() {
   const navigate = useNavigate();
   const [confirmState, setConfirmState] = useState({ open: false });
   const [expandedSiteNames, setExpandedSiteNames] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, approvalFilter]);
 
   const loadPlaces = async () => {
     setLoading(true);
@@ -195,6 +201,10 @@ export default function AdminSitesPage() {
     return matchesSearch && matchesStatus && matchesApproval;
   });
 
+  const ITEMS_PER_PAGE = 20;
+  const totalPages = Math.ceil(filteredPlaces.length / ITEMS_PER_PAGE);
+  const currentPlaces = filteredPlaces.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
       <div className="mx-auto max-w-7xl px-4 md:px-6 py-10">
@@ -319,7 +329,7 @@ export default function AdminSitesPage() {
               </div>
             </div>
             <div className="md:hidden space-y-3 mb-4">
-              {filteredPlaces.map((p) => (
+              {currentPlaces.map((p) => (
                 <div key={p.id} className="rounded-xl border border-slate-200 bg-white p-4">
                   <div className="flex items-start gap-3">
                     {p.cover ? (
@@ -512,7 +522,7 @@ export default function AdminSitesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {filteredPlaces.map((p) => (
+                {currentPlaces.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4">
                       <div className="flex flex-col items-start gap-2">
@@ -712,6 +722,11 @@ export default function AdminSitesPage() {
               <div className="px-6 py-6 text-center text-slate-600">No hay sitios que coincidan con el filtro.</div>
             )}
           </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
           </>
         )}
       </div>

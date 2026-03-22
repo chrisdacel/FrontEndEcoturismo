@@ -4,6 +4,7 @@ import { api } from './services/api';
 
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
+import Pagination from './components/Pagination';
 
 export default function AdminEventsPage() {
   const [events, setEvents] = useState([]);
@@ -18,6 +19,11 @@ export default function AdminEventsPage() {
   const [approvalEditDirection, setApprovalEditDirection] = useState('down');
   const [confirmState, setConfirmState] = useState({ open: false });
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, approvalFilter]);
 
   const approvalLabels = {
     all: 'Todas las aprobaciones',
@@ -105,6 +111,10 @@ export default function AdminEventsPage() {
     const matchesApproval = approvalFilter === 'all' || (event.approval_status || 'pending') === approvalFilter;
     return matchesSearch && matchesApproval;
   });
+
+  const ITEMS_PER_PAGE = 20;
+  const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+  const currentEvents = filteredEvents.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden pt-14">
@@ -208,7 +218,7 @@ export default function AdminEventsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {filteredEvents.map((event) => (
+                  {currentEvents.map((event) => (
                     <tr key={event.id} className="hover:bg-slate-50">
                       <td className="px-6 py-4">
                         <div className="flex flex-col items-start gap-2">
@@ -348,7 +358,7 @@ export default function AdminEventsPage() {
                 <div className="px-4 py-8 text-center text-slate-600">No hay eventos que coincidan con el filtro.</div>
               ) : (
                 <ul className="flex flex-col gap-4">
-                  {filteredEvents.map((event) => (
+                  {currentEvents.map((event) => (
                     <li key={event.id} className="rounded-xl border border-slate-200 bg-white shadow p-4 flex flex-col gap-2">
                       <div className="flex gap-3 items-center">
                         {event.image ? (
@@ -417,6 +427,13 @@ export default function AdminEventsPage() {
                 </ul>
               )}
             </div>
+            {filteredEvents.length > 0 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </>
         )}
       </div>
