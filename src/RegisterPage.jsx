@@ -109,7 +109,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
         email.trim(),
         password,
         role,
-        lastName.trim() || null,
+        lastName.trim(),
         country || null,
         birthDate || null
       );
@@ -124,7 +124,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
       // Redirigir a confirmar cuenta después de 2 segundos
       setTimeout(() => {
         if (onNavigateConfirm) {
-          onNavigateConfirm();
+          onNavigateConfirm(email.trim());
         } else if (onNavigateLogin) {
           onNavigateLogin();
         }
@@ -200,7 +200,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-emerald-100">Apellido (opcional)</label>
+                  <label className="block text-sm font-medium text-emerald-100">Apellido</label>
                   <input
                     type="text"
                     value={lastName}
@@ -213,6 +213,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                         setLastNameError('');
                       }
                     }}
+                    required
                     minLength={2}
                     maxLength={50}
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
@@ -361,6 +362,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                   ageError !== '' ||
                   passwordError !== '' ||
                   name.trim().length < 2 ||
+                  lastName.trim().length < 2 ||
                   password.trim().length === 0 ||
                   password2.trim().length === 0 ||
                   !country ||

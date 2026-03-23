@@ -117,7 +117,7 @@ function AppRoutes() {
               onNavigateHome={() => navigate('/')}
               onNavigatePreferences={() => navigate('/preferencias')}
               onNavigateLogin={() => navigate('/login')}
-              onNavigateConfirm={() => navigate('/confirmar-cuenta')}
+              onNavigateConfirm={(email) => navigate('/confirmar-cuenta', { state: { email } })}
             />
           </GuestRoute>
         }

@@ -67,10 +67,10 @@ export default function ResetPasswordPage({ onNavigateLogin }) {
       setSuccess(msg || 'Contraseña restablecida correctamente.');
       setPassword('');
       setPassword2('');
-      // Redirigir al login después de 2 segundos para que se alcance a leer el mensaje
-      setTimeout(() => {
-        if (onNavigateLogin) onNavigateLogin();
-      }, 2000);
+      // Redirigir al login inmediatamente
+      if (onNavigateLogin) {
+        onNavigateLogin();
+      }
     } catch (err) {
       const msg = err?.message || err?.error || 'No se pudo restablecer la contraseña';
       setError(typeof msg === 'string' ? msg : 'No se pudo restablecer la contraseña');

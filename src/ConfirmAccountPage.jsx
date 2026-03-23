@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { initializeCsrfToken, resendVerificationEmail } from './services/api';
 
 export default function ConfirmAccountPage({ onNavigateHome, onNavigateLogin }) {
   const { user } = useAuth();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
+  const emailToVerify = location.state?.email || user?.email;
 
   useEffect(() => {
     initializeCsrfToken();
@@ -17,7 +21,7 @@ export default function ConfirmAccountPage({ onNavigateHome, onNavigateLogin }) 
     setSuccess('');
     setLoading(true);
     try {
-      const msg = await resendVerificationEmail(user?.email);
+      const msg = await resendVerificationEmail(emailToVerify);
       setSuccess(msg || 'Correo de verificación enviado');
     } catch (err) {
       const msg = err?.message || err?.error || 'No se pudo reenviar el correo';
@@ -27,7 +31,7 @@ export default function ConfirmAccountPage({ onNavigateHome, onNavigateLogin }) 
     }
   };
 
-  const maskedEmail = user?.email || 'tu correo';
+  const maskedEmail = emailToVerify || 'tu correo';
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white overflow-x-hidden">
