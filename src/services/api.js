@@ -354,9 +354,9 @@ export async function deleteAccount(current_password) {
 }
 
 // Reenviar correo de verificación
-export async function resendVerificationEmail() {
+export async function resendVerificationEmail(email) {
   try {
-    const { data } = await api.post('/api/email/verification-notification');
+    const { data } = await api.post('/api/email/verification-notification', { email });
     return data.message || 'Correo de verificación enviado';
   } catch (error) {
     throw error.response?.data || { message: 'No se pudo reenviar el correo' };

@@ -17,7 +17,7 @@ export default function ConfirmAccountPage({ onNavigateHome, onNavigateLogin }) 
     setSuccess('');
     setLoading(true);
     try {
-      const msg = await resendVerificationEmail();
+      const msg = await resendVerificationEmail(user?.email);
       setSuccess(msg || 'Correo de verificación enviado');
     } catch (err) {
       const msg = err?.message || err?.error || 'No se pudo reenviar el correo';
