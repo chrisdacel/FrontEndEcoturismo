@@ -100,7 +100,7 @@ export default function RegistroTurista1({ onNavigateHome, onNavigateLogin, onNa
         <div className="w-full max-w-[35vw] text-left md:max-w-none">
           <p className="mb-2 text-xs text-gray-600 md:text-sm">Tu contraseña debe incluir</p>
           <ul className="list-inside list-disc space-y-1 text-xs text-gray-600 md:text-sm">
-            <li>Entre 8 y 15 caracteres</li>
+            <li>Entre 8 y 64 caracteres</li>
             <li>Al menos una letra mayúscula</li>
             <li>Al menos un dígito</li>
             <li>Opcional: Caracteres especiales como @ ? # $ % ( ) _ = * \ : ; ' . / + &lt; &gt; &amp; ¿ ,[</li>
