@@ -136,16 +136,6 @@ export default function ResetPasswordPage({ onNavigateLogin }) {
                 {passwordError && (
                   <p className="mt-1 text-xs text-red-300">{passwordError}</p>
                 )}
-                <div className="mt-2 text-xs text-emerald-100/80">
-                  <p className="mb-1">Tu contraseña debe incluir:</p>
-                  <ul className="list-inside list-disc space-y-1">
-                    <li>Entre 8 y 64 caracteres</li>
-                    <li>Al menos una letra mayúscula</li>
-                    <li>Al menos una letra minúscula</li>
-                    <li>Al menos un dígito</li>
-                    <li>Solo símbolos permitidos: @ ? # $ % ( ) _ = * \ : ; ' . / + &lt; &gt; &amp; ¿ , [ ]</li>
-                  </ul>
-                </div>
               </div>
 
               <div>
