@@ -20,20 +20,6 @@ function resolveApiOrigin() {
 
 const API_ORIGIN = resolveApiOrigin();
 
-// If frontend and backend use different hostnames, browser may block cookies (=> CSRF 419).
-if (typeof window !== 'undefined') {
-  try {
-    const apiHostname = new URL(API_ORIGIN).hostname;
-    if (apiHostname && apiHostname !== window.location.hostname) {
-      console.warn(
-        `[auth] Hostname mismatch: frontend=${window.location.hostname}, api=${apiHostname}. ` +
-        `Cookie-based auth (Sanctum) may fail with 419. Align VITE_API_URL to the same hostname.`
-      );
-    }
-  } catch {
-    // ignore invalid URL; axios will surface it later
-  }
-}
 
 // Crear instancia de axios con configuración base
 const api = axios.create({
@@ -381,6 +367,11 @@ export async function resendVerificationEmail() {
  * Obtener usuario actual (requiere estar autenticado)
  */
 export async function getCurrentUser() {
+  // Si no hay token guardado, el usuario no está autenticado
+  // Evitar request innecesario que genera 401 en consola
+  if (typeof window !== 'undefined' && !window.localStorage.getItem(AUTH_TOKEN_KEY)) {
+    return null;
+  }
   try {
     const { data } = await api.get('/api/user');
     return data;
