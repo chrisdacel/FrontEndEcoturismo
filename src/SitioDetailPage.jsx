@@ -1,6 +1,8 @@
 import Alert from './components/Alert';
 import ConfirmDialog from './components/ConfirmDialog';
 import { useAuth } from './context/AuthContext';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { useEffect, useState, useRef } from 'react';
 import Footer from './components/Footer';
