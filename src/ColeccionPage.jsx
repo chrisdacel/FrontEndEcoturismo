@@ -399,6 +399,8 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                     <img loading="lazy"
                       src={shot.imagen}
                       alt={shot.nombre}
+                      style={{ opacity: 0, transition: `opacity 0.8s ease ${idx * 0.2}s, transform 0.8s ease ${idx * 0.2}s`, transform: 'translateY(18px)' }}
+                      onLoad={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
                       className={`object-cover rounded-[22px] shadow-lg w-[140px] h-[320px] md:w-[110px] md:h-[260px] lg:w-[200px] lg:h-[440px] ${idx === 1 ? 'h-[340px] md:h-[290px] lg:h-[470px]' : ''}`}
                     />
                   </div>
