@@ -131,9 +131,9 @@ export default function CreateEventPage() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const maxSize = 2 * 1024 * 1024; // 2MB
+    const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
-      setImageError('La imagen supera el límite de 2MB.');
+      setImageError('La imagen supera el límite de 5MB.');
       setImageFile(null);
       setImagePreview('');
       return;
@@ -344,7 +344,7 @@ export default function CreateEventPage() {
                       required
                       className="w-full rounded-lg border border-emerald-200 bg-white px-4 py-3 text-slate-900 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 outline-none transition"
                     />
-                    <p className={"mt-2 text-xs " + (imageError ? "text-rose-600" : "text-slate-500")}>Límite de imagen: 2MB.{imageError ? ` ${imageError}` : ''}</p>
+                    <p className={"mt-2 text-xs " + (imageError ? "text-rose-600" : "text-slate-500")}>Límite de imagen: 5MB.{imageError ? ` ${imageError}` : ''}</p>
                     {imagePreview && (
                       <img loading="lazy" src={imagePreview} alt="Evento" className="mt-2 h-32 w-auto rounded-lg object-cover" />
                     )}
