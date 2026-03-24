@@ -1,4 +1,30 @@
 import axios from 'axios';
+import heic2any from 'heic2any';
+
+/**
+ * Helper para procesar imágenes antes de subirlas (ej. HEIC -> WebP)
+ */
+async function processImageBeforeUpload(file) {
+  if (!file) return file;
+  
+  if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+    try {
+      console.log('Convirtiendo imagen HEIC/HEIF a formato WebP...');
+      const convertedBlob = await heic2any({
+        blob: file,
+        toType: 'image/webp',
+        quality: 0.8
+      });
+      const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+      const originalNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+      return new File([blob], `${originalNameWithoutExt}.webp`, { type: 'image/webp' });
+    } catch (err) {
+      console.error('Error al convertir imagen HEIC:', err);
+      return file; 
+    }
+  }
+  return file;
+}
 
 // Variable para controlar reintentos
 let isRefreshing = false;
@@ -317,8 +343,9 @@ export async function changePassword(current_password, password, password_confir
 
 // Perfil: subir avatar
 export async function uploadAvatar(file) {
+  const processedFile = await processImageBeforeUpload(file);
   const formData = new FormData();
-  formData.append('avatar', file);
+  formData.append('avatar', processedFile);
 
   try {
     await initializeCsrfToken(); // Refrescar token antes de subir
@@ -587,11 +614,11 @@ export async function createPlace(placeData, coverImage, climateImage, featuresI
     }
     
     // Imágenes
-    formData.append('portada', coverImage);
-    formData.append('clima_img', climateImage);
-    formData.append('caracteristicas_img', featuresImage);
-    formData.append('flora_img', floraImage);
-    formData.append('infraestructura_img', infrastructureImage);
+    formData.append('portada', await processImageBeforeUpload(coverImage));
+    formData.append('clima_img', await processImageBeforeUpload(climateImage));
+    formData.append('caracteristicas_img', await processImageBeforeUpload(featuresImage));
+    formData.append('flora_img', await processImageBeforeUpload(floraImage));
+    formData.append('infraestructura_img', await processImageBeforeUpload(infrastructureImage));
     
     const { data } = await api.post('/api/places', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -660,17 +687,17 @@ export async function updatePlace(id, placeData, coverImage = null, climateImage
       formData.append('event_datetime', placeData.event_datetime ?? '');
     }
     if (eventImage) {
-      formData.append('event_image', eventImage);
+      formData.append('event_image', await processImageBeforeUpload(eventImage));
     }
     // Sobrescribir método para compatibilidad con subida de archivos en Laravel
     formData.append('_method', 'PUT');
     
     // Imágenes (solo si se proporcionan)
-    if (coverImage) formData.append('portada', coverImage);
-    if (climateImage) formData.append('clima_img', climateImage);
-    if (featuresImage) formData.append('caracteristicas_img', featuresImage);
-    if (floraImage) formData.append('flora_img', floraImage);
-    if (infrastructureImage) formData.append('infraestructura_img', infrastructureImage);
+    if (coverImage) formData.append('portada', await processImageBeforeUpload(coverImage));
+    if (climateImage) formData.append('clima_img', await processImageBeforeUpload(climateImage));
+    if (featuresImage) formData.append('caracteristicas_img', await processImageBeforeUpload(featuresImage));
+    if (floraImage) formData.append('flora_img', await processImageBeforeUpload(floraImage));
+    if (infrastructureImage) formData.append('infraestructura_img', await processImageBeforeUpload(infrastructureImage));
     // Usar POST con _method=PUT para asegurar parsing correcto del multipart
     const { data } = await api.post(`/api/places/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
