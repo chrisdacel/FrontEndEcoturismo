@@ -53,7 +53,6 @@ const api = axios.create({
   withCredentials: true, // Importante: enviar cookies con cada request
   headers: {
     'Accept': 'application/json',
-    'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
   }
 });
@@ -84,6 +83,15 @@ export function loadAuthTokenFromStorage() {
 
 // Interceptor de request para agregar CSRF token
 api.interceptors.request.use((config) => {
+  // Si estamos enviando FormData (subida de archivos), NO forzar Content-Type.
+  // El browser debe crear el multipart boundary; si se fuerza, el backend puede no parsear $_FILES.
+  if (typeof FormData !== 'undefined' && config?.data instanceof FormData) {
+    if (config.headers) {
+      delete config.headers['Content-Type'];
+      delete config.headers['content-type'];
+    }
+  }
+
   // Obtener el token XSRF de las cookies
   const token = document.cookie
     .split('; ')
@@ -349,9 +357,7 @@ export async function uploadAvatar(file) {
 
   try {
     await initializeCsrfToken(); // Refrescar token antes de subir
-    const { data } = await api.post('/api/profile/avatar', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const { data } = await api.post('/api/profile/avatar', formData);
     return data; // Retorna { avatar_url, user, message }
   } catch (error) {
     throw error.response?.data || { message: 'Error subiendo foto' };
@@ -620,9 +626,7 @@ export async function createPlace(placeData, coverImage, climateImage, featuresI
     formData.append('flora_img', await processImageBeforeUpload(floraImage));
     formData.append('infraestructura_img', await processImageBeforeUpload(infrastructureImage));
     
-    const { data } = await api.post('/api/places', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const { data } = await api.post('/api/places', formData);
     
     return data;
   } catch (error) {
@@ -699,9 +703,7 @@ export async function updatePlace(id, placeData, coverImage = null, climateImage
     if (floraImage) formData.append('flora_img', await processImageBeforeUpload(floraImage));
     if (infrastructureImage) formData.append('infraestructura_img', await processImageBeforeUpload(infrastructureImage));
     // Usar POST con _method=PUT para asegurar parsing correcto del multipart
-    const { data } = await api.post(`/api/places/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const { data } = await api.post(`/api/places/${id}`, formData);
     
     return data;
   } catch (error) {

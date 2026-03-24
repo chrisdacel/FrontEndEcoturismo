@@ -9,6 +9,10 @@ import 'leaflet/dist/leaflet.css';
 // Fix para los iconos de Leaflet en Vite/React
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
+/** Coincide con validación Laravel: max 4096 KB por imagen */
+const MAX_PLACE_IMAGE_BYTES = 4 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
 const greenMarkerSvg = `data:image/svg+xml,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">'
   + '<path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 9.4 12.5 28.5 12.5 28.5S25 21.9 25 12.5C25 5.6 19.4 0 12.5 0z" fill="#16a34a" stroke="#0f6b2a" stroke-width="1"/>'
@@ -265,22 +269,36 @@ export default function CreateSitioPageLeaflet() {
 
   const handleImageChange = (e, fieldName) => {
     const file = e.target.files[0];
-    if (file) {
-      setImages({
-        ...images,
-        [fieldName]: file,
-      });
+    if (!file) return;
 
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviews({
-          ...imagePreviews,
-          [fieldName]: reader.result,
-        });
-      };
-      reader.readAsDataURL(file);
+    if (file.size > MAX_PLACE_IMAGE_BYTES) {
+      setError(
+        `La imagen supera el máximo de 4 MB (${fieldName}). Los PNG suelen pesar más que JPG; comprime o convierte el archivo.`
+      );
+      e.target.value = '';
+      return;
     }
+    const mime = (file.type || '').toLowerCase();
+    if (mime && !ALLOWED_IMAGE_TYPES.includes(mime)) {
+      setError('Formato no permitido. Usa JPG, PNG o WebP.');
+      e.target.value = '';
+      return;
+    }
+
+    setImages((prev) => ({
+      ...prev,
+      [fieldName]: file,
+    }));
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreviews((prev) => ({
+        ...prev,
+        [fieldName]: reader.result,
+      }));
+    };
+    reader.readAsDataURL(file);
+    setError('');
   };
 
   const togglePreference = (prefId) => {

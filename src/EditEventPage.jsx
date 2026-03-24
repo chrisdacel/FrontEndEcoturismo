@@ -230,9 +230,7 @@ export default function EditEventPage() {
       }
       payload.append('_method', 'PUT');
 
-      await api.post(`/api/events/${id}`, payload, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      await api.post(`/api/events/${id}`, payload);
 
       setSuccess(true);
       if (place?.id) {

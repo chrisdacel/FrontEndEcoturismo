@@ -195,9 +195,7 @@ export default function CreateEventPage() {
       payload.append('ends_at', formData.ends_at);
       payload.append('image', imageFile);
 
-      await api.post(`/api/places/${id}/events`, payload, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      await api.post(`/api/places/${id}/events`, payload);
 
       setSuccess(true);
       setTimeout(() => {
