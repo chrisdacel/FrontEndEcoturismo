@@ -3,11 +3,9 @@ import { api } from './api';
 // Usar la instancia existente en lugar de crear una nueva
 export async function createPlace(formData) {
   try {
-    const { data } = await api.post('/api/places', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
-    });
+    // No fijar Content-Type: el navegador debe añadir multipart/form-data + boundary.
+    // Si se fuerza "multipart/form-data" sin boundary, el servidor puede colgar o rechazar la petición.
+    const { data } = await api.post('/api/places', formData);
     return data;
   } catch (error) {
     console.error('Error response:', error.response?.data);
