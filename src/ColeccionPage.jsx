@@ -363,14 +363,15 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
           if (!name || name === 'Sin etiquetas') return '';
           
           let color = '#059669'; // default green
-          if (labelObj?.color && labelObj.color.startsWith('#')) {
-            color = labelObj.color;
+          if (labelObj?.color) {
+            color = labelObj.color.startsWith('#') ? labelObj.color : `#${labelObj.color}`;
           }
           
-          // Add transparency hex '20' (12% opacity) to color for background if it's 6 chars long
-          let bgColor = color.length === 7 ? color + '20' : 'rgba(5, 150, 105, 0.1)';
+          // Match SitioDetailPage styles: bg 15% (26), border 40% (66)
+          let bgColor = color + '26';
+          let borderColor = color + '66';
           
-          return `<span style="color: ${color}; background-color: ${bgColor}; border: 1px solid ${color}40; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; white-space: nowrap;">${name}</span>`;
+          return `<span style="color: ${color}; background-color: ${bgColor}; border: 1px solid ${borderColor}; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; white-space: nowrap;">${name}</span>`;
         }).join('');
         
         const labelsContainerHtml = badgesHtml ? `<div style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-top:2px;">${badgesHtml}</div>` : '';
