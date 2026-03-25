@@ -177,7 +177,7 @@ export default function ColeccionPageTurista({
         </section>
 
         {/* Carousels Section */}
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-4 sm:px-8 md:px-20 bg-gray-50">
           <div className="max-w-7xl mx-auto space-y-16">
             {/* Carousel 1 - Destinos Populares */}
             <div>

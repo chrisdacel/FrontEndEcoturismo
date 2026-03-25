@@ -130,7 +130,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
         </section>
 
         {/* Carousel 1 */}
-        <section className="bg-white px-8 py-16 md:px-20">
+        <section className="bg-white px-4 sm:px-8 py-16 md:px-20">
           <h2 className="mb-8 text-3xl font-bold text-[#267E1B]">Destinos Populares</h2>
           
           <div className="relative">

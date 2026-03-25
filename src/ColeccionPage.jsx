@@ -449,7 +449,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
 
       <main className="pt-0">
         {/* Sección 1: Hero con trío de imágenes y buscador */}
-        <section className="relative w-full pt-16 pb-28 sm:py-16 md:py-12 lg:py-20 coleccion-hero z-40">
+        <section className="bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_100%)] px-4 sm:px-8 md:px-20 py-16 relative z-40">
           <div className="relative z-10 flex flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-between md:gap-8 lg:gap-10 md:px-12">
             {/* Izquierda: trío de imágenes verticales */}
             <div className="w-full md:w-[45%] lg:w-auto flex justify-center">
@@ -461,7 +461,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                       alt={shot.nombre}
                       style={{ opacity: 0, transition: `opacity 0.8s ease ${idx * 0.2}s, transform 0.8s ease ${idx * 0.2}s`, transform: 'translateY(18px)' }}
                       onLoad={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
-                      className={`object-cover rounded-[22px] shadow-lg w-[140px] h-[320px] md:w-[110px] md:h-[260px] lg:w-[200px] lg:h-[440px] ${idx === 1 ? 'h-[340px] md:h-[290px] lg:h-[470px]' : ''}`}
+                      className={`object-cover rounded-[18px] sm:rounded-[22px] shadow-lg w-[30vw] max-w-[140px] h-[220px] min-[400px]:h-[320px] md:w-[110px] md:h-[260px] lg:w-[200px] lg:h-[440px] ${idx === 1 ? 'h-[240px] min-[400px]:h-[340px] md:h-[290px] lg:h-[470px]' : ''}`}
                     />
                   </div>
                 ))}
@@ -471,7 +471,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
             {/* Derecha: Título y Buscador */}
             <div className="relative z-10 flex-1 w-full md:w-[55%] flex flex-col items-center md:items-start gap-6 md:gap-6 lg:gap-8">
               <div className="text-center md:text-left space-y-2">
-                <h1 className="text-4xl md:text-3xl lg:text-5xl font-bold text-slate-900 leading-tight">Explora y conecta con la naturaleza</h1>
+                <h1 className="text-3xl min-[400px]:text-4xl md:text-3xl lg:text-5xl font-bold text-slate-900 leading-tight">Explora y conecta con la naturaleza</h1>
                 <p className="text-slate-700 md:text-sm lg:text-base">Busca sitios, actividades y experiencias sostenibles.</p>
               </div>
               
@@ -491,7 +491,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                 </div>
                 
                 {/* Filters */}
-                <div className="flex flex-row gap-3 md:gap-4 w-full 2xl:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full 2xl:w-auto">
                   <div className="relative flex-1 2xl:flex-none 2xl:w-56" ref={tagMenuRef}>
                     <button
                       type="button"
@@ -550,7 +550,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
         </section>
 
         {/* Sección 2: Sitios Creados desde la API */}
-        <section className="w-full bg-white py-16 px-0 md:px-0">
+        <section className="w-full bg-white py-16 px-4 sm:px-8 md:px-0 relative">
             <div className="px-6 md:px-12 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-0">
               <h2 className="text-3xl font-bold">Sitios Ecoturísticos</h2>
               {(user?.role === 'admin' || user?.role === 'operator') && (
