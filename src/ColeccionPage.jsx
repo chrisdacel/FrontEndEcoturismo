@@ -396,7 +396,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
               <div className="flex w-full gap-4 md:gap-3 lg:gap-5 justify-center">
                 {heroShots.map((shot, idx) => (
                   <div key={shot.id} className="flex items-end">
-                    <img loading="lazy"
+                    <img fetchpriority="high" decoding="async"
                       src={shot.imagen}
                       alt={shot.nombre}
                       style={{ opacity: 0, transition: `opacity 0.8s ease ${idx * 0.2}s, transform 0.8s ease ${idx * 0.2}s`, transform: 'translateY(18px)' }}
@@ -523,7 +523,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                       </button>
                     )}
                     <div className="h-48 w-full overflow-hidden">
-                      <img loading="lazy"
+                      <img loading={index < 4 ? "eager" : "lazy"} decoding="async"
                         src={`${import.meta.env.VITE_API_URL}/api/files/${sitio.cover}`}
                         alt={sitio.name}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
@@ -594,7 +594,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                     }}
                   >
                     {/* Imagen */}
-                    <img loading="lazy"
+                    <img loading={index < 3 ? "eager" : "lazy"} decoding="async"
                       src={rec.imagen || storageUrl(rec.cover)}
                       alt={rec.nombre || rec.name}
                       className="absolute inset-0 h-full w-full object-cover rounded-[26px] origin-center transform transition-transform duration-700 ease-out group-hover:scale-105"
