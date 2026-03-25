@@ -691,24 +691,25 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
         <section id="recomendaciones" className="w-full bg-white py-16 pb-20 px-0 md:px-0">
           <div className="mb-8 px-6 md:px-12 flex items-center justify-between">
             <h2 className="text-3xl font-bold">Recomendaciones</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center rounded-full border border-emerald-100 bg-white shadow-sm overflow-hidden">
               <button 
                 type="button"
                 onClick={() => document.getElementById('recomendaciones-scroll')?.scrollBy({ left: -340, behavior: 'smooth' })}
-                className="grid place-items-center w-10 h-10 rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                className="grid place-items-center w-10 h-8 px-2 text-emerald-600/60 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:bg-emerald-50 transition"
                 aria-label="Anterior recomendación"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
+              <div className="w-[1px] h-4 bg-emerald-100/60"></div>
               <button 
                 type="button"
                 onClick={() => document.getElementById('recomendaciones-scroll')?.scrollBy({ left: 340, behavior: 'smooth' })}
-                className="grid place-items-center w-10 h-10 rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                className="grid place-items-center w-10 h-8 px-2 text-emerald-600/60 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:bg-emerald-50 transition"
                 aria-label="Siguiente recomendación"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
