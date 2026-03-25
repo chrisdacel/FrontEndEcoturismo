@@ -449,7 +449,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
 
       <main className="pt-0">
         {/* Sección 1: Hero con trío de imágenes y buscador */}
-        <section className="bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_100%)] px-4 sm:px-8 md:px-20 py-16 relative z-40">
+        <section className="relative w-full pt-16 pb-28 sm:py-16 md:py-12 lg:py-20 coleccion-hero z-40">
           <div className="relative z-10 flex flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-between md:gap-8 lg:gap-10 md:px-12">
             {/* Izquierda: trío de imágenes verticales */}
             <div className="w-full md:w-[45%] lg:w-auto flex justify-center">

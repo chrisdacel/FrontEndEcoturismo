@@ -225,6 +225,9 @@ body {
 
 .coleccion-hero {
   position: relative;
+  background-color: #f2fbf4;
+  background-image: radial-gradient(rgba(16, 185, 129, 0.08) 2px, transparent 2px);
+  background-size: 32px 32px;
 }
 
 .coleccion-hero::before,
