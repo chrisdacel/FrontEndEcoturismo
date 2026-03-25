@@ -164,11 +164,15 @@ export default function SitioDetailPage({
     let sorted = [...reviews];
     // Ordenar por más recientes
     if (filterType === 'recent') {
-      sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      sorted.sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
     } else if (filterType === 'highest') {
-      sorted.sort((a, b) => b.rating - a.rating);
+      sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     } else if (filterType === 'lowest') {
-      sorted.sort((a, b) => a.rating - b.rating);
+      sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
     }
 
     // Si el usuario está logueado y tiene comentario, mostrarlo primero solo para él
@@ -180,7 +184,7 @@ export default function SitioDetailPage({
       }
     }
     setFilteredReviews(sorted);
-  }, [reviews, filterType]);
+  }, [reviews, filterType, user]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
