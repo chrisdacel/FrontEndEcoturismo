@@ -73,6 +73,8 @@ export default function AdminEventsPage() {
         await api.post(`/api/admin/events/${id}/approve`);
       } else if (approval_status === 'rejected') {
         await api.post(`/api/admin/events/${id}/reject`);
+      } else if (approval_status === 'pending') {
+        await api.post(`/api/admin/events/${id}/pending`);
       }
       await loadEvents();
       setError('');
