@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Footer from './components/Footer';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
@@ -34,6 +34,8 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const [apiError, setApiError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
+  const [selectedTag, setSelectedTag] = useState('');
+  const [sortBy, setSortBy] = useState('recent');
   const [favoriteIds, setFavoriteIds] = useState(new Set());
   const [recommendations, setRecommendations] = useState([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
@@ -42,11 +44,11 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const mapContainerRef = useRef(null);
   const markersLayerRef = useRef(null);
 
-  const loadSites = useCallback(async (query = searchText) => {
+  const loadSites = useCallback(async () => {
     try {
       setLoading(true);
       setApiError(null);
-      const data = await getAllPlaces(query);
+      const data = await getAllPlaces('');
       setSitiosAPI(data);
       if (!Array.isArray(data) || data.length === 0) {
         setApiError('La API respondió vacío o no hay sitios disponibles.');
@@ -59,7 +61,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     } finally {
       setLoading(false);
     }
-  }, [searchText]);
+  }, []);
 
   // Cargar sitios desde la API
   useEffect(() => {
@@ -76,10 +78,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     }
   }, [location.hash]);
 
-  const handleSearch = async () => {
-    setLoading(true);
-    await loadSites(searchText);
-  };
+
 
   const isTourist = user && user.role !== 'admin' && user.role !== 'operator';
   const isAdminOrOperator = user && (user.role === 'admin' || user.role === 'operator');
@@ -145,11 +144,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     setRandomRecommendations(shuffled);
   }, [isTourist, isAdminOrOperator, isGuest, recommendations, sitiosAPI]);
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
+
 
   const handleToggleFavorite = async (event, sitioId) => {
     event.stopPropagation();
@@ -179,6 +174,54 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
       console.error('Error actualizando favorito:', error);
     }
   };
+
+  const uniqueTags = useMemo(() => {
+    const tags = new Set();
+    sitiosAPI.forEach(sitio => {
+      const labelNames = Array.isArray(sitio.label)
+        ? sitio.label.map((label) => label?.name ?? label)
+        : Array.isArray(sitio.labels)
+          ? sitio.labels.map((label) => label?.name ?? label)
+          : [];
+      labelNames.forEach(t => { if (t) tags.add(t); });
+    });
+    return Array.from(tags).sort();
+  }, [sitiosAPI]);
+
+  const filteredSitios = useMemo(() => {
+    let result = [...sitiosAPI];
+    
+    // 1. Text Search
+    if (searchText.trim()) {
+       const lower = searchText.toLowerCase();
+       result = result.filter(s => {
+         const nameMatches = (s.name || s.nombre || '').toLowerCase().includes(lower);
+         const textMatches = (s.slogan || s.description || '').toLowerCase().includes(lower) || 
+                             (s.localization || '').toLowerCase().includes(lower);
+         return nameMatches || textMatches;
+       });
+    }
+
+    // 2. Tag Filter
+    if (selectedTag) {
+       result = result.filter(s => {
+          const tags = Array.isArray(s.label) ? s.label.map(t => t?.name || t) : 
+                       Array.isArray(s.labels) ? s.labels.map(t => t?.name || t) : [];
+          return tags.includes(selectedTag);
+       });
+    }
+
+    // 3. Sorting
+    if (sortBy === 'recent') {
+       result.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    } else if (sortBy === 'az') {
+       result.sort((a, b) => (a.name || a.nombre || '').localeCompare(b.name || b.nombre || ''));
+    } else if (sortBy === 'za') {
+       result.sort((a, b) => (b.name || b.nombre || '').localeCompare(a.name || a.nombre || ''));
+    }
+
+    return result;
+  }, [sitiosAPI, searchText, selectedTag, sortBy]);
 
   // Datos de sitios
   const sitios = [
@@ -414,16 +457,40 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                 <h1 className="text-4xl md:text-3xl lg:text-5xl font-bold text-slate-900 leading-tight">Explora y conecta con la naturaleza</h1>
                 <p className="text-slate-700 md:text-sm lg:text-base">Busca sitios, actividades y experiencias sostenibles.</p>
               </div>
-              <div className="flex w-full max-w-md items-center gap-2">
-                <input
-                  type="text"
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Buscar destinos..."
-                  className="w-full rounded-lg border border-emerald-200 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-300 md:text-sm lg:text-base"
-                />
-                <button onClick={handleSearch} className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 transition md:text-sm lg:text-base">Buscar</button>
+              <div className="flex w-full max-w-3xl flex-col sm:flex-row items-center gap-3">
+                <div className="relative w-full sm:flex-1">
+                  <input
+                    type="text"
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    placeholder="Buscar destinos..."
+                    className="w-full rounded-lg border border-emerald-200 px-3 py-2.5 outline-none focus:ring-2 focus:ring-emerald-300 md:text-sm lg:text-base shadow-sm"
+                  />
+                  <svg className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
+                  </svg>
+                </div>
+                
+                <select
+                  value={selectedTag}
+                  onChange={(e) => setSelectedTag(e.target.value)}
+                  className="w-full sm:w-auto rounded-lg border border-emerald-200 bg-white px-3 py-2.5 text-slate-700 outline-none focus:ring-2 focus:ring-emerald-300 shadow-sm md:text-sm lg:text-base cursor-pointer"
+                >
+                  <option value="">Todas las etiquetas</option>
+                  {uniqueTags.map(tag => (
+                    <option key={tag} value={tag}>{tag}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full sm:w-auto rounded-lg border border-emerald-200 bg-white px-3 py-2.5 text-slate-700 outline-none focus:ring-2 focus:ring-emerald-300 shadow-sm md:text-sm lg:text-base cursor-pointer"
+                >
+                  <option value="recent">Más recientes</option>
+                  <option value="az">A - Z</option>
+                  <option value="za">Z - A</option>
+                </select>
               </div>
             </div>
           </div>
@@ -447,15 +514,15 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
               <div className="flex justify-center py-12">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-400/30 border-t-emerald-400"></div>
               </div>
-            ) : sitiosAPI.length === 0 ? (
+            ) : filteredSitios.length === 0 ? (
               <div className="px-6 md:px-12 py-12 text-center text-rose-600 font-semibold">
-                No hay sitios disponibles para mostrar.<br />
+                No hay sitios disponibles para mostrar según los filtros seleccionados.<br />
                 {apiError && <span className="block text-xs text-rose-700 mt-2">{apiError}</span>}
-                <span className="block text-xs text-slate-500 mt-2">(Si deberías ver sitios aquí, revisa tu conexión, permisos, o contacta soporte. Revisa la consola para más detalles.)</span>
+                <span className="block text-xs text-slate-500 mt-2">(Intenta limpiar tu búsqueda o selecciona otra etiqueta.)</span>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 md:px-12">
-                {sitiosAPI.map((sitio, index) => (
+                {filteredSitios.map((sitio, index) => (
                   <article
                     key={sitio.id}
                     className="group cursor-pointer rounded-lg border border-emerald-100 bg-white shadow-sm shadow-emerald-100/50 overflow-hidden hover:shadow-lg transition relative stagger-item"

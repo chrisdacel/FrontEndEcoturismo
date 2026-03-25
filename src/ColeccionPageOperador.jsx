@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
 
@@ -33,6 +33,15 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const filteredSitios = useMemo(() => {
+    if (!searchText.trim()) return sitios;
+    const lower = searchText.toLowerCase();
+    return sitios.filter(s => 
+      (s.nombre || '').toLowerCase().includes(lower) || 
+      (s.municipio || '').toLowerCase().includes(lower)
+    );
+  }, [sitios, searchText]);
+
   const handlePrevCarousel = (carouselIdx) => {
     setCarouselIndex((prev) => {
       const newIndex = [...prev];
@@ -44,7 +53,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
   const handleNextCarousel = (carouselIdx) => {
     setCarouselIndex((prev) => {
       const newIndex = [...prev];
-      newIndex[carouselIdx] = Math.min(sitios.length - 4, newIndex[carouselIdx] + 1);
+      newIndex[carouselIdx] = Math.min(Math.max(filteredSitios.length - 4, 0), newIndex[carouselIdx] + 1);
       return newIndex;
     });
   };
@@ -122,7 +131,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
           <div className="relative">
             <div className="overflow-hidden">
               <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${carouselIndex[0] * 25}%)` }}>
-                {sitios.map((sitio, index) => (
+                {filteredSitios.map((sitio, index) => (
                   <div key={sitio.id} className="min-w-[25%] px-2">
                     <button
                       onClick={onNavigateSitio}
@@ -149,7 +158,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
             </button>
             <button
               onClick={() => handleNextCarousel(0)}
-              disabled={carouselIndex[0] >= sitios.length - 4}
+              disabled={carouselIndex[0] >= Math.max(filteredSitios.length - 4, 0)}
               className="coleccion-carousel-nav absolute right-0 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-3 shadow-lg hover:bg-white"
             >
               <span className="text-3xl text-[#267E1B]">›</span>
@@ -164,7 +173,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
           <div className="relative">
             <div className="overflow-hidden">
               <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${carouselIndex[1] * 25}%)` }}>
-                {sitios.map((sitio, index) => (
+                {filteredSitios.map((sitio, index) => (
                   <div key={sitio.id} className="min-w-[25%] px-2">
                     <button
                       onClick={onNavigateSitio}
@@ -191,7 +200,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
             </button>
             <button
               onClick={() => handleNextCarousel(1)}
-              disabled={carouselIndex[1] >= sitios.length - 4}
+              disabled={carouselIndex[1] >= Math.max(filteredSitios.length - 4, 0)}
               className="coleccion-carousel-nav absolute right-0 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-3 shadow-lg hover:bg-white"
             >
               <span className="text-3xl text-[#267E1B]">›</span>
@@ -206,7 +215,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
           <div className="relative">
             <div className="overflow-hidden">
               <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${carouselIndex[2] * 25}%)` }}>
-                {sitios.map((sitio, index) => (
+                {filteredSitios.map((sitio, index) => (
                   <div key={sitio.id} className="min-w-[25%] px-2">
                     <button
                       onClick={onNavigateSitio}
@@ -233,7 +242,7 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
             </button>
             <button
               onClick={() => handleNextCarousel(2)}
-              disabled={carouselIndex[2] >= sitios.length - 4}
+              disabled={carouselIndex[2] >= Math.max(filteredSitios.length - 4, 0)}
               className="coleccion-carousel-nav absolute right-0 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-3 shadow-lg hover:bg-white"
             >
               <span className="text-3xl text-[#267E1B]">›</span>

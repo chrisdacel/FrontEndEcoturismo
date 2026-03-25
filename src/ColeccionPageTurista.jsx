@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { getAllPlaces } from './services/placesApi';
@@ -61,11 +61,20 @@ export default function ColeccionPageTurista({
     { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_04.webp', title: 'Laguna del Otún', desc: 'Espejo natural de los Andes' }
   ];
 
+  const filteredSitios = useMemo(() => {
+    if (!searchText.trim()) return sitios;
+    const lower = searchText.toLowerCase();
+    return sitios.filter(s => 
+      (s.title || '').toLowerCase().includes(lower) || 
+      (s.location || '').toLowerCase().includes(lower)
+    );
+  }, [sitios, searchText]);
+
   const handleCarouselNext = (carouselIdx) => {
     setCarouselIndex(prev => {
       const newIndexes = [...prev];
-      if (sitios.length === 0) return newIndexes;
-      newIndexes[carouselIdx] = (newIndexes[carouselIdx] + 1) % Math.max(sitios.length, 1);
+      if (filteredSitios.length === 0) return newIndexes;
+      newIndexes[carouselIdx] = (newIndexes[carouselIdx] + 1) % Math.max(filteredSitios.length, 1);
       return newIndexes;
     });
   };
@@ -73,8 +82,8 @@ export default function ColeccionPageTurista({
   const handleCarouselPrev = (carouselIdx) => {
     setCarouselIndex(prev => {
       const newIndexes = [...prev];
-      if (sitios.length === 0) return newIndexes;
-      newIndexes[carouselIdx] = (newIndexes[carouselIdx] - 1 + Math.max(sitios.length, 1)) % Math.max(sitios.length, 1);
+      if (filteredSitios.length === 0) return newIndexes;
+      newIndexes[carouselIdx] = (newIndexes[carouselIdx] - 1 + Math.max(filteredSitios.length, 1)) % Math.max(filteredSitios.length, 1);
       return newIndexes;
     });
   };
@@ -82,8 +91,8 @@ export default function ColeccionPageTurista({
   const getVisibleItems = (startIndex) => {
     const items = [];
     for (let i = 0; i < 4; i++) {
-      if (sitios.length > 0) {
-        items.push(sitios[(startIndex + i) % sitios.length]);
+      if (filteredSitios.length > 0) {
+        items.push(filteredSitios[(startIndex + i) % filteredSitios.length]);
       }
     }
     return items;
@@ -155,14 +164,11 @@ export default function ColeccionPageTurista({
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Buscar destinos..."
+                placeholder="Buscar destinos asombrosos..."
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
-                className="coleccion-pill-input flex-1 px-6 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="coleccion-pill-input flex-1 px-6 py-3 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-lg text-center"
               />
-              <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition">
-                Buscar
-              </button>
             </div>
           </div>
         </section>
