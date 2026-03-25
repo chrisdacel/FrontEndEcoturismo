@@ -689,10 +689,34 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
 
         {/* Sección 3: Recomendaciones (scroll lateral) */}
         <section id="recomendaciones" className="w-full bg-white py-16 pb-20 px-0 md:px-0">
-          <h2 className="mb-8 px-6 md:px-12 text-3xl font-bold">Recomendaciones</h2>
+          <div className="mb-8 px-6 md:px-12 flex items-center justify-between">
+            <h2 className="text-3xl font-bold">Recomendaciones</h2>
+            <div className="flex items-center gap-2">
+              <button 
+                type="button"
+                onClick={() => document.getElementById('recomendaciones-scroll')?.scrollBy({ left: -340, behavior: 'smooth' })}
+                className="grid place-items-center w-10 h-10 rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                aria-label="Anterior recomendación"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button 
+                type="button"
+                onClick={() => document.getElementById('recomendaciones-scroll')?.scrollBy({ left: 340, behavior: 'smooth' })}
+                className="grid place-items-center w-10 h-10 rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                aria-label="Siguiente recomendación"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
 
           {/* Carril con scroll horizontal y snap */}
-          <div className="overflow-x-auto scrollbar-none px-6 md:px-12">
+          <div id="recomendaciones-scroll" className="overflow-x-auto scrollbar-none px-6 md:px-12">
             <div className="flex gap-6 md:gap-8 snap-x snap-mandatory pr-6 md:pr-12">
               {recommendationsLoading ? (
                 <div className="text-sm text-slate-600">Cargando recomendaciones...</div>
