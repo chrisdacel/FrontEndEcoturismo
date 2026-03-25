@@ -234,8 +234,16 @@ export default function CreateSitioPageLeaflet() {
       attribution: '&copy; OpenStreetMap',
     }).addTo(map);
 
+    const customPin = L.divIcon({
+      className: 'custom-pin',
+      html: `<div style="width: 20px; height: 20px; background-color: #059669; border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);"></div>`,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+      popupAnchor: [0, -12]
+    });
+
     // Crear marcador inicial
-    const marker = L.marker([4.8087, -75.6906]).addTo(map);
+    const marker = L.marker([4.8087, -75.6906], { icon: customPin }).addTo(map);
     markerRef.current = marker;
 
     // Evento de clic en el mapa

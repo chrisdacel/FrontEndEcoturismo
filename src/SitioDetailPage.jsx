@@ -270,21 +270,40 @@ export default function SitioDetailPage({
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(mapInstanceRef.current);
 
-      const labelNames = Array.isArray(sitio.label)
-        ? sitio.label.map((label) => label?.name ?? label)
-        : Array.isArray(sitio.labels)
-          ? sitio.labels.map((label) => label?.name ?? label)
-          : [];
-      const labelsText = labelNames.filter(Boolean).slice(0, 3).join(' • ') || 'Sin etiqueta';
+      const labelsList = Array.isArray(sitio.label) ? sitio.label : (Array.isArray(sitio.labels) ? sitio.labels : []);
+      const badgesHtml = labelsList.filter(Boolean).slice(0, 3).map(labelObj => {
+        const name = labelObj?.name || (typeof labelObj === 'string' ? labelObj : null);
+        if (!name || name === 'Sin etiquetas') return '';
+        
+        let color = '#059669'; // default green
+        if (labelObj?.color) {
+          color = labelObj.color.startsWith('#') ? labelObj.color : `#${labelObj.color}`;
+        }
+        
+        let bgColor = color + '26';
+        let borderColor = color + '66';
+        
+        return `<span style="color: ${color}; background-color: ${bgColor}; border: 1px solid ${borderColor}; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; white-space: nowrap;">${name}</span>`;
+      }).join('');
+      const labelsContainerHtml = badgesHtml ? `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;">${badgesHtml}</div>` : '';
+
       const popupHtml = `
         <div style="display:flex;flex-direction:column;gap:6px;max-width:220px;">
           <strong style="font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${sitio.name || 'Sitio'}</strong>
-          <span style="font-size:12px;color:#059669;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${labelsText}</span>
+          ${labelsContainerHtml}
         </div>
       `;
 
+      const customPin = L.divIcon({
+        className: 'custom-pin',
+        html: `<div style="width: 20px; height: 20px; background-color: #059669; border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);"></div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -12]
+      });
+
       // Agregar marcador
-      L.marker([sitio.lat, sitio.lng]).addTo(mapInstanceRef.current)
+      L.marker([sitio.lat, sitio.lng], { icon: customPin }).addTo(mapInstanceRef.current)
         .bindPopup(popupHtml)
         .openPopup();
     }
