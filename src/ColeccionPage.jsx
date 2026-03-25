@@ -357,12 +357,24 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
       const lng = parseFloat(sitio.lng);
       if (Number.isFinite(lat) && Number.isFinite(lng)) {
         const marker = L.marker([lat, lng]);
-        const labelNames = Array.isArray(sitio.label)
-          ? sitio.label.map((label) => label?.name ?? label)
-          : Array.isArray(sitio.labels)
-            ? sitio.labels.map((label) => label?.name ?? label)
-            : [];
-        const labelsText = labelNames.filter(Boolean).slice(0, 3).join(' • ') || 'Sin etiqueta';
+        const labelsList = Array.isArray(sitio.label) ? sitio.label : (Array.isArray(sitio.labels) ? sitio.labels : []);
+        const badgesHtml = labelsList.filter(Boolean).slice(0, 3).map(labelObj => {
+          const name = labelObj?.name || (typeof labelObj === 'string' ? labelObj : null);
+          if (!name || name === 'Sin etiquetas') return '';
+          
+          let color = '#059669'; // default green
+          if (labelObj?.color && labelObj.color.startsWith('#')) {
+            color = labelObj.color;
+          }
+          
+          // Add transparency hex '20' (12% opacity) to color for background if it's 6 chars long
+          let bgColor = color.length === 7 ? color + '20' : 'rgba(5, 150, 105, 0.1)';
+          
+          return `<span style="color: ${color}; background-color: ${bgColor}; border: 1px solid ${color}40; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; white-space: nowrap;">${name}</span>`;
+        }).join('');
+        
+        const labelsContainerHtml = badgesHtml ? `<div style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-top:2px;">${badgesHtml}</div>` : '';
+
         // Mostrar imagen debajo del nombre
         let imageUrl = '';
         // Prioridad: cover > portada > imagen
@@ -377,7 +389,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
           <div class="popup-card" style="display:flex;flex-direction:column;gap:6px;cursor:pointer;max-width:220px;align-items:center;">
             <strong style="font-size:14px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;display:block;">${sitio.name || 'Sitio'}</strong>
             ${imageUrl ? `<img loading="lazy" src='${imageUrl}' alt='${sitio.name || 'Sitio'}' style='width:100%;max-width:180px;max-height:110px;object-fit:cover;border-radius:10px;margin:4px 0;'/>` : ''}
-            <span style="font-size:12px;color:#059669;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:center;">${labelsText}</span>
+            ${labelsContainerHtml}
           </div>
         `;
         marker.bindPopup(popupHtml);
