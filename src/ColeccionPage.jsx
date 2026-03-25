@@ -449,7 +449,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
 
       <main className="pt-0">
         {/* Sección 1: Hero con trío de imágenes y buscador */}
-        <section className="relative w-full py-16 md:py-12 lg:py-20 coleccion-hero z-40">
+        <section className="relative w-full pt-16 pb-28 sm:py-16 md:py-12 lg:py-20 coleccion-hero z-40">
           <div className="relative z-10 flex flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-between md:gap-8 lg:gap-10 md:px-12">
             {/* Izquierda: trío de imágenes verticales */}
             <div className="w-full md:w-[45%] lg:w-auto flex justify-center">
@@ -504,7 +504,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                       </svg>
                     </button>
                     {tagMenuOpen && (
-                      <div className="absolute left-0 right-0 mt-2 rounded-xl bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[99] max-h-[180px] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-200">
+                      <div className="absolute left-0 right-0 mt-2 rounded-xl bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[99] max-h-[80px] sm:max-h-[180px] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-200">
                         <button
                           type="button"
                           onClick={() => { setSelectedTag(''); setTagMenuOpen(false); }}
@@ -536,7 +536,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                       </svg>
                     </button>
                     {sortMenuOpen && (
-                      <div className="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[99]">
+                      <div className="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[99] max-h-[80px] sm:max-h-[180px] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-200">
                         <button type="button" onClick={() => { setSortBy('recent'); setSortMenuOpen(false); }} className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500">Más recientes</button>
                         <button type="button" onClick={() => { setSortBy('az'); setSortMenuOpen(false); }} className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500">A - Z</button>
                         <button type="button" onClick={() => { setSortBy('za'); setSortMenuOpen(false); }} className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500">Z - A</button>
