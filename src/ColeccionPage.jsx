@@ -504,7 +504,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                       </svg>
                     </button>
                     {tagMenuOpen && (
-                      <div className="absolute left-0 right-0 mt-2 rounded-xl bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[99] max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-200">
+                      <div className="absolute left-0 right-0 mt-2 rounded-xl bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[99] max-h-[180px] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-200">
                         <button
                           type="button"
                           onClick={() => { setSelectedTag(''); setTagMenuOpen(false); }}
