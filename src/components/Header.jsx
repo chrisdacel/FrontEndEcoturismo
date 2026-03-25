@@ -52,28 +52,18 @@ export default function Header() {
 
   useEffect(() => {
     const root = document.documentElement;
-    const accessBtn = document.getElementById("accessibility-widget");
     
     if (mobileOpen) {
       root.style.overflow = "hidden";
-      if (accessBtn) {
-        accessBtn.style.opacity = "0";
-        accessBtn.style.pointerEvents = "none";
-      }
+      document.body.classList.add("mobile-menu-open");
     } else {
       root.style.overflow = "";
-      if (accessBtn) {
-        accessBtn.style.opacity = "1";
-        accessBtn.style.pointerEvents = "auto";
-      }
+      document.body.classList.remove("mobile-menu-open");
     }
     
     return () => {
       root.style.overflow = "";
-      if (accessBtn) {
-        accessBtn.style.opacity = "1";
-        accessBtn.style.pointerEvents = "auto";
-      }
+      document.body.classList.remove("mobile-menu-open");
     };
   }, [mobileOpen]);
 

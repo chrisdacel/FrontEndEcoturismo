@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import AdminOperatorRoute from './components/AdminOperatorRoute';
 import AccessibilityButton from './components/AccessibilityButton';
+import ScrollToTopFab from './components/ScrollToTopFab';
 
 // Lazy loaded pages
 const PreguntasFrecuentesPage = lazy(() => import('./PreguntasFrecuentesPage'));
@@ -746,6 +747,7 @@ function App() {
       <div className="min-h-screen bg-gradient-to-b from-[#0b2f2a] via-[#0f3f38] to-[#0b2f2a] text-white">
         <ScrollToTop />
         <ScrollReveal />
+        <ScrollToTopFab />
         <Header />
         <PageTransition>
           <AppRoutes />

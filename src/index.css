@@ -405,3 +405,10 @@ html.readable-font * {
   letter-spacing: 0.03em !important;
   word-spacing: 0.05em !important;
 }
+
+/* Ocultar botones flotantes cuando el menú móvil estÃ¡ abierto */
+body.mobile-menu-open #accessibility-widget,
+body.mobile-menu-open #scroll-to-top-widget {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

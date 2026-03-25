@@ -12,20 +12,11 @@ export default function ColeccionPageTurista({
 }) {
   const location = useLocation();
   const { user } = useAuth ? useAuth() : { user: null };
-  const [scrollToTop, setScrollToTop] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState([0, 0, 0]);
   const [searchText, setSearchText] = useState('');
   const [sitios, setSitios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollToTop(window.scrollY > 300);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     async function fetchSitios() {
@@ -49,10 +40,6 @@ export default function ColeccionPageTurista({
     }
     fetchSitios();
   }, [user, location.pathname]);
-
-  const scrollTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   const recomendaciones = [
     { img: '/images/Coleccion_sitios_ecoturisticos/paisaje_01.webp', title: 'Reserva La Nona', desc: 'Experiencia única en naturaleza' },
@@ -141,17 +128,6 @@ export default function ColeccionPageTurista({
           </div>
         </div>
       </header>
-
-      {/* Scroll to top button */}
-      {scrollToTop && (
-        <button
-          onClick={scrollTop}
-          className="fixed bottom-6 right-6 z-[9999] rounded-full bg-emerald-500 px-3 py-3 text-white shadow-lg shadow-emerald-500/40 transition hover:scale-110 hover:bg-emerald-600"
-          aria-label="Volver arriba"
-        >
-          ↑
-        </button>
-      )}
 
       <main>
         {/* Hero Section with Search */}

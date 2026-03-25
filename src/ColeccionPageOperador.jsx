@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faLinkedin, faYoutube, faInstagram } from '@fortawesome/free-brands-svg-icons';
 
 export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigateHome, onNavigateSobreNosotros, onNavigatePrivacidad, onNavigateSitio }) {
-  const [scrollToTop, setScrollToTop] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState([0, 0, 0]);
   const [searchText, setSearchText] = useState('');
 
@@ -20,18 +19,6 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
     { id: 3, nombre: "Bioparque Ukumarí", descripcion: "Experiencia educativa", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_03.webp" },
     { id: 4, nombre: "Alto del Nudo", descripcion: "Vistas panorámicas", imagen: "/images/Coleccion_sitios_ecoturisticos/paisaje_04.webp" }
   ];
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollToTop(window.scrollY > 100);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   const filteredSitios = useMemo(() => {
     if (!searchText.trim()) return sitios;
@@ -88,17 +75,6 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
           </div>
         </div>
       </header>
-
-      {/* Scroll to Top Button */}
-      {scrollToTop && (
-        <button
-          onClick={scrollTop}
-          className="fixed bottom-6 right-6 z-[9999] rounded-full bg-emerald-500 px-3 py-3 text-white shadow-lg shadow-emerald-500/40 transition hover:scale-110 hover:bg-emerald-600"
-          aria-label="Volver arriba"
-        >
-          ↑
-        </button>
-      )}
 
       {/* Main Content */}
       <main className="mt-16">

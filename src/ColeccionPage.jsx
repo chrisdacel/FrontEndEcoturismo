@@ -304,15 +304,6 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     { id: 'h3', nombre: 'Colibrí en juncos', imagen: '/images/Coleccion_sitios_ecoturisticos/paisaje_03.webp' },
   ];
 
-  // Scroll to top button
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollToTop(window.scrollY > 100);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   // Inicializar mapa
   useEffect(() => {
     if (isGuest) return;
@@ -428,10 +419,6 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     }
   }, [sitiosAPI, isGuest]);
 
-  const scrollToTopHandler = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const handleCarouselNext = (index) => {
     const newIndices = [...carouselIndex];
     if (newIndices[index] < sitios.length - 4) {
@@ -457,17 +444,6 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
 
   return (
     <div className="min-h-screen coleccion-shell text-slate-900 overflow-x-hidden pt-14">
-      {/* Scroll to Top Button */}
-      {scrollToTop && (
-        <button
-          onClick={scrollToTopHandler}
-          className="fixed bottom-6 right-6 z-[9999] rounded-full bg-emerald-500 px-3 py-3 text-white shadow-lg shadow-emerald-500/40 transition hover:scale-110 hover:bg-emerald-600"
-          aria-label="Volver arriba"
-        >
-          ↑
-        </button>
-      )}
-
       <main className="pt-0">
         {/* Sección 1: Hero con trío de imágenes y buscador */}
         <section className="relative w-full pt-16 pb-28 sm:py-16 md:py-12 lg:py-20 coleccion-hero z-40">
