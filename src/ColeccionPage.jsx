@@ -475,9 +475,9 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                 <p className="text-slate-700 md:text-sm lg:text-base">Busca sitios, actividades y experiencias sostenibles.</p>
               </div>
               
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full max-w-3xl">
+              <div className="flex flex-col 2xl:flex-row 2xl:items-center gap-3 md:gap-4 w-full max-w-3xl">
                 {/* Search bar */}
-                <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 w-full sm:flex-1 min-w-0 shadow-sm">
+                <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 w-full 2xl:flex-1 min-h-[44px] shadow-sm">
                   <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
                   </svg>
@@ -491,8 +491,8 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                 </div>
                 
                 {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                  <div className="relative w-full sm:w-56" ref={tagMenuRef}>
+                <div className="flex flex-row gap-3 md:gap-4 w-full 2xl:w-auto">
+                  <div className="relative flex-1 2xl:flex-none 2xl:w-56" ref={tagMenuRef}>
                     <button
                       type="button"
                       onClick={() => setTagMenuOpen((prev) => !prev)}
@@ -522,7 +522,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                     )}
                   </div>
 
-                  <div className="relative w-full sm:w-56" ref={sortMenuRef}>
+                  <div className="relative flex-1 2xl:flex-none 2xl:w-56" ref={sortMenuRef}>
                     <button
                       type="button"
                       onClick={() => setSortMenuOpen((prev) => !prev)}
