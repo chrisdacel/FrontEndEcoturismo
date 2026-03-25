@@ -415,7 +415,7 @@ export default function AdminSitesPage() {
                               onClick={(event) => {
                                 const rect = event.currentTarget.getBoundingClientRect();
                                 const spaceBelow = window.innerHeight - rect.bottom;
-                                setApprovalEditDirection(spaceBelow < 220 ? 'up' : 'down');
+                                setApprovalEditDirection(spaceBelow < 260 ? 'up' : 'down');
                                 setApprovalEditOpen((prev) => (prev === `mobile-${p.id}` ? null : `mobile-${p.id}`));
                               }}
                               disabled={approvalBusyId === p.id}
@@ -510,7 +510,7 @@ export default function AdminSitesPage() {
               )}
             </div>
 
-            <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200">
+            <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200 pb-44">
               <table className="min-w-full text-sm">
               <thead className="bg-white">
                 <tr>
@@ -572,7 +572,7 @@ export default function AdminSitesPage() {
                           onClick={(event) => {
                             const rect = event.currentTarget.getBoundingClientRect();
                             const spaceBelow = window.innerHeight - rect.bottom;
-                            setStatusEditDirection(spaceBelow < 220 ? 'up' : 'down');
+                            setStatusEditDirection(spaceBelow < 260 ? 'up' : 'down');
                             setStatusEditOpen((prev) => (prev === `table-status-${p.id}` ? null : `table-status-${p.id}`));
                           }}
                           disabled={statusBusyId === p.id}

@@ -312,7 +312,7 @@ export default function OperatorCommentsPage() {
               )}
             </div>
 
-            <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200">
+            <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200 pb-44">
               <table className="min-w-full text-sm">
               <thead className="bg-white">
                 <tr>

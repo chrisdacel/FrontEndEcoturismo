@@ -229,7 +229,7 @@ export default function AdminOperatorsPage() {
               onClick={(eventTarget) => {
                 const rect = eventTarget.currentTarget.getBoundingClientRect();
                 const spaceBelow = window.innerHeight - rect.bottom;
-                setEventMenuDirection(spaceBelow < 220 ? 'up' : 'down');
+                setEventMenuDirection(spaceBelow < 260 ? 'up' : 'down');
                 setEventMenuOpen((prev) => (prev === menuKey ? null : menuKey));
               }}
               disabled={eventApprovalBusyId === event.id}
@@ -457,7 +457,7 @@ export default function AdminOperatorsPage() {
                         onClick={(eventTarget) => {
                           const rect = eventTarget.currentTarget.getBoundingClientRect();
                           const spaceBelow = window.innerHeight - rect.bottom;
-                          setEventMenuDirection(spaceBelow < 220 ? 'up' : 'down');
+                          setEventMenuDirection(spaceBelow < 260 ? 'up' : 'down');
                           setEventMenuOpen((prev) => (prev === menuKey ? null : menuKey));
                         }}
                         disabled={eventApprovalBusyId === event.id}
@@ -548,7 +548,7 @@ export default function AdminOperatorsPage() {
             )}
           </div>
 
-          <div className="mt-4 hidden md:block min-h-[360px] overflow-visible bg-white border-b border-slate-200 pb-12">
+          <div className="mt-4 hidden md:block min-h-[360px] overflow-visible bg-white border-b border-slate-200 pb-44">
             <div className="relative overflow-x-auto overflow-y-visible">
               <table className="min-w-full text-sm">
                 <thead className="bg-white">

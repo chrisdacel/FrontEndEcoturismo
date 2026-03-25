@@ -209,7 +209,7 @@ export default function AdminEventsPage() {
         ) : (
           <>
             {/* Vista de tabla para escritorio */}
-            <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200">
+            <div className="hidden md:block overflow-x-auto bg-white border-b border-slate-200 pb-44">
               <table className="min-w-full text-sm">
                 <thead className="bg-white">
                   <tr>
@@ -257,7 +257,7 @@ export default function AdminEventsPage() {
                             onClick={(eventBtn) => {
                               const rect = eventBtn.currentTarget.getBoundingClientRect();
                               const spaceBelow = window.innerHeight - rect.bottom;
-                              setApprovalEditDirection(spaceBelow < 220 ? 'up' : 'down');
+                              setApprovalEditDirection(spaceBelow < 260 ? 'up' : 'down');
                               setApprovalEditOpen((prev) => (prev === `table-${event.id}` ? null : `table-${event.id}`));
                             }}
                             disabled={approvalBusyId === event.id}
