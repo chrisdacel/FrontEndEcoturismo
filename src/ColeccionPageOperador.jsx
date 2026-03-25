@@ -108,15 +108,20 @@ export default function ColeccionPageOperador({ userName = "Jane Mar", onNavigat
           <div className="relative flex h-full flex-col items-center justify-center px-8 text-white">
             <h1 className="mb-8 text-center text-4xl font-bold md:text-5xl">Conoce los mejores destinos turísticos en un clic</h1>
             <div className="w-full max-w-2xl">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  placeholder="Buscar destino..."
-                  className="coleccion-pill-input flex-1 rounded-lg border-2 border-white bg-white/90 px-6 py-3 text-slate-900 outline-none focus:border-[#267E1B]"
-                />
-                <button className="rounded-full bg-emerald-500 px-5 py-2.5 text-base font-semibold text-white hover:bg-emerald-600 transition md:px-8 md:py-3 md:text-lg">
+              <div className="flex gap-3 items-center">
+                <div className="flex w-full items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 shadow-sm">
+                  <svg className="h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    placeholder="Buscar destino..."
+                    className="w-full bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
+                  />
+                </div>
+                <button className="whitespace-nowrap rounded-full bg-emerald-500 px-5 py-2.5 text-base font-semibold text-white hover:bg-emerald-600 transition shadow-sm md:px-8 md:py-3 md:text-lg">
                   + Crear Sitio
                 </button>
               </div>

@@ -36,6 +36,10 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
   const [searchText, setSearchText] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
   const [sortBy, setSortBy] = useState('recent');
+  const [tagMenuOpen, setTagMenuOpen] = useState(false);
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const tagMenuRef = useRef(null);
+  const sortMenuRef = useRef(null);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
   const [recommendations, setRecommendations] = useState([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
@@ -69,6 +73,19 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     loadSites();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, location.pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tagMenuRef.current && !tagMenuRef.current.contains(event.target)) {
+        setTagMenuOpen(false);
+      }
+      if (sortMenuRef.current && !sortMenuRef.current.contains(event.target)) {
+        setSortMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (location.hash !== '#recomendaciones') return;
@@ -457,40 +474,71 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                 <h1 className="text-4xl md:text-3xl lg:text-5xl font-bold text-slate-900 leading-tight">Explora y conecta con la naturaleza</h1>
                 <p className="text-slate-700 md:text-sm lg:text-base">Busca sitios, actividades y experiencias sostenibles.</p>
               </div>
-              <div className="flex w-full max-w-3xl flex-col sm:flex-row items-center gap-3">
-                <div className="relative w-full sm:flex-1">
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-3xl z-30">
+                <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 flex-1 min-w-[250px] shadow-sm">
+                  <svg className="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
+                  </svg>
                   <input
                     type="text"
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     placeholder="Buscar destinos..."
-                    className="w-full rounded-lg border border-emerald-200 px-3 py-2.5 outline-none focus:ring-2 focus:ring-emerald-300 md:text-sm lg:text-base shadow-sm"
+                    className="w-full bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
                   />
-                  <svg className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
-                  </svg>
                 </div>
                 
-                <select
-                  value={selectedTag}
-                  onChange={(e) => setSelectedTag(e.target.value)}
-                  className="w-full sm:w-auto rounded-lg border border-emerald-200 bg-white px-3 py-2.5 text-slate-700 outline-none focus:ring-2 focus:ring-emerald-300 shadow-sm md:text-sm lg:text-base cursor-pointer"
-                >
-                  <option value="">Todas las etiquetas</option>
-                  {uniqueTags.map(tag => (
-                    <option key={tag} value={tag}>{tag}</option>
-                  ))}
-                </select>
+                <div className="relative w-full sm:w-56" ref={tagMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setTagMenuOpen((prev) => !prev)}
+                    className="inline-flex w-full items-center justify-between gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50 shadow-sm"
+                  >
+                    <span className="truncate">{selectedTag || 'Todas las etiquetas'}</span>
+                    <svg className={`h-4 w-4 transition-transform duration-200 ${tagMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {tagMenuOpen && (
+                    <div className="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[99]">
+                      <button
+                        type="button"
+                        onClick={() => { setSelectedTag(''); setTagMenuOpen(false); }}
+                        className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                      >Todas las etiquetas</button>
+                      {uniqueTags.map(tag => (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => { setSelectedTag(tag); setTagMenuOpen(false); }}
+                          className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500"
+                        >{tag}</button>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full sm:w-auto rounded-lg border border-emerald-200 bg-white px-3 py-2.5 text-slate-700 outline-none focus:ring-2 focus:ring-emerald-300 shadow-sm md:text-sm lg:text-base cursor-pointer"
-                >
-                  <option value="recent">Más recientes</option>
-                  <option value="az">A - Z</option>
-                  <option value="za">Z - A</option>
-                </select>
+                <div className="relative w-full sm:w-56" ref={sortMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setSortMenuOpen((prev) => !prev)}
+                    className="inline-flex w-full items-center justify-between gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50 shadow-sm"
+                  >
+                    <span className="truncate">
+                      {sortBy === 'recent' ? 'Más recientes' : sortBy === 'az' ? 'A - Z' : 'Z - A'}
+                    </span>
+                    <svg className={`h-4 w-4 transition-transform duration-200 ${sortMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {sortMenuOpen && (
+                    <div className="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden bg-white text-slate-800 shadow-lg ring-1 ring-slate-200/60 dropdown-open z-[99]">
+                      <button type="button" onClick={() => { setSortBy('recent'); setSortMenuOpen(false); }} className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500">Más recientes</button>
+                      <button type="button" onClick={() => { setSortBy('az'); setSortMenuOpen(false); }} className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500">A - Z</button>
+                      <button type="button" onClick={() => { setSortBy('za'); setSortMenuOpen(false); }} className="w-full px-4 py-2 text-left text-sm transition-colors hover:bg-slate-100 hover:text-emerald-500">Z - A</button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
