@@ -332,17 +332,20 @@ export default function CreateSitioPageLeaflet() {
     // Validaciones
     if (!formData.lat || !formData.lng) {
       setError('Por favor selecciona una ubicación en el mapa');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (selectedPreferences.length === 0) {
       setError('Selecciona al menos una etiqueta');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (!isEdit) {
       if (!images.portada || !images.clima_img || !images.caracteristicas_img || !images.flora_img || !images.infraestructura_img) {
         setError('Todas las imágenes son requeridas');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
     }
@@ -398,6 +401,7 @@ export default function CreateSitioPageLeaflet() {
       }
 
       setSuccess(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       if (isEdit) {
         setTimeout(() => {
           navigate(`${eventBasePath}/sitio/${id}`);

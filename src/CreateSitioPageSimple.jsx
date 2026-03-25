@@ -149,16 +149,19 @@ export default function CreateSitioPageSimple() {
     // Validaciones
     if (!formData.lat || !formData.lng) {
       setError('Por favor ingresa las coordenadas (latitud y longitud)');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (!images.portada || !images.clima_img || !images.caracteristicas_img || !images.flora_img || !images.infraestructura_img) {
       setError('Todas las imágenes son requeridas');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (selectedPreferences.length === 0) {
       setError('Selecciona al menos una etiqueta');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -190,11 +193,13 @@ export default function CreateSitioPageSimple() {
       await createPlace(formDataToSend);
 
       setSuccess(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       setTimeout(() => {
         navigate('/coleccion');
       }, 2000);
     } catch (err) {
       setError(err.message || 'Error creando sitio');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setLoading(false);
     }

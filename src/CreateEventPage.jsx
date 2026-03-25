@@ -154,35 +154,42 @@ export default function CreateEventPage() {
 
     if (!formData.title.trim()) {
       setError('El titulo del evento es obligatorio');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (!formData.starts_at) {
       setError('La fecha y hora del evento es obligatoria');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     if (!formData.ends_at) {
       setError('La fecha y hora de finalización es obligatoria');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     const currentDateError = getDateError(formData.starts_at);
     if (currentDateError) {
       setDateError(currentDateError);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     const currentEndDateError = getEndDateError(formData.starts_at, formData.ends_at);
     if (currentEndDateError) {
       setEndDateError(currentEndDateError);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (!imageFile) {
       setError('La imagen del evento es obligatoria');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     if (imageError) {
       setError(imageError);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -198,12 +205,14 @@ export default function CreateEventPage() {
       await api.post(`/api/places/${id}/events`, payload);
 
       setSuccess(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       setTimeout(() => {
         navigate(`${basePath}/sitio/${id}#evento`);
       }, 1200);
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || 'Error creando el evento';
       setError(message);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setSaving(false);
     }
