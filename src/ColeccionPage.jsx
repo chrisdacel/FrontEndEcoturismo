@@ -447,9 +447,9 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
       <main className="pt-0">
         {/* Sección 1: Hero con trío de imágenes y buscador */}
         <section className="relative w-full pt-16 pb-28 sm:py-16 md:py-12 lg:py-20 coleccion-hero z-40">
-          <div className="relative z-10 flex flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-center xl:gap-16 2xl:gap-24 md:px-12 max-w-[1536px] mx-auto">
+          <div className="relative z-10 flex flex-col items-center gap-12 px-6 lg:flex-row lg:items-center lg:justify-center xl:gap-16 2xl:gap-24 md:px-12 max-w-[1536px] mx-auto">
             {/* Izquierda: trío de imágenes verticales */}
-            <div className="w-full md:w-auto flex justify-center">
+            <div className="w-full lg:w-auto flex justify-center">
               <div className="flex w-full md:w-auto gap-4 lg:gap-6 xl:gap-8 justify-center">
                 {heroShots.map((shot, idx) => (
                   <div key={shot.id} className="flex items-end w-[30vw] sm:w-[130px] md:w-[150px] lg:w-[180px] xl:w-[210px]">
@@ -466,8 +466,8 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
             </div>
 
             {/* Derecha: Título y Buscador */}
-            <div className="relative z-10 w-full md:w-[45%] lg:w-[450px] xl:w-[500px] flex flex-col items-center md:items-start gap-6 lg:gap-8 shrink-0">
-              <div className="text-center md:text-left space-y-2">
+            <div className="relative z-10 w-full lg:w-[450px] xl:w-[500px] flex flex-col items-center lg:items-start gap-6 lg:gap-8 shrink-0">
+              <div className="text-center lg:text-left space-y-2">
                 <h1 className="text-3xl min-[400px]:text-4xl md:text-3xl lg:text-5xl font-bold text-slate-900 leading-tight">Explora y conecta con la naturaleza</h1>
                 <p className="text-slate-700 md:text-sm lg:text-base">Busca sitios, actividades y experiencias sostenibles.</p>
               </div>
