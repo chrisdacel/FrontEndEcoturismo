@@ -33,6 +33,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
   const [success, setSuccess] = useState('');
   const [ageError, setAgeError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [emailError, setEmailError] = useState('');
 
   const calculateAge = (dateString) => {
     if (!dateString) return null;
@@ -94,6 +95,12 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
 
     if (!validatePassword(password)) {
       setError(passwordError);
+      return;
+    }
+
+    // Validar email básico
+    if (!email.includes('@') || !email.includes('.')) {
+      setError('El correo debe contener al menos un @ y un punto (.)');
       return;
     }
     
@@ -231,11 +238,22 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEmail(val);
+                      if (val.length > 0 && (!val.includes('@') || !val.includes('.'))) {
+                        setEmailError('El correo debe contener al menos un @ y un punto (.)');
+                      } else {
+                        setEmailError('');
+                      }
+                    }}
                     required
                     className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-white placeholder:text-emerald-100/60 outline-none focus:ring-2 focus:ring-emerald-400/60"
                     placeholder="tu@correo.com"
                   />
+                  {emailError && (
+                    <p className="mt-1 text-xs text-red-300">{emailError}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-emerald-100">País</label>
@@ -361,6 +379,7 @@ export default function RegisterPage({ onNavigateHome, onNavigateLogin, onNaviga
                   loading ||
                   ageError !== '' ||
                   passwordError !== '' ||
+                  emailError !== '' ||
                   name.trim().length < 2 ||
                   lastName.trim().length < 2 ||
                   password.trim().length === 0 ||
