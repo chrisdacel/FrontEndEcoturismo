@@ -450,18 +450,18 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
       <main className="pt-0">
         {/* Sección 1: Hero con trío de imágenes y buscador */}
         <section className="relative w-full pt-16 pb-28 sm:py-16 md:py-12 lg:py-20 coleccion-hero z-40">
-          <div className="relative z-10 flex flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-between md:gap-8 lg:gap-10 md:px-12">
+          <div className="relative z-10 flex flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-center xl:gap-16 2xl:gap-24 md:px-12 max-w-[1536px] mx-auto">
             {/* Izquierda: trío de imágenes verticales */}
-            <div className="w-full md:w-[45%] lg:w-auto flex justify-center">
-              <div className="flex w-full gap-4 md:gap-3 lg:gap-5 justify-center">
+            <div className="w-full md:w-auto flex justify-center">
+              <div className="flex w-full md:w-auto gap-4 lg:gap-6 xl:gap-8 justify-center">
                 {heroShots.map((shot, idx) => (
-                  <div key={shot.id} className="flex items-end">
+                  <div key={shot.id} className="flex items-end w-[30vw] sm:w-[130px] md:w-[150px] lg:w-[180px] xl:w-[210px]">
                     <img fetchpriority="high" decoding="async"
                       src={shot.imagen}
                       alt={shot.nombre}
                       style={{ opacity: 0, transition: `opacity 0.8s ease ${idx * 0.2}s, transform 0.8s ease ${idx * 0.2}s`, transform: 'translateY(18px)' }}
                       onLoad={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
-                      className={`object-cover rounded-[18px] sm:rounded-[22px] shadow-lg w-[30vw] max-w-[140px] h-[220px] min-[400px]:h-[320px] md:w-[110px] md:h-[260px] lg:w-[200px] lg:h-[440px] ${idx === 1 ? 'h-[240px] min-[400px]:h-[340px] md:h-[290px] lg:h-[470px]' : ''}`}
+                      className={`object-cover rounded-[18px] sm:rounded-[22px] shadow-lg w-full h-[220px] min-[400px]:h-[320px] md:h-[260px] lg:h-[440px] xl:h-[480px] ${idx === 1 ? 'h-[240px] min-[400px]:h-[340px] md:h-[290px] lg:h-[470px] xl:h-[510px]' : ''}`}
                     />
                   </div>
                 ))}
@@ -469,15 +469,16 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
             </div>
 
             {/* Derecha: Título y Buscador */}
-            <div className="relative z-10 flex-1 w-full md:w-[55%] flex flex-col items-center md:items-start gap-6 md:gap-6 lg:gap-8">
+            <div className="relative z-10 w-full md:w-[45%] lg:w-[450px] xl:w-[500px] flex flex-col items-center md:items-start gap-6 lg:gap-8 shrink-0">
               <div className="text-center md:text-left space-y-2">
                 <h1 className="text-3xl min-[400px]:text-4xl md:text-3xl lg:text-5xl font-bold text-slate-900 leading-tight">Explora y conecta con la naturaleza</h1>
                 <p className="text-slate-700 md:text-sm lg:text-base">Busca sitios, actividades y experiencias sostenibles.</p>
               </div>
               
-              <div className="flex flex-col 2xl:flex-row 2xl:items-center gap-3 md:gap-4 w-full max-w-3xl">
+              {/* Contenedor con max-w-[500px] para encoger tamaño global del buscador y filtros */}
+              <div className="flex flex-col gap-3 md:gap-4 w-full max-w-[500px]">
                 {/* Search bar */}
-                <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 w-full 2xl:flex-1 min-h-[44px] shadow-sm">
+                <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 w-full min-h-[44px] shadow-sm">
                   <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.6-4.15a7.75 7.75 0 11-15.5 0 7.75 7.75 0 0115.5 0z" />
                   </svg>
@@ -491,8 +492,8 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                 </div>
                 
                 {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full 2xl:w-auto">
-                  <div className="relative flex-1 2xl:flex-none 2xl:w-56" ref={tagMenuRef}>
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full">
+                  <div className="relative flex-1" ref={tagMenuRef}>
                     <button
                       type="button"
                       onClick={() => setTagMenuOpen((prev) => !prev)}
@@ -522,7 +523,7 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
                     )}
                   </div>
 
-                  <div className="relative flex-1 2xl:flex-none 2xl:w-56" ref={sortMenuRef}>
+                  <div className="relative flex-1" ref={sortMenuRef}>
                     <button
                       type="button"
                       onClick={() => setSortMenuOpen((prev) => !prev)}
