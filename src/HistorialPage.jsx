@@ -20,8 +20,8 @@ export default function HistorialPage() {
         setLoading(true);
         setError('');
         const [historyData, reviewData] = await Promise.all([
-          fetchUserHistory(8),
-          fetchUserReviews(8),
+          fetchUserHistory(500),
+          fetchUserReviews(500),
         ]);
         setHistory(Array.isArray(historyData) ? historyData : []);
         setReviews(Array.isArray(reviewData) ? reviewData : []);
@@ -80,9 +80,14 @@ export default function HistorialPage() {
                     <div key={key} className="rounded-xl border border-slate-200 bg-white p-4">
                       <p className="text-sm font-semibold text-slate-900">{placeName}</p>
                       <p className="mt-1 text-xs text-slate-600">{placeLocalization}</p>
-                      <p className="mt-2 text-xs text-slate-500">
-                        Ultima visita: {item.visited_at ? new Date(item.visited_at).toLocaleString() : '—'}
-                      </p>
+                      <div className="mt-2 flex items-center justify-between">
+                        <p className="text-xs text-slate-500">
+                          Última visita: {item.visited_at ? new Date(item.visited_at).toLocaleString() : '—'}
+                        </p>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                          {item.visits_count || 1} {(item.visits_count || 1) === 1 ? 'visita' : 'visitas'}
+                        </span>
+                      </div>
                     </div>
                   );
                 })}
@@ -96,9 +101,10 @@ export default function HistorialPage() {
                 <table className="w-full text-sm table-fixed">
                   <thead className="bg-white">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-1/3 truncate">Sitio</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-1/3 truncate">Ubicación</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-1/3 truncate">Última visita</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-[30%] truncate">Sitio</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-[30%] truncate">Ubicación</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-[15%] truncate">Visitas</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 w-[25%] truncate">Última visita</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
@@ -111,13 +117,18 @@ export default function HistorialPage() {
                         <tr key={key} className="hover:bg-slate-50">
                           <td className="px-4 py-3 text-slate-800 break-words max-w-xs">{placeName}</td>
                           <td className="px-4 py-3 text-slate-600 break-words max-w-xs">{placeLocalization}</td>
+                          <td className="px-4 py-3 text-slate-700">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                              {item.visits_count || 1}
+                            </span>
+                          </td>
                           <td className="px-4 py-3 text-slate-600 text-xs break-words max-w-xs">{item.visited_at ? new Date(item.visited_at).toLocaleString() : '—'}</td>
                         </tr>
                       );
                     })}
                     {history.length === 0 && (
                       <tr>
-                        <td colSpan="3" className="px-4 py-6 text-center text-slate-600">No hay visitas recientes</td>
+                        <td colSpan="4" className="px-4 py-6 text-center text-slate-600">No hay visitas recientes</td>
                       </tr>
                     )}
                   </tbody>
