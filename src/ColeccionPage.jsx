@@ -351,12 +351,20 @@ export default function ColeccionPage({ onNavigateHome, onNavigateLogin, onNavig
     const layer = markersLayerRef.current;
     layer.clearLayers();
 
+    const customPin = L.divIcon({
+      className: 'custom-pin',
+      html: `<div style="width: 20px; height: 20px; background-color: #059669; border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);"></div>`,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+      popupAnchor: [0, -12]
+    });
+
     const bounds = [];
     sitiosAPI.forEach((sitio) => {
       const lat = parseFloat(sitio.lat);
       const lng = parseFloat(sitio.lng);
       if (Number.isFinite(lat) && Number.isFinite(lng)) {
-        const marker = L.marker([lat, lng]);
+        const marker = L.marker([lat, lng], { icon: customPin });
         const labelsList = Array.isArray(sitio.label) ? sitio.label : (Array.isArray(sitio.labels) ? sitio.labels : []);
         const badgesHtml = labelsList.filter(Boolean).slice(0, 3).map(labelObj => {
           const name = labelObj?.name || (typeof labelObj === 'string' ? labelObj : null);

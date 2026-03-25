@@ -255,7 +255,7 @@ export default function SitioDetailPage({
       // Inicializar mapa
       mapInstanceRef.current = L.map(mapRef.current, {
         scrollWheelZoom: false // Desactivado por defecto
-      }).setView([sitio.lat, sitio.lng], 13);
+      }).setView([sitio.lat, sitio.lng], 16);
 
       // Activar zoom de scroll solo tras hacer clic; desactivarlo al sacar el mouse
       mapInstanceRef.current.on('click', () => {
