@@ -69,7 +69,7 @@ export default function AdminDashboardPage() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg p-4 flex flex-col gap-3">
+            <div className="bg-white rounded-lg p-4 flex flex-col gap-3 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div className="rounded-full bg-emerald-100 p-3">
                   <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,7 +82,7 @@ export default function AdminDashboardPage() {
               <h3 className="text-sm font-medium text-slate-600">Turistas activos</h3>
             </div>
 
-            <div className="bg-white rounded-lg p-4 flex flex-col gap-3">
+            <div className="bg-white rounded-lg p-4 flex flex-col gap-3 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div className="rounded-full bg-indigo-100 p-3">
                   <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +95,7 @@ export default function AdminDashboardPage() {
               <h3 className="text-sm font-medium text-slate-600">Operadores activos</h3>
             </div>
 
-            <div className="bg-white rounded-lg p-4 flex flex-col gap-3">
+            <div className="bg-white rounded-lg p-4 flex flex-col gap-3 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div className="rounded-full bg-amber-100 p-3">
                   <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,7 +108,7 @@ export default function AdminDashboardPage() {
               <h3 className="text-sm font-medium text-slate-600">Sitios activos</h3>
             </div>
 
-            <div className="bg-white rounded-lg p-4 flex flex-col gap-3">
+            <div className="bg-white rounded-lg p-4 flex flex-col gap-3 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div className="rounded-full bg-rose-100 p-3">
                   <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
