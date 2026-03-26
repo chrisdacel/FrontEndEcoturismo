@@ -396,15 +396,15 @@ export default function SitioDetailPage({
     recent: 'Mas recientes',
     highest: 'Mejor calificacion',
     lowest: 'Peor calificacion',
-    most_likes: 'Mas me gusta',
-    most_dislikes: 'Mas no me gusta',
+    most_likes: 'Mas likes',
+    most_dislikes: 'Mas dislikes',
   };
   const filterOptions = [
     { value: 'recent', label: 'Mas recientes' },
     { value: 'highest', label: 'Mejor calificacion' },
     { value: 'lowest', label: 'Peor calificacion' },
-    { value: 'most_likes', label: 'Mas me gusta' },
-    { value: 'most_dislikes', label: 'Mas no me gusta' },
+    { value: 'most_likes', label: 'Mas likes' },
+    { value: 'most_dislikes', label: 'Mas dislikes' },
   ];
   const daysOfWeek = [
     { key: 'lunes', label: 'Lunes' },
