@@ -1141,13 +1141,13 @@ export default function SitioDetailPage({
                 <h2 className="text-2xl sm:text-3xl font-semibold text-emerald-700">Comentarios</h2>
                 <span className="text-xs sm:text-sm text-slate-600">{reviews.length} comentario(s)</span>
               </div>
-              <div className="flex items-center gap-2 mt-2 sm:mt-0 w-full sm:w-auto">
-                <label className="text-xs sm:text-sm font-semibold text-slate-700 whitespace-nowrap">Ordenar por:</label>
-                <div className="relative min-w-[110px] max-w-[150px] w-full sm:w-auto" ref={filterMenuRef}>
+              <div className="flex items-center justify-between sm:justify-start gap-2 mt-2 sm:mt-0 w-full sm:w-auto">
+                <label className="text-sm font-semibold text-slate-700 whitespace-nowrap">Ordenar por:</label>
+                <div className="relative w-full sm:w-auto min-w-[160px]" ref={filterMenuRef}>
                   <button
                     type="button"
                     onClick={() => setFilterMenuOpen((prev) => !prev)}
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50 min-w-[100px] max-w-[140px] w-full sm:w-auto"
+                    className="inline-flex w-full items-center justify-between gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 ring-1 ring-emerald-200 transition hover:bg-emerald-50 shadow-sm"
                   >
                     <span className="truncate">{filterLabels[filterType] || 'Mas recientes'}</span>
                     <svg
