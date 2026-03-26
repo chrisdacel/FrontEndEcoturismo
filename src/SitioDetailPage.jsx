@@ -170,9 +170,43 @@ export default function SitioDetailPage({
         return dateB - dateA;
       });
     } else if (filterType === 'highest') {
-      sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      sorted.sort((a, b) => {
+        const ratingA = a.rating || 0;
+        const ratingB = b.rating || 0;
+        if (ratingA !== ratingB) return ratingB - ratingA;
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
     } else if (filterType === 'lowest') {
-      sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+      sorted.sort((a, b) => {
+        const ratingA = a.rating || 0;
+        const ratingB = b.rating || 0;
+        if (ratingA === 0 && ratingB !== 0) return 1;
+        if (ratingB === 0 && ratingA !== 0) return -1;
+        if (ratingA !== ratingB) return ratingA - ratingB;
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
+    } else if (filterType === 'most_likes') {
+      sorted.sort((a, b) => {
+        const likesA = a.likes_count || 0;
+        const likesB = b.likes_count || 0;
+        if (likesA !== likesB) return likesB - likesA;
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
+    } else if (filterType === 'most_dislikes') {
+      sorted.sort((a, b) => {
+        const dislikesA = a.dislikes_count || 0;
+        const dislikesB = b.dislikes_count || 0;
+        if (dislikesA !== dislikesB) return dislikesB - dislikesA;
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
     }
 
     // Si el usuario está logueado y tiene comentario, mostrarlo primero solo para él
@@ -362,11 +396,15 @@ export default function SitioDetailPage({
     recent: 'Mas recientes',
     highest: 'Mejor calificacion',
     lowest: 'Peor calificacion',
+    most_likes: 'Mas me gusta',
+    most_dislikes: 'Mas no me gusta',
   };
   const filterOptions = [
     { value: 'recent', label: 'Mas recientes' },
     { value: 'highest', label: 'Mejor calificacion' },
     { value: 'lowest', label: 'Peor calificacion' },
+    { value: 'most_likes', label: 'Mas me gusta' },
+    { value: 'most_dislikes', label: 'Mas no me gusta' },
   ];
   const daysOfWeek = [
     { key: 'lunes', label: 'Lunes' },
