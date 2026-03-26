@@ -571,7 +571,7 @@ export default function Header() {
 
       {/* Mobile Menu Full Screen Overlay */}
       <div 
-        className={`fixed inset-0 z-[60] xl:hidden flex flex-col backdrop-blur-md bg-white/80 supports-[backdrop-filter]:bg-white/80 border-b border-slate-200/50 text-slate-900 overflow-y-auto transition-transform duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform ${
+        className={`fixed inset-0 z-[9998] xl:hidden flex flex-col backdrop-blur-md bg-white/80 supports-[backdrop-filter]:bg-white/80 border-b border-slate-200/50 text-slate-900 overflow-y-auto transition-transform duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform ${
           mobileOpen ? "translate-y-0" : "-translate-y-full pointer-events-none"
         }`}
       >
